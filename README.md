@@ -1,0 +1,1 @@
+A secure fitness web application that allows gym members to log workouts and submit exercise videos for trainer feedback.
