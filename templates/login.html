@@ -1,0 +1,17 @@
+<!DOCTYPE html> <!--Informs the browser that the page is an HTML5 document-->
+<html lang="en"> <!--Specifies the content is in english improving accessibily-->
+    <head> <!--Contains metadata-->
+        <meta charset="UTF-8"> <!--Informs the browser how to interpret characters supporting various letter, symbols and accents-->
+        <title>Login</title> <!--Name of browser tab-->
+    </head>
+    <body> <!--What the user sees/interacts with-->
+        <h2>Login</h2> <!--Informs the user to login to their account-->
+        <form action="/login" method = "POST"> <!--Sends data to flask's login route POST meants that the data is not sent in the url to ensure security-->
+            <label>Username: </label> <br> <!--Allows the user to input a username-->
+            <input type = "text" name = "username" required> <br> <br>
+            <label>Password: </label> <br> <!--Allows the user to input a password-->
+            <input type = "password" name = "password" required> <br> <br>
+            <button type="submit">Login</button> <!--Submits the form and calls the Login route-->
+        </form>
+    </body>
+</html>
