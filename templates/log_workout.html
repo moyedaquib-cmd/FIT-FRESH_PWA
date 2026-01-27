@@ -1,0 +1,21 @@
+<!DOCTYPE html> <!--Informs the browser that the page is an HTML5 document-->
+<html lang="en"> <!--Specifies the content is in english improving accessibily-->
+    <head> <!--Contains metadata-->
+        <meta charset="UTF-8"> <!--Informs the browser how to interpret characters supporting various letter, symbols and accents-->
+        <title>Workout Log</title> <!--Name of browser tab-->
+    </head>
+    <body> <!--What the user sees/interacts with-->
+        <h2>Log Your Workout</h2> <!--Informs the user to log their workout-->
+        <form action="/log-workout" method = "POST"> <!--Sends data to flask's log-workout route POST meants that the data is not sent in the url to ensure security-->
+            <label>Exercise Name: </label> <br> <!--Name of the exercise-->
+            <input type = "text" name = "exercise" required> <br> <br>
+            <label>Sets: </label> <br> <!--Stores how many sets the user performed while preventing invalid values like negative values -->
+            <input type = "number" name = "sets" min="1" required> <br> <br>
+            <label>Reps: </label> <br> <!--Stores how many reps the user performed while preventing invalid values like negative values -->
+            <input type = "number" name = "reps" min="1" required> <br> <br> 
+            <label>Weight: </label> <br> <!--Stores the weight of the exercise while allowing for decimals but not enabling negative values-->
+            <input type = "number" name = "weight" step="0.1" min="0" required> <br> <br>
+            <button type="submit">SAVE</button> <!--Submits the form and calls the log-workout route-->
+        </form>
+    </body>
+</html>

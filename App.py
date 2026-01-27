@@ -1,7 +1,7 @@
 import os #Allows python to interact with the operating system
-from flask import Flask, request, redirect, url_for, render_template, session #Imports flask which I will use to create my PWA, request which reads data sent from forms
-from DB_Models import db, User #Imports the database controller object I created and the user table
-from werkzeug.security import generate_password_hash, check_password_hash #Allows plaintext passwords to be stored as hashed values and checks between hashed passwords and plaintext passwords to match them, render_template to render HTML files from the templates directory, session to remember information like login status
+from flask import Flask, request, redirect, url_for, render_template, session #Imports flask which I will use to create my PWA, request which reads data sent from forms, render_template to render HTML files from the templates directory, session to remember information like login status, redirect to send a user to a different URL, url_for to generate a path to a different URL without having to code an entirely new one
+from DB_Models import db, User, Workout #Imports the database controller object I created and the user table
+from werkzeug.security import generate_password_hash, check_password_hash #Allows plaintext passwords to be stored as hashed values and checks between hashed passwords and plaintext passwords to match them
 app = Flask(__name__) #This line creates the flask application
 basedir = os.path.abspath(os.path.dirname(__file__)) #This line of code is used to turn the path into a fully resolved absolute path so that the program works on all operating systems. "__file__" relates to the full path of the file being executed. "os.path.dirname(__file__)" removes the file name 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "instance", "app.db") #This line builds the file path while telling flask exactly where the database is located. "SQLite:///" informs Flask to use SQLite and create an absolute path. "os.path.join" builds the file path. This makes it so that the program works with any operating systems and resolves correctly every time.
@@ -41,10 +41,29 @@ def login():
     session["user_id"] = user.id #Stores the user's unique ID allowing easy identification of the logged-in user
     session["role"] = user.role #Stores the role of the user to enable role-based access control
     return redirect(url_for("home"))
+@app.route("/log-workout", methods=["GET"]) #Returns the page where the user can log workouts
+def log_workout_page(): 
+    if "user_id" not in session: #Redirects the user to the login page if their details are not found in the database
+        return redirect(url_for("login"))
+    return render_template("log_workout.html")
+@app.route("/log-workout", methods=["POST"])
+def log_workout():
+    if "user_id" not in session: 
+        return redirect (url_for("login"))
+    exercise = request.form.get("exercise")
+    sets = request.form.get("sets")
+    reps = request.form.get("reps")
+    weight = request.form.get("weight")
+    if not exercise or not sets or not reps or not weight:
+        return "Please fill in all the fields", 400
+    workout = Workout(user_id = session["user_id"], exercise = exercise, sets = int(sets), reps = int(reps), weight = float(weight))
+    db.session.add(workout)
+    db.session.commit()
+    return "Workout Logged!"
 @app.route("/")
 def home():
     return "RUNNING"
 if __name__ == "__main__":
+    #with app.app_context():
+        #db.create_all()
     app.run(debug = True)
-#with app.app_context():
-    #db.create_all()
