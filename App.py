@@ -1,12 +1,18 @@
 import os #Allows python to interact with the operating system
 from flask import Flask, request, redirect, url_for, render_template, session #Imports flask which I will use to create my PWA, request which reads data sent from forms, render_template to render HTML files from the templates directory, session to remember information like login status, redirect to send a user to a different URL, url_for to generate a path to a different URL without having to code an entirely new one
-from DB_Models import db, User, Workout #Imports the database controller object I created and the user table
+from DB_Models import db, User, Workout, CalorieEntry #Imports the database controller object I created and the user table
+from datetime import datetime #Imports datetime which allows the user to have the time they logged their calories/workouts saved
 from werkzeug.security import generate_password_hash, check_password_hash #Allows plaintext passwords to be stored as hashed values and checks between hashed passwords and plaintext passwords to match them
+import pytz #A timezone database to convert to ohter timezones
 app = Flask(__name__) #This line creates the flask application
 basedir = os.path.abspath(os.path.dirname(__file__)) #This line of code is used to turn the path into a fully resolved absolute path so that the program works on all operating systems. "__file__" relates to the full path of the file being executed. "os.path.dirname(__file__)" removes the file name 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "instance", "app.db") #This line builds the file path while telling flask exactly where the database is located. "SQLite:///" informs Flask to use SQLite and create an absolute path. "os.path.join" builds the file path. This makes it so that the program works with any operating systems and resolves correctly every time.
 app.config["SECRET_KEY"] = "oJvneTznic84TgELjsKA" #This is a secret key used by flask to lock the login sessions so that people with no knowledge of the key cant access important information and tamper with cookies.
 db.init_app(app) #Connects the database to the app
+
+def local_time(utc_dt): #A function that Converts UTC to Sydney Time
+    local_tz = pytz.timezone("Australia/Sydney") #The tiemzone it converts to is Sydney, Australia
+    return utc_dt.replace(tzinfo=pytz.utc).astimezone(local_tz) #Replaces UTC with the timezone of Sydney Australia
 
 @app.route("/") #The home page
 def home():
@@ -89,6 +95,29 @@ def workout_history():
         return redirect(url_for("home"))
     workouts = Workout.query.filter_by(user_id = session["user_id"]).order_by(Workout.workout_date.desc()).all() #Workouts are sorted by the date that they are added (descending)
     return render_template("workout_history.html", workouts = workouts)
+
+@app.route("/log-calories", methods = ["GET", "POST"]) #Returns the page where the user can log calories
+def log_calories():
+    if "user_id" not in session:
+        return redirect(url_for("home"))
+    if request.method == "GET":
+        return render_template("log_calories.html")
+    meal = request.form.get("meal")
+    calories = request.form.get("calories")
+    if not calories or not meal:
+        return "Please fill in all the fields", 400
+    calorie_entry = CalorieEntry(user_id = session["user_id"], meal = meal, calories = int(calories))
+    db.session.add(calorie_entry)
+    db.session.commit()
+    return redirect(url_for("calorie_history"))
+@app.route("/calorie-history")  #The place where the user can see their calorie history (all the calories they have tracked)
+def calorie_history():
+    if "user_id" not in session:
+        return redirect(url_for("home"))
+    entries = CalorieEntry.query.filter_by(user_id = session["user_id"]).order_by(CalorieEntry.entry_date.desc()).all()
+    for entry in entries: #Converts UTC to local time
+        entry.local_time = local_time(entry.entry_date)
+    return render_template("calorie_tracker.html", entries = entries)
 
 @app.route("/logout") #Ends the app if the user chooses to
 def logout():

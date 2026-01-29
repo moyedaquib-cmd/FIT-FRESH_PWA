@@ -1,0 +1,18 @@
+<!DOCTYPE html> <!--Informs the browser that the page is an HTML5 document-->
+<html lang="en"> <!--Specifies the content is in english improving accessibily-->
+    <head> <!--Contains metadata-->
+        <meta charset="UTF-8"> <!--Informs the browser how to interpret characters supporting various letter, symbols and accents-->
+        <title>Calorie Tracker</title> <!--Name of browser tab-->
+    </head>
+    <body> <!--What the user sees/interacts with-->
+        <h2>Track Your Workout</h2> <!--Informs the user to track their calories-->
+        <form method = "POST">
+            <label>Meal: </label> <br> <!--What meal the user ate-->
+            <input type = "text" name = "meal" required> <br> <br>
+            <label>Calories: </label> <br> <!--How many calories were in the meal-->
+            <input type = "number" name = "calories" min="0" required> <br> <br> 
+            <button type="submit">SAVE</button> 
+        </form>
+        <a href="/">Back to Home</a> <!--Sends the user back to the home page-->
+    </body>
+</html>

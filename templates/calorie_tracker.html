@@ -1,0 +1,33 @@
+<!--This file uses Jinja2 which is flask's templating engine-->
+<!DOCTYPE html>
+<html lang = "en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Calorie Viewing</title>
+    </head>
+    <body>
+        <h2>View Your Calories</h2> 
+        {%if entries %} <!--Flask checks if a table named entries exists. If it does then it shows the table and if not it informs the users that there are no calories logged-->
+            <table border="1" cellpadding = "5"> <!--Creates a table with a border and cell spacing-->
+                <tr> <!--Rows of the table-->
+                    <th>Date</th> <!--Table headings-->
+                    <th>Time</th>
+                    <th>Meal</th>
+                    <th>Calories</th>
+                </tr>
+            {% for entry in entries %} <!--A loop that goes over each workout object from the database to display them 1 row at a time-->
+            <tr>
+                <td>{{ entry.entry_date.strftime("%d %b %Y")}}</td> <!--Columns in the row (table data). This one is the date logged-->
+                <td>{{ entry.local_time.strftime("%I:%M %p") }}</td> <!--This one is the time-->
+                <td>{{ entry.meal}}</td> <!--The meal-->
+                <td>{{ entry.calories }}</td> <!--The calories in the meal-->
+            </tr>
+            {% endfor %} <!--Ends the loop-->
+            </table>
+        {% else %}
+            <p>No Calories Tracked</p>
+        {% endif %} <!--Ends the if statement-->
+        <br>
+        <a href="/">Back to Home</a> <!--Allows the user to go back to the home page-->
+    </body>
+</html>
