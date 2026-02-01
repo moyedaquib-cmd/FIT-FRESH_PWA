@@ -84,6 +84,12 @@ def log_workout():
     weight = request.form.get("weight")
     if not exercise or not sets or not reps or not weight:
         return "Please fill in all the fields", 400
+    if int(sets) < 0:
+        return "Sets must be positive", 400
+    if int(reps) < 0:
+        return "Reps must be positive", 400
+    if float(weight) < 0:
+        return "Weight must be positive", 400
     workout = Workout(user_id = session["user_id"], exercise = exercise, sets = int(sets), reps = int(reps), weight = float(weight))
     db.session.add(workout)
     db.session.commit()
@@ -106,7 +112,9 @@ def log_calories():
     calories = request.form.get("calories")
     if not calories or not meal:
         return "Please fill in all the fields", 400
-    calorie_entry = CalorieEntry(user_id = session["user_id"], meal = meal, calories = int(calories))
+    if float(calories) < 0:
+        return "Calories must be positive", 400
+    calorie_entry = CalorieEntry(user_id = session["user_id"], meal = meal, calories = float(calories))
     db.session.add(calorie_entry)
     db.session.commit()
     return redirect(url_for("calorie_history"))
@@ -118,6 +126,58 @@ def calorie_history():
     for entry in entries: #Converts UTC to local time
         entry.local_time = local_time(entry.entry_date)
     return render_template("calorie_tracker.html", entries = entries)
+
+@app.route("/edit-workout/<int:workout_id>", methods = ["GET", "POST"]) #A feature to update a row
+def edit_workout(workout_id):
+    if "user_id" not in session:
+        return redirect(url_for("home"))
+    workout = Workout.query.get_or_404(workout_id) #Searches the table and returns a 404 error if nnothing is found
+    if workout.user_id != session ["user_id"]:
+        return "Unauthorised user", 403
+    if request.method == "GET":
+        return render_template("edit_workout.html", workout = workout)
+    workout.exercise = request.form.get("exercise")
+    workout.sets = int(request.form.get("sets"))
+    workout.reps = int(request.form.get("reps"))
+    workout.weight = float(request.form.get("weight"))
+    db.session.commit()
+    return redirect(url_for("workout_history"))
+
+@app.route("/delete-workout/<int:workout_id>", methods = ["POST"]) #A feature to delete a row
+def delete_workout(workout_id):
+    if "user_id" not in session:
+        return redirect(url_for("home"))
+    workout = Workout.query.get_or_404(workout_id)
+    if workout.user_id != session ["user_id"]:
+        return "Unauthorised user", 403
+    db.session.delete(workout)
+    db.session.commit()
+    return redirect(url_for("workout_history"))
+
+@app.route("/edit-calories/<int:entry_id>", methods = ["GET", "POST"])
+def edit_calories(entry_id):
+    if "user_id" not in session:
+        return redirect(url_for("home"))
+    entry = CalorieEntry.query.get_or_404(entry_id)
+    if entry.user_id != session ["user_id"]:
+        return "Unauthorised user", 403
+    if request.method == "GET":
+        return render_template("edit_calories.html", entry = entry)
+    entry.meal = request.form.get("meal")
+    entry.calories = float(request.form.get("calories"))
+    db.session.commit()
+    return redirect(url_for("calorie_history"))
+
+@app.route("/delete-calories/<int:entry_id>", methods = ["POST"])
+def delete_calories(entry_id):
+    if "user_id" not in session:
+        return redirect(url_for("home"))
+    entry = CalorieEntry.query.get_or_404(entry_id)
+    if entry.user_id != session ["user_id"]:
+        return "Unauthorised user", 403
+    db.session.delete(entry)
+    db.session.commit()
+    return redirect(url_for("calorie_history"))
 
 @app.route("/logout") #Ends the app if the user chooses to
 def logout():

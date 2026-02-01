@@ -20,4 +20,4 @@ class CalorieEntry(db.Model): #A table that stores the calories tracked by the u
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable = False) #Links calories to the logged-in user 
     entry_date = db.Column(db.DateTime, default = datetime.utcnow, nullable = False) #The date and time the user tracked the calories
     meal = db.Column(db.String(50), nullable = False) #Meal
-    calories = db.Column(db.Integer, nullable = False) #Calories of the meal
+    calories = db.Column(db.Float, nullable = False) #Calories of the meal

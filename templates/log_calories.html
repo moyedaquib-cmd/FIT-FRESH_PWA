@@ -10,9 +10,15 @@
             <label>Meal: </label> <br> <!--What meal the user ate-->
             <input type = "text" name = "meal" required> <br> <br>
             <label>Calories: </label> <br> <!--How many calories were in the meal-->
-            <input type = "number" name = "calories" min="0" required> <br> <br> 
+            <input type = "number" name = "calories" min="0" step = "0.1" required> <br> <br> 
             <button type="submit">SAVE</button> 
         </form>
-        <a href="/">Back to Home</a> <!--Sends the user back to the home page-->
+        <hr>
+        {% if session.role == "gym_goer" %}
+            <a href="{{ url_for('gym_goer_dashboard') }}">Back to Dashboard</a>
+        {% else %}
+            <a href="{{ url_for('personal_trainer_dashboard') }}">Back to Dashboard</a>
+        {% endif %}
+        <a href="/">Back to Home</a> 
     </body>
 </html>

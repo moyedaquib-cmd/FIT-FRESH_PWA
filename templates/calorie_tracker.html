@@ -14,6 +14,7 @@
                     <th>Time</th>
                     <th>Meal</th>
                     <th>Calories</th>
+                    <th>Actions</th>
                 </tr>
             {% for entry in entries %} <!--A loop that goes over each workout object from the database to display them 1 row at a time-->
             <tr>
@@ -21,6 +22,12 @@
                 <td>{{ entry.local_time.strftime("%I:%M %p") }}</td> <!--This one is the time-->
                 <td>{{ entry.meal}}</td> <!--The meal-->
                 <td>{{ entry.calories }}</td> <!--The calories in the meal-->
+                <td>
+                    <a href="{{ url_for('edit_calories', entry_id = entry.id) }}">Edit</a>
+                    <form action = "{{ url_for('delete_calories', entry_id = entry.id) }}" method = "POST" style = "display:inline;">
+                        <button type = "submit">Delete</button>
+                    </form>
+                </td>
             </tr>
             {% endfor %} <!--Ends the loop-->
             </table>
@@ -28,6 +35,12 @@
             <p>No Calories Tracked</p>
         {% endif %} <!--Ends the if statement-->
         <br>
-        <a href="/">Back to Home</a> <!--Allows the user to go back to the home page-->
+        <hr> <!--Role based system that brings the user to back to their respective dashboards-->
+        {% if session.role == "gym_goer" %}
+            <a href="{{ url_for('gym_goer_dashboard') }}">Back to Dashboard</a>
+        {% else %}
+            <a href="{{ url_for('personal_trainer_dashboard') }}">Back to Dashboard</a>
+        {% endif %}
+        <a href="/">Back to Home</a> 
     </body>
 </html>

@@ -15,6 +15,7 @@
                     <th>Sets</th>
                     <th>Reps</th>
                     <th>Weight</th>
+                    <th>Actions</th>
                 </tr>
             {% for workout in workouts %} <!--A loop that goes over each workout object from the database to display them 1 row at a time-->
             <tr>
@@ -23,6 +24,12 @@
                 <td>{{ workout.sets }}</td>
                 <td>{{ workout.reps }}</td>
                 <td>{{ workout.weight }}</td>
+                <td>
+                    <a href="{{ url_for('edit_workout', workout_id = workout.id) }}">Edit</a>
+                    <form action = "{{ url_for('delete_workout', workout_id = workout.id) }}" method = "POST" style = "display:inline;">
+                        <button type = "submit">Delete</button>
+                    </form>
+                </td>
             </tr>
             {% endfor %} <!--Ends the loop-->
             </table>
@@ -30,6 +37,12 @@
             <p>No workouts logged</p>
         {% endif %} <!--Ends the if statement-->
         <br>
-        <a href="/">Back to Home</a> <!--Allows the user to go back to the home page-->
+        <hr>
+        {% if session.role == "gym_goer" %}
+            <a href="{{ url_for('gym_goer_dashboard') }}">Back to Dashboard</a>
+        {% else %}
+            <a href="{{ url_for('personal_trainer_dashboard') }}">Back to Dashboard</a>
+        {% endif %}
+        <a href="/">Back to Home</a> 
     </body>
 </html>
