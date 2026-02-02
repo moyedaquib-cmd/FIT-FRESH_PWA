@@ -21,3 +21,12 @@ class CalorieEntry(db.Model): #A table that stores the calories tracked by the u
     entry_date = db.Column(db.DateTime, default = datetime.utcnow, nullable = False) #The date and time the user tracked the calories
     meal = db.Column(db.String(50), nullable = False) #Meal
     calories = db.Column(db.Float, nullable = False) #Calories of the meal
+class Exercise(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(100), nullable = False)
+    description = db.Column(db.String(50), nullable = False)
+    muscle_group = db.Column(db.String(50), nullable = False)
+    difficulty = db.Column(db.String(20), nullable = False)
+    image_url = db.Column(db.String(255))
+    trainer_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable = False)
+    created_at = db.Column(db.DateTime, default = datetime.utcnow, nullable = False)

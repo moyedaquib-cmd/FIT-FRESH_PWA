@@ -5,6 +5,15 @@
         <title>Fit & Fresh</title>
     </head>
     <body>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul style="color: green;">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
         <h1>WELCOME to Fit&Fresh!</h1>
         <a href="/register">Register</a>
         <a href="/login">Login</a>

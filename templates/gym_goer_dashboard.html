@@ -5,6 +5,15 @@
         <title>Gym Goer Dashboard</title>
     </head>
     <body>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul style="color: green;">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
         <h1>Gym Goer Dashboard</h1>
         <a href="/log-workout">Log Workout</a> <br> <br> <!--Allows the user to log workouts-->
         <a href="/logout">Logout</a> <!--Sends the user back to the home page-->

@@ -5,6 +5,15 @@
         <title>Workout Log</title> <!--Name of browser tab-->
     </head>
     <body> <!--What the user sees/interacts with-->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul style="color: green;">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
         <h2>Log Your Workout</h2> <!--Informs the user to log their workout-->
         <form action="/log-workout" method = "POST"> <!--Sends data to flask's log-workout route POST meants that the data is not sent in the url to ensure security-->
             <label>Exercise Name: </label> <br> <!--Name of the exercise-->

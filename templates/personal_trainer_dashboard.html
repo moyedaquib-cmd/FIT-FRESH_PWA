@@ -5,11 +5,21 @@
         <title>Personal Trainer Dashboard</title>
     </head>
     <body>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul style="color: green;">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
         <h1>Personal Trainer Dashboard</h1>
         <a href="/log-workout">Log Workout</a> <br> <br>
         <a href="/logout">Logout</a> <!--Sends the user back to the home page-->
         <a href="/workout-history">View Workout History</a> <!--Allows the user to see a lift of their logged workouts-->
         <a href="/log-calories">Track Your Calories</a>
         <a href="/calorie-history">View Calories Tracked</a>
+        <a href="/add-exercise">Add Exercise</a>
     </body>
 </html>

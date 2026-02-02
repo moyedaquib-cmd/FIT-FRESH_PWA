@@ -5,9 +5,20 @@
         <meta charset="UTF-8">
     </head>
     <body> 
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul style="color: green;">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
         <h2>Update Calories</h2>
         <form method = "POST"> 
-            <input name = "meal" value = "{{ entry.meal }}" required> <br> <br> <
+            <label for="meal">Meal: </label> <br>
+            <input name = "meal" value = "{{ entry.meal }}" required> <br> <br> 
+            <label for="calories">Calories: </label> <br>
             <input name = "calories" type = "number" value = "{{ entry.calories }}" step = "0.1" min = "0" required> <br> <br>
             <button type = "submit">Update Entry</button>
         </form>

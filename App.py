@@ -1,6 +1,6 @@
 import os #Allows python to interact with the operating system
-from flask import Flask, request, redirect, url_for, render_template, session #Imports flask which I will use to create my PWA, request which reads data sent from forms, render_template to render HTML files from the templates directory, session to remember information like login status, redirect to send a user to a different URL, url_for to generate a path to a different URL without having to code an entirely new one
-from DB_Models import db, User, Workout, CalorieEntry #Imports the database controller object I created and the user table
+from flask import Flask, request, redirect, url_for, render_template, session, flash #Imports flask which I will use to create my PWA, request which reads data sent from forms, render_template to render HTML files from the templates directory, session to remember information like login status, redirect to send a user to a different URL, url_for to generate a path to a different URL without having to code an entirely new one
+from DB_Models import db, User, Workout, CalorieEntry, Exercise #Imports the database controller object I created and the user table
 from datetime import datetime #Imports datetime which allows the user to have the time they logged their calories/workouts saved
 from werkzeug.security import generate_password_hash, check_password_hash #Allows plaintext passwords to be stored as hashed values and checks between hashed passwords and plaintext passwords to match them
 import pytz #A timezone database to convert to ohter timezones
@@ -29,11 +29,13 @@ def register_page():
         return "Please fill in all the fields", 400
     existing_user = User.query.filter_by(username=username).first() #Checks for duplicate usernames by searching the user table and finding a maching username
     if existing_user: #Prevents duplicate accounts to avoid ambiguity and allow the databases to be unique.
-        return "Username already exists", 400
+        flash("Username already exists")
+        return redirect(url_for("register_page"))
     hashed_password = generate_password_hash(password) #Generates a secure hash from the password
     new_user = User(username=username, password_hash=hashed_password, role=role)
     db.session.add(new_user) #These lines save the program to the database "add()" stages the object while "Commit()" permanently saves it
     db.session.commit() #Confirms the user has successfully registered
+    flash("Account created successfully. Please log in")
     return redirect(url_for("login"))
 
 @app.route("/login", methods=["POST", "GET"]) #The login page
@@ -46,14 +48,17 @@ def login():
         return "Please fill in all the fields", 400
     user =  User.query.filter_by(username=username).first()
     if not user: #If no account exists with the username filled in, the PWA doesn't allows them to log in
-        return "Invalid username or password", 401 #Invalid username or passwird increases safety as attackers dont know what is wrong with their login form
+        flash("Invalid username or password")
+        return redirect(url_for("login"))
     if not check_password_hash(user.password_hash, password): #Checks the hashed password with the user table and compares the plaintext and hashed versions to see if the password is correct
         return "Invalid username or password", 401
     session["user_id"] = user.id #Stores the user's unique ID allowing easy identification of the logged-in user
     session["role"] = user.role #Stores the role of the user to enable role-based access control
     if user.role == "gym_goer": #Based ont the user's role, they're redirected to a particular dashboard
+        flash("Logged in successfully")
         return redirect(url_for("gym_goer_dashboard"))
     else:
+        flash("Logged in successfully")
         return redirect(url_for("personal_trainer_dashboard"))
 
 @app.route("/gym-goer-dashboard") #dashboard only accessible to gym goers
@@ -93,7 +98,7 @@ def log_workout():
     workout = Workout(user_id = session["user_id"], exercise = exercise, sets = int(sets), reps = int(reps), weight = float(weight))
     db.session.add(workout)
     db.session.commit()
-    return "Workout Logged!"
+    return redirect(url_for("workout_history"))
 
 @app.route("/workout-history") #The place where the user can see their workout history (all the workouts they have logged)
 def workout_history():
@@ -141,6 +146,7 @@ def edit_workout(workout_id):
     workout.reps = int(request.form.get("reps"))
     workout.weight = float(request.form.get("weight"))
     db.session.commit()
+    flash("Workout Updated")
     return redirect(url_for("workout_history"))
 
 @app.route("/delete-workout/<int:workout_id>", methods = ["POST"]) #A feature to delete a row
@@ -152,6 +158,7 @@ def delete_workout(workout_id):
         return "Unauthorised user", 403
     db.session.delete(workout)
     db.session.commit()
+    flash("Workout Deleted")
     return redirect(url_for("workout_history"))
 
 @app.route("/edit-calories/<int:entry_id>", methods = ["GET", "POST"])
@@ -166,6 +173,7 @@ def edit_calories(entry_id):
     entry.meal = request.form.get("meal")
     entry.calories = float(request.form.get("calories"))
     db.session.commit()
+    flash("Calories Updated")
     return redirect(url_for("calorie_history"))
 
 @app.route("/delete-calories/<int:entry_id>", methods = ["POST"])
@@ -177,7 +185,25 @@ def delete_calories(entry_id):
         return "Unauthorised user", 403
     db.session.delete(entry)
     db.session.commit()
+    flash("Calories Deleted")
     return redirect(url_for("calorie_history"))
+
+@app.route("/add-exercise", methods = ["GET", "POST"])
+def add_exercise():
+    if "user_id" not in session or session.get("role") == "gym_goer":
+        flash("Access denied!")
+        return redirect(url_for("login"))
+    if request.method == "POST":
+        name = request.form["name"]
+        description = request.form["description"]
+        muscle_group = request.form["muscle_group"]
+        image_url = request.form.get("image_url")
+        exercise = Exercise(name = name, description = description, muscle_group = muscle_group, image_url = image_url, created_by = session["user_id"])
+        db.session.add(exercise)
+        db.session.commit()
+        flash("Exercise added successfully! ")
+        return redirect(url_for("personal_trainer_dashboard"))
+    return render_template("add_exercise.html")
 
 @app.route("/logout") #Ends the app if the user chooses to
 def logout():

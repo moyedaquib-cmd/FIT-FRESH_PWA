@@ -6,6 +6,15 @@
         <title>Calorie Viewing</title>
     </head>
     <body>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul style="color: green;">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
         <h2>View Your Calories</h2> 
         {%if entries %} <!--Flask checks if a table named entries exists. If it does then it shows the table and if not it informs the users that there are no calories logged-->
             <table border="1" cellpadding = "5"> <!--Creates a table with a border and cell spacing-->

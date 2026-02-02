@@ -5,6 +5,15 @@
         <title>Calorie Tracker</title> <!--Name of browser tab-->
     </head>
     <body> <!--What the user sees/interacts with-->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul style="color: green;">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
         <h2>Track Your Workout</h2> <!--Informs the user to track their calories-->
         <form method = "POST">
             <label>Meal: </label> <br> <!--What meal the user ate-->
