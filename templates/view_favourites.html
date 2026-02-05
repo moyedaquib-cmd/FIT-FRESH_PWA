@@ -1,0 +1,45 @@
+<!DOCTYPE html> <!--Informs the browser that the page is an HTML5 document-->
+<html lang = "en"> <!--Specifies the content is in english improving accessibily-->
+    <head> <!--Contains metadata-->
+        <meta charset="UTF-8"> <!--Informs the browser how to interpret characters supporting various letter, symbols and accents-->
+        <title>Favourites</title> <!--Name of browser tab-->
+    </head>
+    <body> <!--What the user sees/interacts with--> 
+        {% with messages = get_flashed_messages() %} <!--Retrives the message created with flash-->
+            {% if messages %} <!--If the message exists, it's shown with green text-->
+                <ul style="color: green;"> 
+                    {% for message in messages %} <!--Creates a for loop that keeps showing messages when the PWA is run-->
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        <h2>My Favourite Exercises</h2> <!--Informs the user on the feature-->
+        {% if exercises %}
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px"> <!--Creates a 3 column grid with spacing between columns. Each exercise is a grid item-->
+                {% for exercise in exercises %} <!--Loop creates a grid item per exercise-->
+                    <div style="border:1px solid #ccc; padding:10px"> <!--Each grid item has border and padding-->
+                        <h3>{{ exercise.name }}</h3> <!--Retrieves name of exercise from table-->
+                        <p><strong>Muscle: </strong> {{ exercise.muscle_group }} </p> <!--The muscle group the exercise targets-->
+                        {% if exercise.image_url %} <!--If there is an image then it's displayed-->
+                            <img src="{{ exercise.image_url }}" width="100%">
+                        {% endif %}
+                        <a href="{{ url_for('exercise_detail', exercise_id = exercise.id) }}"> <!--When the user clicks on the link, PWA takes them to the page wher exercise details are shown-->
+                            View Details
+                        </a>
+                    </div> 
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No favourited exercies</p>
+        {% endif %}
+        <br>
+        <hr> <!--Role based UI that allows the user to go back to their respective dashboard-->
+        {% if session.role == "gym_goer" %}
+            <a href="{{ url_for('gym_goer_dashboard') }}">Back to Dashboard</a>
+        {% else %}
+            <a href="{{ url_for('personal_trainer_dashboard') }}">Back to Dashboard</a>
+        {% endif %}
+        <a href="/">Back to Home</a> <!--Allows user to go back to the home page-->
+    </body>
+</html>

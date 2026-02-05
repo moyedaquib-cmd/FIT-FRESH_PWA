@@ -1,21 +1,38 @@
-<!DOCTYPE html>
-<html lang = "en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Add Exercise</title>
+<!DOCTYPE html> <!--Informs the browser that the page is an HTML5 document-->
+<html lang = "en"> <!--Specifies the content is in english improving accessibily-->
+    <head> <!--Contains metadata-->
+        <meta charset="UTF-8"> <!--Informs the browser how to interpret characters supporting various letter, symbols and accents-->
+        <title>Add Exercise</title> <!--Name of browser tab-->
     </head>
-    <body>
-        <h2>Add Exercise</h2>
-        <form method = "POST">
-            <label>Exercise Name: </label> <br>
-            <input name="name" required> <br> <br>
-            <label>Description: </label> <br> 
-            <textarea name="description" required></textarea> <br> <br>
-            <label>Muscle Group: </label> <br>
-            <input name = "muscle_group" required> <br> <br>
-            <label>Image: </label> <br>
-            <input name = "image"> <br> <br>
-            <button type = "submit">Add Exercise</button> 
+    <body> <!--What the user sees/interacts with-->
+        {% with messages = get_flashed_messages() %} <!--Retrives the message created with flash-->
+            {% if messages %} <!--If the message exists, it's shown with green text-->
+                <ul style="color: green;"> 
+                    {% for message in messages %} <!--Creates a for loop that keeps showing messages when the PWA is run-->
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        <h2>Add Exercise</h2> <!--Informs the user on the feature-->
+        <form method = "POST"> <!--Creates a form that sends data to the server-->
+            <label>Exercise Name: </label> <br> <!--Describes the field-->
+            <input name="name" required> <br> <br> <!--Allows the user to input data. Name allows Flask to call on the data. Required forces users to enter data-->
+            <label>Description: </label> <br> <!--Describes the field-->
+            <textarea name="description" required></textarea> <br> <br> <!--Allows the user to input data in a big, adjustable area of text. Name allows Flask to call on the data. Required forces users to enter data-->
+            <label>Muscle Group: </label> <br> <!--Describes the field-->
+            <input name = "muscle_group" required> <br> <br> <!--Allows the user to input data. Name allows Flask to call on the data. Required forces users to enter data-->
+            <label>Image URL: </label> <br> <!--Describes the field-->
+            <input name = "image_url"> <br> <br> <!--Allows the user to input data. Name allows Flask to call on the data. Required forces users to enter data-->
+            <label>Difficulty: </label><br> <!--Describes the field-->
+            <select name="difficulty" required>  <!--Allows the user to select an option. Name allows Flask to call on the data. Required forces users to enter data-->
+                <option value = "Beginner">Beginner</option> 
+                <option value = "Intermediate">Intermediate</option>
+                <option value = "Advanced">Advanced</option>
+            </select> <br> <br>
+            <button type = "submit">Add Exercise</button> <!--Submit button--> 
+            <a href="{{ url_for('personal_trainer_dashboard') }}">Back to Dashboard</a> <!--Allows user to go back to their dashboard-->
+            <a href="{{ url_for('home') }}">Back to Home</a> <!--Allows user to go back to the home page-->
         </form>
     </body>
 </html>

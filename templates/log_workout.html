@@ -5,10 +5,10 @@
         <title>Workout Log</title> <!--Name of browser tab-->
     </head>
     <body> <!--What the user sees/interacts with-->
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <ul style="color: green;">
-                    {% for message in messages %}
+        {% with messages = get_flashed_messages() %} <!--Retrives the message created with flash-->
+            {% if messages %} <!--If the message exists, it's shown with green text-->
+                <ul style="color: green;"> 
+                    {% for message in messages %} <!--Creates a for loop that keeps showing messages when the PWA is run-->
                         <li>{{ message }}</li>
                     {% endfor %}
                 </ul>
@@ -27,11 +27,11 @@
             <button type="submit">SAVE</button> <!--Submits the form and calls the log-workout route-->
         </form>
         <hr>
-        {% if session.role == "gym_goer" %}
+        {% if session.role == "gym_goer" %} <!--Role based UI that allows the user to go back to their respective dashboard-->
             <a href="{{ url_for('gym_goer_dashboard') }}">Back to Dashboard</a>
         {% else %}
             <a href="{{ url_for('personal_trainer_dashboard') }}">Back to Dashboard</a>
         {% endif %}
-        <a href="/">Back to Home</a> 
+        <a href="/">Back to Home</a> <!--Allows user to go back to the home page-->
     </body>
 </html>

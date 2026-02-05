@@ -3,22 +3,22 @@
     <head> <!--Contains metadata-->
         <meta charset="UTF-8"> <!--Informs the browser how to interpret characters supporting various letter, symbols and accents-->
         <title>Login</title> <!--Name of browser tab-->
-        <script>
-            function togglePassword() {
-                const passwordInput = document.getElementById("password");
-                if (passwordInput.type === "password") {
-                    passwordInput.type = "text";
+        <script> //Javascript function
+            function togglePassword() { //Switches password from being hidden to visible
+                const passwordInput = document.getElementById("password"); //Gets the password element
+                if (passwordInput.type === "password") { 
+                    passwordInput.type = "text"; //Password in visible characters
                 } else {
-                    passwordInput.type = "password";
+                    passwordInput.type = "password"; //Password in hidden characters
                 }
             }
         </script>
     </head>
     <body> <!--What the user sees/interacts with-->
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
+        {% with messages = get_flashed_messages() %} <!--Retrives the message created with flash-->
+            {% if messages %} <!--If the message exists, it's shown with green text-->
                 <ul style="color: green;">
-                    {% for message in messages %}
+                    {% for message in messages %} <!--Creates a for loop that keeps showing messages when the PWA is run-->
                         <li>{{ message }}</li>
                     {% endfor %}
                 </ul>
@@ -28,9 +28,10 @@
         <form action="/login" method = "POST"> <!--Sends data to flask's login route POST meants that the data is not sent in the url to ensure security-->
             <label>Username: </label> <br> <!--Allows the user to input a username-->
             <input type = "text" name = "username" required> <br> <br>
-            <label>Password: </label> <br> <!--Allows the user to input a password-->
+            <label>Password: </label> <br>
+            <button type = "button" onclick = "togglePassword()">👁</button> <!--Button to switch between viewing and hiding the password--> <!--Allows the user to input a password-->
             <input type = "password" id = "password" name = "password" required> <br> <br>
-            <button type = "button" onclick = "togglePassword()">👁</button> 
+            <a href="/">Back to Home</a>
             <button type="submit">Login</button> <!--Submits the form and calls the Login route-->
         </form>
     </body>

@@ -1,33 +1,33 @@
-<!DOCTYPE html> 
-<html lang = "en">
-    <head>
-        <title>Update Calories</title>
-        <meta charset="UTF-8">
+<!DOCTYPE html> <!--Informs the browser that the page is an HTML5 document-->
+<html lang = "en"> <!--Specifies the content is in english improving accessibily-->
+    <head> <!--Contains metadata-->
+        <title>Update Calories</title> <!--Informs the browser how to interpret characters supporting various letter, symbols and accents-->
+        <meta charset="UTF-8"> <!--Name of browser tab-->
     </head>
-    <body> 
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <ul style="color: green;">
-                    {% for message in messages %}
+    <body> <!--What the user sees/interacts with-->
+        {% with messages = get_flashed_messages() %} <!--Retrives the message created with flash-->
+            {% if messages %} <!--If the message exists, it's shown with green text-->
+                <ul style="color: green;"> 
+                    {% for message in messages %} <!--Creates a for loop that keeps showing messages when the PWA is run-->
                         <li>{{ message }}</li>
                     {% endfor %}
                 </ul>
             {% endif %}
         {% endwith %}
-        <h2>Update Calories</h2>
-        <form method = "POST"> 
-            <label for="meal">Meal: </label> <br>
-            <input name = "meal" value = "{{ entry.meal }}" required> <br> <br> 
-            <label for="calories">Calories: </label> <br>
-            <input name = "calories" type = "number" value = "{{ entry.calories }}" step = "0.1" min = "0" required> <br> <br>
-            <button type = "submit">Update Entry</button>
+        <h2>Update Calories</h2> <!--Informs the user on the feature-->
+        <form method = "POST"> <!--Sends data to server with a POST request-->
+            <label for="meal">Meal: </label> <br> <!--Describes the field-->
+            <input name = "meal" value = "{{ entry.meal }}" required> <br> <br>  <!--Allows the user to input data. Name allows Flask to call on the data. Required forces users to enter data. The field is pre-filled with the existing data-->
+            <label for="calories">Calories: </label> <br> <!--Describes the field-->
+            <input name = "calories" type = "number" value = "{{ entry.calories }}" step = "0.1" min = "0" required> <br> <br> <!--Allows the user to input data. Name allows Flask to call on the data. Required forces users to enter data. The field is pre-filled with the existing data. The numbers go up at increments of 0.1 and a number below 0 cannot be inputed-->
+            <button type = "submit">Update Entry</button> <!--Submit button--> 
         </form>
-        <hr>
+        <hr> <!--Role based UI that allows the user to go back to their respective dashboard-->
         {% if session.role == "gym_goer" %}
             <a href="{{ url_for('gym_goer_dashboard') }}">Back to Dashboard</a>
         {% else %}
             <a href="{{ url_for('personal_trainer_dashboard') }}">Back to Dashboard</a>
         {% endif %}
-        <a href="/">Back to Home</a> 
+        <a href="/">Back to Home</a>  <!--Allows user to go back to the home page-->
     </body>
 </html>

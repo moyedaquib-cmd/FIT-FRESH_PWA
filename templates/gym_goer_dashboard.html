@@ -1,24 +1,26 @@
-<!DOCTYPE html>
-<html lang = "en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Gym Goer Dashboard</title>
+<!DOCTYPE html> <!--Informs the browser that the page is an HTML5 document-->
+<html lang = "en"> <!--Specifies the content is in english improving accessibily-->
+    <head> <!--Contains metadata-->
+        <meta charset="UTF-8"> <!--Informs the browser how to interpret characters supporting various letter, symbols and accents-->
+        <title>Gym Goer Dashboard</title> <!--Name of browser tab-->
     </head>
-    <body>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <ul style="color: green;">
-                    {% for message in messages %}
+    <body> <!--What the user sees/interacts with-->
+        {% with messages = get_flashed_messages() %} <!--Retrives the message created with flash-->
+            {% if messages %} <!--If the message exists, it's shown with green text-->
+                <ul style="color: green;"> 
+                    {% for message in messages %} <!--Creates a for loop that keeps showing messages when the PWA is run-->
                         <li>{{ message }}</li>
                     {% endfor %}
                 </ul>
             {% endif %}
         {% endwith %}
-        <h1>Gym Goer Dashboard</h1>
+        <h1>Gym Goer Dashboard</h1> <!--Informs the user on the feature-->
         <a href="/log-workout">Log Workout</a> <br> <br> <!--Allows the user to log workouts-->
-        <a href="/logout">Logout</a> <!--Sends the user back to the home page-->
+        <a href="/logout">Logout</a> <!--Sends the user back to the home page and clears the session-->
         <a href="/workout-history">View Workout History</a> <!--Allows the user to see a list of their logged workouts-->
-        <a href="/log-calories">Track Your Calories</a> <!--Allows the to track calories-->
+        <a href="/log-calories">Track Your Calories</a> <!--Allows the user to track calories-->
         <a href="/calorie-history">View Calories Tracked</a> <!--Allows the user to see a list of their tracked calories-->
+        <a href="/view-favourites">View Favourites</a> <!--Allows the user to view their saved exercises-->
+        <a href="/exercises">View Exercises</a> <!--Allows the user to view exercises-->
     </body>
 </html>

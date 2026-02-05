@@ -3,22 +3,22 @@
     <head> <!--Contains metadata-->
         <meta charset="UTF-8"> <!--Informs the browser how to interpret characters supporting various letter, symbols and accents-->
         <title>Register</title> <!--Name of browser tab-->
-        <script>
-            function togglePassword() {
-                const passwordInput = document.getElementById("password");
+        <script> //Javascript function
+            function togglePassword() { //Switches password from being hidden to visible
+                const passwordInput = document.getElementById("password"); //Gets the password element
                 if (passwordInput.type === "password") {
-                    passwordInput.type = "text";
+                    passwordInput.type = "text"; //Password in visible characters
                 } else {
-                    passwordInput.type = "password";
+                    passwordInput.type = "password"; //Password in hidden characters
                 }
             }
         </script>
     </head>
     <body> <!--What the user sees/interacts with-->
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
+        {% with messages = get_flashed_messages() %} <!--Retrives the message created with flash-->
+            {% if messages %} <!--If the message exists, it's shown with green text-->
                 <ul style="color: green;">
-                    {% for message in messages %}
+                    {% for message in messages %} <!--Creates a for loop that keeps showing messages when the PWA is run-->
                         <li>{{ message }}</li>
                     {% endfor %}
                 </ul>
@@ -32,10 +32,11 @@
             <button type = "button" onclick = "togglePassword()">👁</button> 
             <input type = "password" id = "password" name = "password" required> <br> <br>
             <label>Role: </label> <br> <!--Creates a dropdown menu for the user to choose their role-->
-            <select name = "role" required> 
+            <select name = "role" required> <!--Allows user to select their role-->
                 <option value = "gym_goer">Gym Goer</option>
                 <option value="trainer">Personal Trainer</option>
             </select> <br> <br>
+            <a href="/">Back to Home</a>
             <button type="submit">Register</button> <!--Submits the form and calls the register route-->
         </form>
     </body>

@@ -1,25 +1,25 @@
-<!--This file uses Jinja2 which is flask's templating engine-->
-<!DOCTYPE html>
-<html lang = "en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Workout History</title>
+<!DOCTYPE html> <!--Informs the browser that the page is an HTML5 document-->
+<html lang = "en"> <!--Specifies the content is in english improving accessibily-->
+    <head> <!--Contains metadata-->
+        <meta charset="UTF-8"> <!--Informs the browser how to interpret characters supporting various letter, symbols and accents-->
+        <title>Workout History</title> <!--Name of browser tab-->
     </head>
-    <body>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <ul style="color: green;">
-                    {% for message in messages %}
+    <body> <!--What the user sees/interacts with-->
+        {% with messages = get_flashed_messages() %} <!--Retrives the message created with flash-->
+            {% if messages %} <!--If the message exists, it's shown with green text-->
+                <ul style="color: green;"> 
+                    {% for message in messages %} <!--Creates a for loop that keeps showing messages when the PWA is run-->
                         <li>{{ message }}</li>
                     {% endfor %}
                 </ul>
             {% endif %}
         {% endwith %}
-        <h2>Your Workout History</h2> 
-        {%if workouts %} <!--Flask checks if a table named workouts exists. If it does then it shows the table and if not it informs the users that there are no workouts logged-->
+        <h2>Your Workout History</h2> <!--Informs the user on the feature-->
+        {%if workouts %} <!--If the user has logs, it shows a table, otherwise it informs the user that there are no workouts tracked-->
             <table border="1" cellpadding = "5"> <!--Creates a table with a border and cell spacing-->
-                <tr> <!--Rows of the table-->
-                    <th>Date</th> <!--Table headings-->
+                <tr>
+                    <!--Table Headers-->
+                    <th>Date</th> 
                     <th>Exercise</th>
                     <th>Sets</th>
                     <th>Reps</th>
@@ -28,15 +28,16 @@
                 </tr>
             {% for workout in workouts %} <!--A loop that goes over each workout object from the database to display them 1 row at a time-->
             <tr>
-                <td>{{ workout.workout_date}}</td> <!--Column in the row (table data)-->
+                <!--Table rows that retrieve data from a particular database-->
+                <td>{{ workout.workout_date}}</td> 
                 <td>{{ workout.exercise}}</td>
                 <td>{{ workout.sets }}</td>
                 <td>{{ workout.reps }}</td>
                 <td>{{ workout.weight }}</td>
                 <td>
-                    <a href="{{ url_for('edit_workout', workout_id = workout.id) }}">Edit</a>
-                    <form action = "{{ url_for('delete_workout', workout_id = workout.id) }}" method = "POST" style = "display:inline;">
-                        <button type = "submit">Delete</button>
+                    <a href="{{ url_for('edit_workout', workout_id = workout.id) }}">Edit</a> <!--Allows the user to edit the data-->
+                    <form action = "{{ url_for('delete_workout', workout_id = workout.id) }}" method = "POST" style = "display:inline;"> <!--Allows the user to delete the data. Inline styling keeps button next to edit-->
+                        <button type = "submit">Delete</button> <!--Delete button-->
                     </form>
                 </td>
             </tr>
@@ -46,12 +47,12 @@
             <p>No workouts logged</p>
         {% endif %} <!--Ends the if statement-->
         <br>
-        <hr>
+        <hr> <!--Role based UI that allows the user to go back to their respective dashboard-->
         {% if session.role == "gym_goer" %}
             <a href="{{ url_for('gym_goer_dashboard') }}">Back to Dashboard</a>
         {% else %}
             <a href="{{ url_for('personal_trainer_dashboard') }}">Back to Dashboard</a>
         {% endif %}
-        <a href="/">Back to Home</a> 
+        <a href="/">Back to Home</a> <!--Allows user to go back to the home page-->
     </body>
 </html>
