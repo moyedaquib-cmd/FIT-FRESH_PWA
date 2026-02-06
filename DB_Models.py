@@ -29,8 +29,17 @@ class Exercise(db.Model): #A table that stores the exercise added by the trainer
     difficulty = db.Column(db.String(20), nullable = False) #How difficult it's to perform
     image_url = db.Column(db.String(255)) #The image of the exercise
     trainer_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable = False) #Links Exercise to the logged-in user 
-class Favourite(db.Model): #A table that stores the user's favourite exercises
+class Favourite_Exercise(db.Model): #A table that stores the user's favourite exercises
     id = db.Column(db.Integer, primary_key = True) #Creates a unique ID integer for each user
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable = False) #Links favourite to the logged-in user 
     exercise_id = db.Column(db.Integer, db.ForeignKey("exercise.id"), nullable = False) #Links the exercise to its id
+    __table_args__ = (db.UniqueConstraint("user_id", "exercise_id"), ) #Database blocks duplicate favourites from being added.
+class Review_Exercise(db.Model):
+    id = db.Column(db.Integer, primary_key = True) #Creates a unique ID integer for each user
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable = False) #Links review to logged-in user
+    exercise_id = db.Column(db.Integer, db.ForeignKey("exercise.id"), nullable = False) #Links the exercise to its id
+    rating = db.Column(db.Integer, nullable = False) #Stores the rating the user gave (1-5)
+    comment = db.Column(db.String(400)) #Stores the comment the user made
+    created_at = db.Column(db.DateTime, default = datetime.utcnow) #Stores when the review was created
+    user = db.relationship("User", backref="exercise_reviews")
     __table_args__ = (db.UniqueConstraint("user_id", "exercise_id"), ) #Database blocks duplicate favourites from being added.

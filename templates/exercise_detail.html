@@ -20,6 +20,38 @@
         {% if exercise.image_url %} <!--If there is an image then it's displayed-->
             <img src="{{ exercise.image_url }}" width = "300">
         {% endif %}
+        <hr>
+        <h3>Reviews</h3>
+        {% if session.role == "gym_goer" %}
+        <form method = "POST" action="{{ url_for('add_review', exercise_id = exercise.id)}}">
+            <label>Rating: </label>
+            <select name = "rating" required>
+                <option value="5">★★★★★</option>
+                <option value="4">★★★★</option>
+                <option value="3">★★★</option>
+                <option value="2">★★</option>
+                <option value="1">★</option>
+            </select>
+            <br> <br>
+            <textarea name = "comment" placeholder = "Review the exercise!" maxlength = "400"></textarea>
+            <br> <br>
+            <button type = "submit">Submit Review</button>
+        </form>
+        {% endif %}
+        {% if reviews %}
+            <ul>
+                {% for review in reviews %}
+                    <li>
+                        <strong> {{ review.user.username }} </strong>
+                        <br>
+                        <strong>{{ review.rating }}/5</strong> <br>
+                        {{ review.comment }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No reviews yet</p>
+        {% endif %}
         <form action = "{{ url_for('toggle_favourite', exercise_id = exercise.id) }}" method = "POST">
             {% if is_favourite %}
                 <button type="submit">Remove Favourite</button>

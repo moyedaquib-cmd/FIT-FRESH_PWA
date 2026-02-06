@@ -14,7 +14,7 @@
                 </ul>
             {% endif %}
         {% endwith %}
-        <h2>My Favourite Exercises</h2> <!--Informs the user on the feature-->
+        <h2>My Favourites</h2> <!--Informs the user on the feature-->
         {% if exercises %}
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px"> <!--Creates a 3 column grid with spacing between columns. Each exercise is a grid item-->
                 {% for exercise in exercises %} <!--Loop creates a grid item per exercise-->

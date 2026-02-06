@@ -1,6 +1,6 @@
 import os #Allows python to interact with the operating system
 from flask import Flask, request, redirect, url_for, render_template, session, flash #Flask: a lightweight web framework for Python that allows the creation of PWA, request: Allows Python to access data sent by the user, redirect: Send the user to a different URL, url_for: Uses the name of a function to create a URL path, render_template: Allows the use of Jinja2 to develop dynamic HTML pages, session: Allows users to store data across multiple HTTP requests, flash: Provides messages to the user that they can view
-from DB_Models import db, User, Workout, CalorieEntry, Exercise, Favourite #Imports all of the databases I created.
+from DB_Models import db, User, Workout, CalorieEntry, Exercise, Favourite_Exercise, Review_Exercise #Imports all of the databases I created.
 from datetime import datetime #Datetime allows date and time to be viewed by the user
 from werkzeug.security import generate_password_hash, check_password_hash #Werkzeug allows the hashing of passwords. generate_password_hash creates a hash from a password and check_password_hash checks the password with the hashed versions to verify the account
 import pytz #A timezone database to convert to other timezones
@@ -251,22 +251,23 @@ def exercises():  #The function that runs when someone visits the url
 def exercise_detail(exercise_id):  #The function that runs when someone visits the url. The parameter informs which object the user wants to view
     exercise = Exercise.query.get_or_404(exercise_id) #Searches the table and returns a 404 error (the object doesn't exist) if nothing is found
     is_favourite = False
+    reviews = Review_Exercise.query.filter_by(exercise_id = exercise.id).all()
     if "user_id" in session:
-        is_favourite = Favourite.query.filter_by(user_id = session["user_id"], exercise_id = exercise.id).first() is not None
-    return render_template("exercise_detail.html", exercise = exercise, is_favourite = is_favourite) # Returns the page, displaying it to the user. The template can loop, showcasing each piece of data
+        is_favourite = Favourite_Exercise.query.filter_by(user_id = session["user_id"], exercise_id = exercise.id).first() is not None
+    return render_template("exercise_detail.html", exercise = exercise, is_favourite = is_favourite, reviews = reviews) # Returns the page, displaying it to the user. The template can loop, showcasing each piece of data
 
 #A feature that allows user to favourite an exercise and save it
 @app.route("/toggle-favourite/<int:exercise_id>", methods = ["POST"]) #Tells flask to run the function below this decorator when someone visits the url. The route can respond to POST requests (occurs when the user submits a form). This is a dynamic route based on the id of the object  
 def toggle_favourite(exercise_id):  #The function that runs when someone visits the url. The parameter informs which object the user wants to view
     if "user_id" not in session:  #Redirects the user to the home page if their details are not found in the database
         return redirect(url_for("home")) #Redirects the user to a particular page
-    favourite = Favourite.query.filter_by(user_id = session["user_id"], exercise_id = exercise_id).first() #Looks for a row in the Favourite table that matches the current user and the exercise they clicked on
+    favourite = Favourite_Exercise.query.filter_by(user_id = session["user_id"], exercise_id = exercise_id).first() #Looks for a row in the Favourite table that matches the current user and the exercise they clicked on
     if favourite: #If the favourite exists it removes it
         db.session.delete(favourite)
         db.session.commit()
         flash("Removed from Favourites")
     else:  #If the favourite doesn't exist it adds it to the table
-        new_favourite = Favourite(user_id = session["user_id"], exercise_id = exercise_id)
+        new_favourite = Favourite_Exercise(user_id = session["user_id"], exercise_id = exercise_id)
         db.session.add(new_favourite)
         flash("Added to favourites")
         db.session.commit()
@@ -277,8 +278,28 @@ def toggle_favourite(exercise_id):  #The function that runs when someone visits 
 def view_favourites():  #The function that runs when someone visits the url.
     if "user_id" not in session: #Redirects the user to the home page if their details are not found in the database
         return redirect(url_for(home)) #Redirects the user to a particular page
-    favourite_exercises = db.session.query(Exercise).join(Favourite, Favourite.exercise_id == Exercise.id).filter(Favourite.user_id == session ["user_id"])
+    favourite_exercises = db.session.query(Exercise).join(Favourite_Exercise, Favourite_Exercise.exercise_id == Exercise.id).filter(Favourite_Exercise.user_id == session ["user_id"])
     return render_template("view_favourites.html", exercises = favourite_exercises) # Returns the page, displaying it to the user. The template can loop, showcasing each piece of data
+
+#Allows users to add reviews
+@app.route("/add-review/<int:exercise_id>", methods = ["POST"])
+def add_review(exercise_id):
+    if "user_id" not in session:
+        return redirect(url_for("home"))
+    rating = float(request.form.get("rating"))
+    comment = request.form.get("comment")
+    if rating < 1 or rating > 5:
+        flash("Rating must be between 1 and 5")
+        return redirect(url_for("exercise_detail", exercise_id = exercise_id))
+    existing_Review = Review_Exercise.query.filter_by(user_id = session["user_id"], exercise_id = exercise_id).first()
+    if existing_Review:
+        flash("You can't leave more than 1 review")
+        return redirect(url_for("exercise_detail", exercise_id = exercise_id))
+    review = Review_Exercise(user_id = session["user_id"], exercise_id = exercise_id, rating = rating, comment = comment)
+    db.session.add(review)
+    db.session.commit()
+    flash("Review added!")
+    return redirect(url_for("exercise_detail", exercise_id = exercise_id))
 
 #Ends the app if the user chooses to
 @app.route("/logout") #Tells flask to run the function below this decorator when someone visits the url.
