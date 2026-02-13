@@ -41,5 +41,19 @@ class Review_Exercise(db.Model):
     rating = db.Column(db.Integer, nullable = False) #Stores the rating the user gave (1-5)
     comment = db.Column(db.String(400)) #Stores the comment the user made
     created_at = db.Column(db.DateTime, default = datetime.utcnow) #Stores when the review was created
-    user = db.relationship("User", backref="exercise_reviews")
+    user = db.relationship("User", backref="exercise_reviews") #Creates an object-level relationship between the user and review_exercise table. Backref creates the reverse relationship while enabling the tables to be claled on later.
     __table_args__ = (db.UniqueConstraint("user_id", "exercise_id"), ) #Database blocks duplicate favourites from being added.
+class Diets(db.Model):
+    id = db.Column(db.Integer, primary_key = True) #Creates a unique ID integer for each user
+    name = db.Column(db.String(250), nullable = False) #Name of the diet
+    description = db.Column(db.String(500), nullable = False) #Description of diet
+    Daily_Calories = db.Column(db.Integer) #Total calories per day of the diet
+    trainer_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable = False) #Id of the trainer who made the diet 
+    trainer = db.relationship("User", backref="diets") #Creates an object-level relationship between the user and Diets table. Backref creates the reverse relationship while enabling the tables to be called on later.
+class WorkoutRoutine(db.Model):
+    id = db.Column(db.Integer, primary_key = True) #Creates a unique ID integer for each user
+    name = db.Column(db.String(250), nullable = False) #Name of workout routine
+    description = db.Column(db.String(500), nullable = False) #Description of workout routine
+    difficulty = db.Column(db.String(20)) #Difficulty of workout routine
+    trainer_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable = False) #Id of the trainer who made the diet 
+    trainer = db.relationship("User", backref="Workout_Routine") #Creates an object-level relationship between the user and WorkoutRoutine table. Backref creates the reverse relationship while enabling the tables to be called on later.

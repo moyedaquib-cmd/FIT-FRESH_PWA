@@ -278,28 +278,31 @@ def toggle_favourite(exercise_id):  #The function that runs when someone visits 
 def view_favourites():  #The function that runs when someone visits the url.
     if "user_id" not in session: #Redirects the user to the home page if their details are not found in the database
         return redirect(url_for(home)) #Redirects the user to a particular page
-    favourite_exercises = db.session.query(Exercise).join(Favourite_Exercise, Favourite_Exercise.exercise_id == Exercise.id).filter(Favourite_Exercise.user_id == session ["user_id"])
+    favourite_exercises = db.session.query(Exercise).join(Favourite_Exercise, Favourite_Exercise.exercise_id == Exercise.id).filter(Favourite_Exercise.user_id == session ["user_id"]) #Selects data from the exercise table and joins it to the favourite_exercise table and filters the data to the ones only the logged-in users can view
     return render_template("view_favourites.html", exercises = favourite_exercises) # Returns the page, displaying it to the user. The template can loop, showcasing each piece of data
 
 #Allows users to add reviews
-@app.route("/add-review/<int:exercise_id>", methods = ["POST"])
-def add_review(exercise_id):
-    if "user_id" not in session:
-        return redirect(url_for("home"))
-    rating = float(request.form.get("rating"))
+@app.route("/add-review/<int:exercise_id>", methods = ["POST"]) #Tells flask to run the function below this decorator when someone visits the url. The route can respond to POST requests (occurs when the user submits a form). This is a dynamic route based on the id of the object
+def add_review(exercise_id): #The function that runs when someone visits the url.
+    if "user_id" not in session: #Redirects the user to the home page if their details are not found in the database
+        return redirect(url_for("home")) #Redirects the user to a particular page
+    #Requests the following values to send to the server from the webpage
+    rating = float(request.form.get("rating")) 
     comment = request.form.get("comment")
+    #Doesn't allow invalid ratings
     if rating < 1 or rating > 5:
         flash("Rating must be between 1 and 5")
-        return redirect(url_for("exercise_detail", exercise_id = exercise_id))
-    existing_Review = Review_Exercise.query.filter_by(user_id = session["user_id"], exercise_id = exercise_id).first()
-    if existing_Review:
+        return redirect(url_for("exercise_detail", exercise_id = exercise_id)) #Redirects the user to a particular page
+    existing_Review = Review_Exercise.query.filter_by(user_id = session["user_id"], exercise_id = exercise_id).first() #Looks for a row in the Review_Exercise table that matches the current user and the review they left
+    if existing_Review: #Doesn't allow users to leave more than 1 review
         flash("You can't leave more than 1 review")
-        return redirect(url_for("exercise_detail", exercise_id = exercise_id))
-    review = Review_Exercise(user_id = session["user_id"], exercise_id = exercise_id, rating = rating, comment = comment)
+        return redirect(url_for("exercise_detail", exercise_id = exercise_id)) #Redirects the user to a particular page. 
+    #Saves the information to the respective table
+    review = Review_Exercise(user_id = session["user_id"], exercise_id = exercise_id, rating = rating, comment = comment) 
     db.session.add(review)
     db.session.commit()
-    flash("Review added!")
-    return redirect(url_for("exercise_detail", exercise_id = exercise_id))
+    flash("Review added!") #Showcases a message to the user
+    return redirect(url_for("exercise_detail", exercise_id = exercise_id)) #Returns the page, displaying it to the user. The template can loop, showcasing each piece of data
 
 #Ends the app if the user chooses to
 @app.route("/logout") #Tells flask to run the function below this decorator when someone visits the url.
