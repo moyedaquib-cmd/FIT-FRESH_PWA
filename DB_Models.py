@@ -1,59 +1,38 @@
-from flask_sqlalchemy import SQLAlchemy #Allows communication with a SQL database through Python code
-from flask_login import UserMixin #Allows the user to log in and saves their data
-from datetime import date, datetime # #Datetime allows date and time to be viewed by the user
-db = SQLAlchemy() #Creates a database controller object that creates tables and saves/retrieves data. 
-class User(db.Model, UserMixin): #This defines a user table. db.Model tells SQLAlchemy that this class is a database table. UserMixin creates a login_system automatically that Flask-Login uses to authenticate and identify users securely.
-    id = db.Column(db.Integer, primary_key = True) #Creates a unique ID integer for each user
-    username = db.Column(db.String(50), unique = True, nullable = False) #Stores a login name (50 characters) that has to be unique and is required to exist 
-    password_hash = db.Column(db.String(255), nullable = False) #Stores the hashed password (255 characters)
-    role = db.Column(db.String(20), nullable = False) #Stores the role of the user (gym goer or personal trainer)
-class Workout(db.Model): #This defines a workouts table to log exercises.
-    id = db.Column(db.Integer, primary_key = True) #Creates a unique ID integer for each user
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable = False) #Links workout to the logged-in user
-    workout_date = db.Column(db.Date, default = date.today, nullable = False) #The date the workout occured, defaults to the day the user is logging the workout
-    exercise = db.Column(db.String(100), nullable = False) #What type of exercise it is
-    sets = db.Column(db.Integer, nullable = False) #How many sets the user performed
-    reps = db.Column(db.Integer, nullable = False) #How many reps of each exercise the user performed
-    weight = db.Column(db.Float, nullable = False) #The weight that they exercised with
-class CalorieEntry(db.Model): #A table that stores the calories tracked by the user for each meal.
-    id = db.Column(db.Integer, primary_key = True)  #Creates a unique ID integer for each user
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable = False) #Links calories to the logged-in user 
-    entry_date = db.Column(db.DateTime, default = datetime.utcnow, nullable = False) #The date and time the user tracked the calories
-    meal = db.Column(db.String(50), nullable = False) #Meal
-    calories = db.Column(db.Float, nullable = False) #Calories of the meal
-class Exercise(db.Model): #A table that stores the exercise added by the trainer.
-    id = db.Column(db.Integer, primary_key = True)  #Creates a unique ID integer for each user
-    name = db.Column(db.String(100), nullable = False) #Name of the exercise
-    description = db.Column(db.String(50), nullable = False) #Description of the exercise
-    muscle_group = db.Column(db.String(50), nullable = False) #What muscle group it affects
-    difficulty = db.Column(db.String(20), nullable = False) #How difficult it's to perform
-    image_url = db.Column(db.String(255)) #The image of the exercise
-    trainer_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable = False) #Links Exercise to the logged-in user 
-class Favourite_Exercise(db.Model): #A table that stores the user's favourite exercises
-    id = db.Column(db.Integer, primary_key = True) #Creates a unique ID integer for each user
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable = False) #Links favourite to the logged-in user 
-    exercise_id = db.Column(db.Integer, db.ForeignKey("exercise.id"), nullable = False) #Links the exercise to its id
-    __table_args__ = (db.UniqueConstraint("user_id", "exercise_id"), ) #Database blocks duplicate favourites from being added.
-class Review_Exercise(db.Model):
-    id = db.Column(db.Integer, primary_key = True) #Creates a unique ID integer for each user
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable = False) #Links review to logged-in user
-    exercise_id = db.Column(db.Integer, db.ForeignKey("exercise.id"), nullable = False) #Links the exercise to its id
-    rating = db.Column(db.Integer, nullable = False) #Stores the rating the user gave (1-5)
-    comment = db.Column(db.String(400)) #Stores the comment the user made
-    created_at = db.Column(db.DateTime, default = datetime.utcnow) #Stores when the review was created
-    user = db.relationship("User", backref="exercise_reviews") #Creates an object-level relationship between the user and review_exercise table. Backref creates the reverse relationship while enabling the tables to be claled on later.
-    __table_args__ = (db.UniqueConstraint("user_id", "exercise_id"), ) #Database blocks duplicate favourites from being added.
-class Diets(db.Model):
-    id = db.Column(db.Integer, primary_key = True) #Creates a unique ID integer for each user
-    name = db.Column(db.String(250), nullable = False) #Name of the diet
-    description = db.Column(db.String(500), nullable = False) #Description of diet
-    Daily_Calories = db.Column(db.Integer) #Total calories per day of the diet
-    trainer_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable = False) #Id of the trainer who made the diet 
-    trainer = db.relationship("User", backref="diets") #Creates an object-level relationship between the user and Diets table. Backref creates the reverse relationship while enabling the tables to be called on later.
-class WorkoutRoutine(db.Model):
-    id = db.Column(db.Integer, primary_key = True) #Creates a unique ID integer for each user
-    name = db.Column(db.String(250), nullable = False) #Name of workout routine
-    description = db.Column(db.String(500), nullable = False) #Description of workout routine
-    difficulty = db.Column(db.String(20)) #Difficulty of workout routine
-    trainer_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable = False) #Id of the trainer who made the diet 
-    trainer = db.relationship("User", backref="Workout_Routine") #Creates an object-level relationship between the user and WorkoutRoutine table. Backref creates the reverse relationship while enabling the tables to be called on later.
+import sqlite3 #Allows pyton to interact with an SQLite3 database directly
+import os #Allows Python to interact with the OS
+basedir = os.path.abspath(os.path.dirname(__file__)) #Builds an absolute path to the DB file allowing it to worl on all OS
+DB_PATH = os.path.join(basedir, "instance", "app.db") #The location of the DB file
+
+#Opens and returns a connection to the SQLite3 database.
+def get_db():
+    os.makedirs(os.path.dirname(DB_PATH), exist_ok = True) #Creates the instance folder if it doesn't exist
+    conn = sqlite3.connect(DB_PATH) #Connects to the database file
+    conn.row_factory = sqlite3.Row #Allows columns to be accessed by name instead of index
+    conn.execute("PRAGMA foreign_keys = ON") #Enforces foreign key constraints
+    return conn
+
+#Creates all tables if they don't exist. 
+def init_db():
+    conn = get_db()
+    cursor = conn.cursor() #Creates a cursor object from the database connection allowing interaction with data
+    
+    #Users table which stores registered accounts
+    cursor.execute("CREATE TABLE IF NOT EXISTS user (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL, role TEXT NOT NULL)") #Text not null makes it so that no empty information is collected. Additionally, "UNIQUE" makes it so tjhat no duplicate information is collected
+
+    #Workouts table which stores logged workouts linked to the user
+    cursor.execute("CREATE TABLE IF NOT EXISTS workout (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, workout_date TEXT NOT NULL DEFAULT (DATE('now')), exercise TEXT NOT NULL, sets INTEGER NOT NULL, reps INTEGER NOT NULL, weight REAL NOT NULL, FOREIGN KEY (user_id) REFERENCES user(id))") #Foreign Key indicates which table it has a relationship with
+ 
+    #Calorie_Entry table which stores tracked meals and calories linked to a user
+    cursor.execute("CREATE TABLE IF NOT EXISTS calorie_entry (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, entry_date TEXT NOT NULL DEFAULT (DATETIME('now')), meal TEXT NOT NULL, calories REAL NOT NULL, FOREIGN KEY (user_id) REFERENCES user(id))")
+
+    #Exercise table which stores all exercises created by trainers
+    cursor.execute("CREATE TABLE IF NOT EXISTS exercise (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT NOT NULL, muscle_group TEXT NOT NULL, difficulty TEXT NOT NULL, image_url TEXT, trainer_id INTEGER NOT NULL, FOREIGN KEY (trainer_id) REFERENCES user(id))") #trainer_id links each exercise to the trainer who created it
+    
+    #Favourite_Exercise table which stores the exercises the 
+    cursor.execute("CREATE TABLE IF NOT EXISTS favourite_exercise (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, exercise_id INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES user(id), FOREIGN KEY (exercise_id) REFERENCES exercise(id), UNIQUE (user_id, exercise_id))") #UNIQUE prevents duplicate favourites for the same user and exercise
+
+    #Review_Exercise table wich sotres user reviews and ratings for exercises
+    cursor.execute("CREATE TABLE IF NOT EXISTS review_exercise (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, exercise_id INTEGER NOT NULL, rating INTEGER NOT NULL, comment TEXT, created_at TEXT NOT NULL DEFAULT (DATETIME('now')), FOREIGN KEY (user_id) REFERENCES user(id), FOREIGN KEY (exercise_id) REFERENCES exercise(id), UNIQUE (user_id, exercise_id))")
+    
+    conn.commit() #Saves all the table creations
+    conn.close() #Closes the connection

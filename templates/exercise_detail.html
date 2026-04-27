@@ -42,7 +42,7 @@
             <ul>
                 {% for review in reviews %}
                     <li>
-                        <strong> {{ review.user.username }} </strong>
+                        <strong> {{ review["username"] }} </strong>
                         <br>
                         <strong>{{ review.rating }}/5</strong> <br>
                         {{ review.comment }}
