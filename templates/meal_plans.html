@@ -1,0 +1,39 @@
+<!DOCTYPE html> 
+<html lang = "en"> 
+    <head> 
+        <meta charset="UTF-8">
+        <title>View Exercise</title> 
+    </head>
+    <body> 
+        {% with messages = get_flashed_messages() %} 
+            {% if messages %} 
+                <ul style="color: green;"> 
+                    {% for message in messages %} 
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        <h2>Meal Plans & Diets</h2>
+        {% if meal_plans %} 
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px">
+                {% for plan in meal_plans %} 
+                    <div style="border:1px solid #ccc; padding:10px"> 
+                        <h3>{{ plan.name }}</h3> <!--Name of the meal plan-->
+                        <p>{{ plan.description }}</p> <!--Desceiption of the meal plan-->
+                        <a href="{{ url_for('meal_plan_detail', plan_id = plan.id) }}">View Details</a>
+                    </div> 
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No Meal Plans yet.</p>
+        {% endif %}
+        <hr> 
+        {% if session.role == "gym_goer" %}
+            <a href="{{ url_for('gym_goer_dashboard') }}">Back to Dashboard</a>
+        {% else %}
+            <a href="{{ url_for('personal_trainer_dashboard') }}">Back to Dashboard</a>
+        {% endif %}
+        <a href="/">Back to Home</a> 
+    </body>
+</html>

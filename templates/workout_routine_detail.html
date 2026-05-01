@@ -1,0 +1,65 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+    <head> 
+        <meta charset="UTF-8"> 
+        <title>{{ routine.name }}</title>
+    </head>
+    <body> 
+        {% with messages = get_flashed_messages() %} 
+            {% if messages %} 
+                <ul style="color: green;">
+                    {% for message in messages %} 
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        <h2>{{ routine.name }}</h2> <!--Displays the name of the routine-->
+        <p><strong>Difficulty: </strong>{{ routine.difficulty }}</p> <!--Displays the difficulty level-->
+        <p>{{ routine.description }}</p> <!--Description of the routine-->
+        <hr>
+        <h3>Exercises in This Routine</h3>
+        <p style="white-space: pre-wrap;">{{ routine.exercises_list }}</p> <!--Displays the exercises list, preserving line breaks entered by the trainer-->
+        <hr>
+        <h3>Reviews</h3>
+        {% if session.role == "gym_goer" %} 
+        <form method="POST" action="{{ url_for('add_workout_routine_review', routine_id=routine.id) }}"> 
+            <label>Rating: </label>
+            <select name="rating" required>
+                <option value="5">★★★★★</option>
+                <option value="4">★★★★</option>
+                <option value="3">★★★</option>
+                <option value="2">★★</option>
+                <option value="1">★</option>
+            </select>
+            <br><br>
+            <textarea name="comment" placeholder="Review this routine!" maxlength="400"></textarea> 
+            <br><br>
+            <button type="submit">Submit Review</button> 
+        </form>
+        {% endif %}
+        {% if reviews %}
+            <ul>
+                {% for review in reviews %} 
+                    <li>
+                        <strong>{{ review["username"] }}</strong><br>
+                        <strong>{{ review["rating"] }}/5</strong><br> 
+                        {{ review["comment"] }} 
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No reviews yet.</p> 
+        {% endif %}
+        <hr>
+        <form action="{{ url_for('toggle_favourite_workout_routine', routine_id=routine.id) }}" method="POST">
+            {% if is_favourite %} 
+                <button type="submit">Remove Favourite</button>
+            {% else %}
+                <button type="submit">Favourite</button>
+            {% endif %}
+        </form>
+        <br>
+        <a href="{{ url_for('workout_routines') }}">Back to Routines</a> 
+    </body>
+</html>

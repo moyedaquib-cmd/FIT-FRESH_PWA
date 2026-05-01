@@ -1,21 +1,21 @@
-<!DOCTYPE html> <!--Informs the browser that the page is an HTML5 document-->
-<html lang="en"> <!--Specifies the content is in english improving accessibily-->
-    <head> <!--Contains metadata-->
-        <meta charset="UTF-8"> <!--Informs the browser how to interpret characters supporting various letter, symbols and accents-->
-        <title>Workout Log</title> <!--Name of browser tab-->
+<!DOCTYPE html> 
+<html lang="en"> 
+    <head> 
+        <meta charset="UTF-8"> 
+        <title>Workout Log</title> 
     </head>
-    <body> <!--What the user sees/interacts with-->
-        {% with messages = get_flashed_messages() %} <!--Retrives the message created with flash-->
-            {% if messages %} <!--If the message exists, it's shown with green text-->
+    <body> 
+        {% with messages = get_flashed_messages() %}
+            {% if messages %} 
                 <ul style="color: green;"> 
-                    {% for message in messages %} <!--Creates a for loop that keeps showing messages when the PWA is run-->
+                    {% for message in messages %} 
                         <li>{{ message }}</li>
                     {% endfor %}
                 </ul>
             {% endif %}
         {% endwith %}
-        <h2>Log Your Workout</h2> <!--Informs the user to log their workout-->
-        <form action="/log-workout" method = "POST"> <!--Sends data to flask's log-workout route POST meants that the data is not sent in the url to ensure security-->
+        <h2>Log Your Workout</h2> 
+        <form action="/log-workout" method = "POST"> <!--Sends data to flask's log-workout route POST meaning that the data is not sent in the url to ensure security-->
             <label>Exercise Name: </label> <br> <!--Name of the exercise-->
             <input type = "text" name = "exercise" required> <br> <br>
             <label>Sets: </label> <br> <!--Stores how many sets the user performed while preventing invalid values like negative values -->
@@ -24,14 +24,14 @@
             <input type = "number" name = "reps" min="1" required> <br> <br> 
             <label>Weight: </label> <br> <!--Stores the weight of the exercise while allowing for decimals but not enabling negative values-->
             <input type = "number" name = "weight" step="0.1" min="0" required> <br> <br>
-            <button type="submit">SAVE</button> <!--Submits the form and calls the log-workout route-->
+            <button type="submit">SAVE</button>
         </form>
         <hr>
-        {% if session.role == "gym_goer" %} <!--Role based UI that allows the user to go back to their respective dashboard-->
+        {% if session.role == "gym_goer" %} 
             <a href="{{ url_for('gym_goer_dashboard') }}">Back to Dashboard</a>
         {% else %}
             <a href="{{ url_for('personal_trainer_dashboard') }}">Back to Dashboard</a>
         {% endif %}
-        <a href="/">Back to Home</a> <!--Allows user to go back to the home page-->
+        <a href="/">Back to Home</a> 
     </body>
 </html>

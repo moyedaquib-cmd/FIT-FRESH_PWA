@@ -1,20 +1,20 @@
-<!DOCTYPE html> <!--Informs the browser that the page is an HTML5 document-->
-<html lang = "en"> <!--Specifies the content is in english improving accessibily-->
-    <head> <!--Contains metadata-->
-        <meta charset="UTF-8"> <!--Informs the browser how to interpret characters supporting various letter, symbols and accents-->
-        <title>{{ exercise.name }}</title> <!--Name of browser tab-->
+<!DOCTYPE html> 
+<html lang = "en">
+    <head> 
+        <meta charset="UTF-8"> 
+        <title>{{ exercise.name }}</title> 
     </head>
-    <body> <!--What the user sees/interacts with-->
-        {% with messages = get_flashed_messages() %} <!--Retrives the message created with flash-->
-            {% if messages %} <!--If the message exists, it's shown with green text-->
+    <body> 
+        {% with messages = get_flashed_messages() %} 
+            {% if messages %} 
                 <ul style="color: green;"> 
-                    {% for message in messages %} <!--Creates a for loop that keeps showing messages when the PWA is run-->
+                    {% for message in messages %} 
                         <li>{{ message }}</li>
                     {% endfor %}
                 </ul>
             {% endif %}
         {% endwith %}
-        <h2>{{ exercise.name }}</h2> <!--Informs the user on the exercise-->
+        <h2>{{ exercise.name }}</h2> <!--The name of the exercise-->
         <p><strong>Muscle Group: </strong> {{ exercise.muscle_group }} </p> <!--The muscle group the exercise targets-->
         <p>{{ exercise.description }}</p> <!--Description of the exercise-->
         {% if exercise.image_url %} <!--If there is an image then it's displayed-->
@@ -23,7 +23,8 @@
         <hr>
         <h3>Reviews</h3>
         {% if session.role == "gym_goer" %}
-        <form method = "POST" action="{{ url_for('add_review', exercise_id = exercise.id)}}">
+        <form method = "POST" action="{{ url_for('add_review_exercise', exercise_id = exercise.id)}}">
+            <!--Allows users to leave a rating out of 5 stars through a drop-down menu-->
             <label>Rating: </label>
             <select name = "rating" required>
                 <option value="5">★★★★★</option>
@@ -33,26 +34,29 @@
                 <option value="1">★</option>
             </select>
             <br> <br>
-            <textarea name = "comment" placeholder = "Review the exercise!" maxlength = "400"></textarea>
+            <textarea name = "comment" placeholder = "Review the exercise!" maxlength = "400"></textarea> <!--Allows users to leave a review with a max of 400 words. It also includes placeholder text informing the user on what to do-->
             <br> <br>
             <button type = "submit">Submit Review</button>
         </form>
         {% endif %}
+        <!--If there are reviews, then they are displayed in a loop until all reviews are shown. Otherewise, the users are informed that there are no reviews-->
         {% if reviews %}
             <ul>
                 {% for review in reviews %}
                     <li>
-                        <strong> {{ review["username"] }} </strong>
+                        <strong> {{ review["username"] }} </strong> <!--Username of who left the review-->
                         <br>
-                        <strong>{{ review.rating }}/5</strong> <br>
-                        {{ review.comment }}
+                        <strong>{{ review.rating }}/5</strong> <br> <!--Shows the rating out of 5-->
+                        {{ review.comment }} <!--The review itself-->
                     </li>
                 {% endfor %}
             </ul>
         {% else %}
             <p>No reviews yet</p>
         {% endif %}
-        <form action = "{{ url_for('toggle_favourite', exercise_id = exercise.id) }}" method = "POST">
+        <!--Enables users to favourite an object-->
+        <form action = "{{ url_for('toggle_favourite_exercise', exercise_id = exercise.id) }}" method = "POST">
+        <!--If the object is already favourited, then a button showing the user that they can remove it is shown. Otherwise, the user is informed that they can favourite it-->
             {% if is_favourite %}
                 <button type="submit">Remove Favourite</button>
             {% else %}
@@ -60,6 +64,6 @@
             {% endif %}
         </form>
         <br><br>
-        <a href="/exercises">Back to Exercises</a> <!--Allows user to go back to the exercises page-->
+        <a href="/exercises">Back to Exercises</a>
     </body>
 </html>

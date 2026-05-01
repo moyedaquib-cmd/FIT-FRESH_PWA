@@ -1,0 +1,40 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+    <head>
+        <meta charset="UTF-8"> 
+        <title>Workout Routines</title> 
+    </head>
+    <body> 
+        {% with messages = get_flashed_messages() %} 
+            {% if messages %} 
+                <ul style="color: green;">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        <h2>Workout Routines</h2>
+        {% if routines %} 
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px">
+                {% for routine in routines %} 
+                    <div style="border:1px solid #ccc; padding:10px">
+                        <h3>{{ routine.name }}</h3> <!--Retrieves name of routine from table-->
+                        <p><strong>Difficulty: </strong>{{ routine.difficulty }}</p> <!--Displays the difficulty level of the routine-->
+                        <p>{{ routine.description }}</p> <!--Description of the routine-->
+                        <a href="{{ url_for('routine_detail', routine_id=routine.id) }}">View Details</a> 
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No workout routines yet.</p> 
+        {% endif %}
+        <hr> 
+        {% if session.role == "gym_goer" %}
+            <a href="{{ url_for('gym_goer_dashboard') }}">Back to Dashboard</a>
+        {% else %}
+            <a href="{{ url_for('personal_trainer_dashboard') }}">Back to Dashboard</a>
+        {% endif %}
+        <a href="/">Back to Home</a> 
+    </body>
+</html>

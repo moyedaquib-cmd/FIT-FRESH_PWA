@@ -1,0 +1,35 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+    <head>
+        <meta charset="UTF-8"> 
+        <title>Add Workout Routine</title> 
+    </head>
+    <body> 
+        {% with messages = get_flashed_messages() %} 
+            {% if messages %} 
+                <ul style="color: green;">
+                    {% for message in messages %} 
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        <h2>Add Workout Routine</h2> 
+        <form method="POST"> 
+            <label>Routine Name: </label><br> 
+            <input name="name" required><br><br> 
+            <label>Description: </label><br> 
+            <textarea name="description" required></textarea><br><br> 
+            <label>Difficulty: </label><br> 
+            <select name="difficulty" required>
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+            </select><br><br>
+            <label>Exercises (list each exercise on a new line): </label><br> 
+            <textarea name="exercises_list" rows="8" required></textarea><br><br> 
+            <button type="submit">Add Routine</button>
+            <a href="{{ url_for('personal_trainer_dashboard') }}">Back to Dashboard</a> 
+        </form>
+    </body>
+</html>

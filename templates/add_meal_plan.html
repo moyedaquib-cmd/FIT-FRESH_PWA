@@ -1,0 +1,29 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+    <head> 
+        <meta charset="UTF-8"> 
+        <title>Add Meal Plan</title>
+    </head>
+    <body> 
+        {% with messages = get_flashed_messages() %} 
+            {% if messages %} 
+                <ul style="color: green;">
+                    {% for message in messages %} 
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        <h2>Add Meal Plan</h2>
+        <form method="POST">
+            <label>Plan Name: </label><br> 
+            <input name="name" required><br><br>
+            <label>Description: </label><br> 
+            <textarea name="description" required></textarea><br><br>
+            <label>Meals (list each meal on a new line): </label><br> 
+            <textarea name="meals" rows="8" required></textarea><br><br> <!--Larger text area so the trainer can list multiple meals across multiple lines-->
+            <button type="submit">Add Meal Plan</button> 
+            <a href="{{ url_for('personal_trainer_dashboard') }}">Back to Dashboard</a> 
+        </form>
+    </body>
+</html>
