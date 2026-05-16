@@ -1,56 +1,53 @@
-<!DOCTYPE html> 
-<html lang = "en">
-    <head> 
-        <meta charset="UTF-8">
-        <title>Workout History</title> 
-    </head>
-    <body> 
-        {% with messages = get_flashed_messages() %} 
-            {% if messages %} 
-                <ul style="color: green;"> 
-                    {% for message in messages %} 
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-        <h2>Your Workout History</h2> 
-        {%if workouts %}
-            <table border="1" cellpadding = "5">
+{% extends "base.html" %}
+{% block title %}Workout History — Fit & Fresh{% endblock %}
+{% block content %}
+<div class="page">
+    <div class="page-header">
+        <h2>Workout History</h2>
+        <a href="/log-workout" class="btn btn-primary">+ Log Workout</a>
+    </div>
+ 
+    {% if workouts %}
+    <div class="table-wrap">
+        <table>
+            <thead>
                 <tr>
-                    <th>Date</th> 
+                    <th>Date</th>
                     <th>Exercise</th>
                     <th>Sets</th>
                     <th>Reps</th>
                     <th>Weight</th>
                     <th>Actions</th>
                 </tr>
-            {% for workout in workouts %} 
-            <tr>
-                <td>{{ workout.workout_date}}</td> 
-                <td>{{ workout.exercise}}</td>
-                <td>{{ workout.sets }}</td>
-                <td>{{ workout.reps }}</td>
-                <td>{{ workout.weight }}</td>
-                <td>
-                    <a href="{{ url_for('edit_workout', workout_id = workout.id) }}">Edit</a>
-                    <form action = "{{ url_for('delete_workout', workout_id = workout.id) }}" method = "POST" style = "display:inline;"> 
-                        <button type = "submit">Delete</button> 
-                    </form>
-                </td>
-            </tr>
-            {% endfor %} 
-            </table>
-        {% else %}
-            <p>No workouts logged</p>
-        {% endif %} 
-        <br>
-        <hr> 
-        {% if session.role == "gym_goer" %}
-            <a href="{{ url_for('gym_goer_dashboard') }}">Back to Dashboard</a>
-        {% else %}
-            <a href="{{ url_for('personal_trainer_dashboard') }}">Back to Dashboard</a>
-        {% endif %}
-        <a href="/">Back to Home</a> 
-    </body>
-</html>
+            </thead>
+            <tbody>
+                {% for workout in workouts %}
+                <tr>
+                    <td style="color:var(--text-muted);">{{ workout.workout_date }}</td>
+                    <td><strong>{{ workout.exercise }}</strong></td>
+                    <td>{{ workout.sets }}</td>
+                    <td>{{ workout.reps }}</td>
+                    <td>{{ workout.weight }} kg</td>
+                    <td>
+                        <div class="table-actions">
+                            <a href="{{ url_for('edit_workout', workout_id=workout.id) }}" class="btn btn-outline btn-sm">Edit</a>
+                            <form action="{{ url_for('delete_workout', workout_id=workout.id) }}" method="POST">
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">🏋️</div>
+        <h3>No Workouts Logged</h3>
+        <p>Start tracking your training sessions.</p>
+        <a href="/log-workout" class="btn btn-primary" style="margin-top:1rem;">Log Your First Workout</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

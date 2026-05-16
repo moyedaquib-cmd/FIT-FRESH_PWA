@@ -1,31 +1,67 @@
-<!DOCTYPE html>
-<html lang = "en"> 
-    <head> 
-        <meta charset="UTF-8">
-        <title>Personal Trainer Dashboard</title> 
-    </head>
-    <body> 
-        {% with messages = get_flashed_messages() %}
-            {% if messages %} 
-                <ul style="color: green;"> 
-                    {% for message in messages %}
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-        <h1>Personal Trainer Dashboard</h1> 
-        <a href="/log-workout">Log Workout</a> <br> <br> 
-        <a href="/logout">Logout</a> 
-        <a href="/workout-history">View Workout History</a> 
-        <a href="/log-calories">Track Your Calories</a> 
-        <a href="/calorie-history">View Calories Tracked</a>
-        <a href="/add-exercise">Add Exercise</a> <!--Allows the user to add exercises-->
-        <a href="/view-favourites">View Favourites</a> 
-        <a href="/exercises">View Exercises</a> 
-        <a href="/add-meal-plan">Add Meal Plan</a> <!--Allows users to create meal plans-->
-        <a href="/meal-plans">View Meal Plans</a>
-        <a href="/workout-routines">View Workout Routines</a>
-        <a href="/add-workout-routine">Add Workout Routine</a> <!--Allows users to creat workout routines-->
-    </body>
-</html>
+{% extends "base.html" %}
+{% block title %}Trainer Dashboard — Fit & Fresh{% endblock %}
+{% block content %}
+<div class="page">
+    <h2>Your Dashboard</h2>
+    <p style="color:var(--text-muted);margin-top:0.25rem;">Your Dashboard</p>
+ 
+    <div class="dash-grid">
+        <a href="/add-exercise" class="dash-card primary">
+            <div class="dash-card-icon">➕</div>
+            <div class="dash-card-title">Add Exercise</div>
+            <div class="dash-card-sub">Upload a new exercise to the library</div>
+        </a>
+        <a href="/add-meal-plan" class="dash-card primary">
+            <div class="dash-card-icon">🥗</div>
+            <div class="dash-card-title">Add Meal Plan</div>
+            <div class="dash-card-sub">Create a new diet or nutrition plan</div>
+        </a>
+        <a href="/add-workout-routine" class="dash-card primary">
+            <div class="dash-card-icon">🔥</div>
+            <div class="dash-card-title">Add Routine</div>
+            <div class="dash-card-sub">Build a full workout program</div>
+        </a>
+        <a href="/exercises" class="dash-card">
+            <div class="dash-card-icon">💪</div>
+            <div class="dash-card-title">Exercise Library</div>
+            <div class="dash-card-sub">Browse all uploaded exercises</div>
+        </a>
+        <a href="/meal-plans" class="dash-card">
+            <div class="dash-card-icon">📋</div>
+            <div class="dash-card-title">Meal Plans</div>
+            <div class="dash-card-sub">View all meal plans</div>
+        </a>
+        <a href="/workout-routines" class="dash-card">
+            <div class="dash-card-icon">📅</div>
+            <div class="dash-card-title">Routines</div>
+            <div class="dash-card-sub">View all workout routines</div>
+        </a>
+        <a href="/log-workout" class="dash-card">
+            <div class="dash-card-icon">🏋️</div>
+            <div class="dash-card-title">Log Workout</div>
+            <div class="dash-card-sub">Track your own training</div>
+        </a>
+        <a href="/workout-history" class="dash-card">
+            <div class="dash-card-icon">📊</div>
+            <div class="dash-card-title">Workout History</div>
+            <div class="dash-card-sub">View your logged sessions</div>
+        </a>
+        <a href="/log-calories" class="dash-card">
+            <div class="dash-card-icon">🍽️</div>
+            <div class="dash-card-title">Track Calories</div>
+            <div class="dash-card-sub">Log your meals</div>
+        </a>
+        <a href="/calorie-history" class="dash-card">
+            <div class="dash-card-icon">🥦</div>
+            <div class="dash-card-title">Calorie History</div>
+            <div class="dash-card-sub">Browse tracked nutrition</div>
+        </a>
+        <a href="/view-favourites" class="dash-card">
+            <div class="dash-card-icon">⭐</div>
+            <div class="dash-card-title">Favourites</div>
+            <div class="dash-card-sub">Your saved content</div>
+        </a>
+    </div>
+</div>
+{% endblock %}
+ 

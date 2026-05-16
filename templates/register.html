@@ -1,43 +1,37 @@
-<!DOCTYPE html> 
-<html lang="en"> 
-    <head> 
-        <meta charset="UTF-8"> 
-        <title>Register</title>
-        <script> //Javascript function
-            function togglePassword() { //Switches password from being hidden to visible
-                const passwordInput = document.getElementById("password"); //Gets the password element
-                if (passwordInput.type === "password") {
-                    passwordInput.type = "text"; //Password in visible characters
-                } else {
-                    passwordInput.type = "password"; //Password in hidden characters
-                }
-            }
-        </script>
-    </head>
-    <body> 
-        {% with messages = get_flashed_messages() %} 
-            {% if messages %} 
-                <ul style="color: green;">
-                    {% for message in messages %} 
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-        <h2>Register Account</h2> 
-        <form action="/register" method = "POST"> 
-            <label>Username: </label> <br>
-            <input type = "text" name = "username" required> <br> <br>
-            <label>Password: </label> <br> 
-            <button type = "button" onclick = "togglePassword()">👁</button> 
-            <input type = "password" id = "password" name = "password" required> <br> <br>
-            <label>Role: </label> <br> <!--Creates a dropdown menu for the user to choose their role-->
-            <select name = "role" required> 
-                <option value = "gym_goer">Gym Goer</option>
-                <option value="trainer">Personal Trainer</option>
-            </select> <br> <br>
-            <a href="/">Back to Home</a>
-            <button type="submit">Register</button>
+{% extends "base.html" %}
+{% block title %}Register — Fit & Fresh{% endblock %}
+{% block content %}
+<div class="page-sm">
+    <div class="auth-logo">
+        <div class="auth-logo-text">FIT<span>&</span>FRESH</div>
+        <p style="color:var(--text-muted);font-size:0.9rem;margin-top:0.25rem;">Create your account to get started.</p>
+    </div>
+    <div class="form-card">
+        <form action="/register" method="POST">
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" name="username" class="form-control" placeholder="Choose a username" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <div class="password-field">
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Choose a password" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword()">👁</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">I am a...</label>
+                <select name="role" class="form-control" required>
+                    <option value="gym_goer">Gym Goer</option>
+                    <option value="trainer">Personal Trainer</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top:0.5rem;">Create Account</button>
         </form>
-    </body>
-</html>
+    </div>
+    <p class="auth-switch">Already have an account? <a href="/login">Log in here</a></p>
+</div>
+<script>
+function togglePassword() { const p = document.getElementById("password"); p.type = p.type === "password" ? "text" : "password";}
+</script>
+{% endblock %}

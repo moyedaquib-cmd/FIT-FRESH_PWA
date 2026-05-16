@@ -1,38 +1,37 @@
-<!DOCTYPE html> <!--Informs the browser that the page is an HTML5 document-->
-<html lang = "en"> <!--Specifies the content is in english improving accessibily-->
-    <head> <!--Contains metadata-->
-        <meta charset="UTF-8"> <!--Informs the browser how to interpret characters supporting various letter, symbols and accents-->
-        <title>Add Exercise</title> <!--Name of browser tab-->
-    </head>
-    <body> <!--What the user sees/interacts with-->
-        {% with messages = get_flashed_messages() %} <!--Retrives the message created with flash-->
-            {% if messages %} <!--If the message exists, it's shown with green text-->
-                <ul style="color: green;"> 
-                    {% for message in messages %} <!--Creates a for loop that keeps showing messages when the PWA is run-->
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-        <h2>Add Exercise</h2> <!--Informs the user on the feature-->
-        <form method = "POST"> <!--Creates a form that sends data to the server-->
-            <label>Exercise Name: </label> <br> 
-            <input name="name" required> <br> <br> <!--Allows the user to input data. Name allows Flask to call on the data. Required forces users to enter data-->
-            <label>Description: </label> <br>
-            <textarea name="description" required></textarea> <br> <br> <!--Allows the user to input data in a big, adjustable area of text-->
-            <label>Muscle Group: </label> <br> 
-            <input name = "muscle_group" required> <br> <br> 
-            <label>Image URL: </label> <br> 
-            <input name = "image_url"> <br> <br> 
-            <label>Difficulty: </label><br> 
-            <select name="difficulty" required>  <!--Allows the user to select an option-->
-                <option value = "Beginner">Beginner</option> 
-                <option value = "Intermediate">Intermediate</option>
-                <option value = "Advanced">Advanced</option>
-            </select> <br> <br>
-            <button type = "submit">Add Exercise</button> <!--Submit button--> 
-            <a href="{{ url_for('personal_trainer_dashboard') }}">Back to Dashboard</a> <!--Allows user to go back to their dashboard-->
-            <a href="{{ url_for('home') }}">Back to Home</a> <!--Allows user to go back to the home page-->
+{% extends "base.html" %}
+{% block title %}Add Exercise — Fit & Fresh{% endblock %}
+{% block content %}
+<div class="page-sm">
+    <a href="{{ url_for('personal_trainer_dashboard') }}" class="back-link">← Back to Dashboard</a>
+    <h2 style="margin-bottom:1.5rem;">Add Exercise</h2>
+    <div class="form-card">
+        <form method="POST">
+            <div class="form-group">
+                <label class="form-label">Exercise Name</label>
+                <input name="name" class="form-control" placeholder="e.g. Barbell Back Squat" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Form</label>
+                <textarea name="description" class="form-control" placeholder="Describe the exercise and how to perform it..." required></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Muscle Group</label>
+                <input name="muscle_group" class="form-control" placeholder="e.g. Quadriceps, Glutes" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Image URL <span style="color:var(--text-dim);font-weight:400;text-transform:none;">(optional)</span></label>
+                <input name="image_url" class="form-control" placeholder="https://example.com/image.jpg">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Difficulty</label>
+                <select name="difficulty" class="form-control" required>
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">Add Exercise</button>
         </form>
-    </body>
-</html>
+    </div>
+</div>
+{% endblock %}

@@ -1,29 +1,26 @@
-<!DOCTYPE html> 
-<html lang="en"> 
-    <head> 
-        <meta charset="UTF-8"> 
-        <title>Add Meal Plan</title>
-    </head>
-    <body> 
-        {% with messages = get_flashed_messages() %} 
-            {% if messages %} 
-                <ul style="color: green;">
-                    {% for message in messages %} 
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-        <h2>Add Meal Plan</h2>
+{% extends "base.html" %}
+{% block title %}Add Meal Plan — Fit & Fresh{% endblock %}
+{% block content %}
+<div class="page-sm">
+    <a href="{{ url_for('personal_trainer_dashboard') }}" class="back-link">← Back to Dashboard</a>
+    <h2 style="margin-bottom:1.5rem;">Diet</h2>
+    <div class="form-card">
         <form method="POST">
-            <label>Plan Name: </label><br> 
-            <input name="name" required><br><br>
-            <label>Description: </label><br> 
-            <textarea name="description" required></textarea><br><br>
-            <label>Meals (list each meal on a new line): </label><br> 
-            <textarea name="meals" rows="8" required></textarea><br><br> <!--Larger text area so the trainer can list multiple meals across multiple lines-->
-            <button type="submit">Add Meal Plan</button> 
-            <a href="{{ url_for('personal_trainer_dashboard') }}">Back to Dashboard</a> 
+            <div class="form-group">
+                <label class="form-label">Plan Name</label>
+                <input name="name" class="form-control" placeholder="e.g. 2500 Cal Muscle Building Plan" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea name="description" class="form-control" placeholder="Describe this meal plan and who it's for..." required></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Meals</label>
+                <p class="form-hint" style="margin-bottom:0.4rem;">List each meal on a new line</p>
+                <textarea name="meals" class="form-control" rows="8" placeholder="Breakfast: Oats with protein powder&#10;Snack: Greek yoghurt&#10;Lunch: Chicken rice and veg&#10;..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">Add Meal Plan</button>
         </form>
-    </body>
-</html>
+    </div>
+</div>
+{% endblock %}

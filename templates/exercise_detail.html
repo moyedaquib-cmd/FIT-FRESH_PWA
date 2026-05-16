@@ -1,69 +1,74 @@
-<!DOCTYPE html> 
-<html lang = "en">
-    <head> 
-        <meta charset="UTF-8"> 
-        <title>{{ exercise.name }}</title> 
-    </head>
-    <body> 
-        {% with messages = get_flashed_messages() %} 
-            {% if messages %} 
-                <ul style="color: green;"> 
-                    {% for message in messages %} 
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-        <h2>{{ exercise.name }}</h2> <!--The name of the exercise-->
-        <p><strong>Muscle Group: </strong> {{ exercise.muscle_group }} </p> <!--The muscle group the exercise targets-->
-        <p>{{ exercise.description }}</p> <!--Description of the exercise-->
-        {% if exercise.image_url %} <!--If there is an image then it's displayed-->
-            <img src="{{ exercise.image_url }}" width = "300">
+{% extends "base.html" %}
+{% block title %}{{ exercise.name }} — Fit & Fresh{% endblock %}
+{% block content %}
+<div class="page">
+    <a href="/exercises" class="back-link">← Back to Exercises</a>
+ 
+    <div class="detail-hero">
+        {% if exercise.image_url %}
+        <img src="{{ exercise.image_url }}" class="detail-hero-img" alt="{{ exercise.name }}">
         {% endif %}
-        <hr>
+        <div class="detail-hero-body">
+            <h2>{{ exercise.name }}</h2>
+            <div class="detail-meta">
+                <span class="badge badge-muscle">{{ exercise.muscle_group }}</span>
+                {% if exercise.difficulty == "Beginner" %}
+                    <span class="badge badge-beginner">{{ exercise.difficulty }}</span>
+                {% elif exercise.difficulty == "Intermediate" %}
+                    <span class="badge badge-intermediate">{{ exercise.difficulty }}</span>
+                {% else %}
+                    <span class="badge badge-advanced">{{ exercise.difficulty }}</span>
+                {% endif %}
+            </div>
+            <p>{{ exercise.description }}</p>
+            <form action="{{ url_for('toggle_favourite_exercise', exercise_id=exercise.id) }}" method="POST" class="fav-form">
+                {% if is_favourite %}
+                <button type="submit" class="btn btn-fav-active btn-sm">★ Remove Favourite</button>
+                {% else %}
+                <button type="submit" class="btn btn-outline btn-sm">☆ Add to Favourites</button>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+ 
+    <div class="detail-section">
         <h3>Reviews</h3>
         {% if session.role == "gym_goer" %}
-        <form method = "POST" action="{{ url_for('add_review_exercise', exercise_id = exercise.id)}}">
-            <!--Allows users to leave a rating out of 5 stars through a drop-down menu-->
-            <label>Rating: </label>
-            <select name = "rating" required>
-                <option value="5">★★★★★</option>
-                <option value="4">★★★★</option>
-                <option value="3">★★★</option>
-                <option value="2">★★</option>
-                <option value="1">★</option>
-            </select>
-            <br> <br>
-            <textarea name = "comment" placeholder = "Review the exercise!" maxlength = "400"></textarea> <!--Allows users to leave a review with a max of 400 words. It also includes placeholder text informing the user on what to do-->
-            <br> <br>
-            <button type = "submit">Submit Review</button>
-        </form>
+        <div class="review-form">
+            <form method="POST" action="{{ url_for('add_review_exercise', exercise_id=exercise.id) }}">
+                <div class="star-select" style="margin-bottom:0.75rem;">
+                    <label class="form-label">Your Rating</label>
+                    <select name="rating" class="form-control" style="width:auto;" required>
+                        <option value="5">★★★★★</option>
+                        <option value="4">★★★★</option>
+                        <option value="3">★★★</option>
+                        <option value="2">★★</option>
+                        <option value="1">★</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <textarea name="comment" class="form-control" placeholder="Share your thoughts on this exercise..." maxlength="400"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Submit Review</button>
+            </form>
+        </div>
         {% endif %}
-        <!--If there are reviews, then they are displayed in a loop until all reviews are shown. Otherewise, the users are informed that there are no reviews-->
+ 
         {% if reviews %}
-            <ul>
-                {% for review in reviews %}
-                    <li>
-                        <strong> {{ review["username"] }} </strong> <!--Username of who left the review-->
-                        <br>
-                        <strong>{{ review.rating }}/5</strong> <br> <!--Shows the rating out of 5-->
-                        {{ review.comment }} <!--The review itself-->
-                    </li>
-                {% endfor %}
-            </ul>
+        <div class="reviews-list">
+            {% for review in reviews %}
+            <div class="review-card">
+                <div class="review-header">
+                    <span class="review-author">{{ review["username"] }}</span>
+                    <span class="review-stars">{{ "★" * review["rating"] }}{{ "☆" * (5 - review["rating"]) }}</span>
+                </div>
+                <p class="review-comment">{{ review["comment"] }}</p>
+            </div>
+            {% endfor %}
+        </div>
         {% else %}
-            <p>No reviews yet</p>
+        <p style="color:var(--text-muted);font-size:0.9rem;">No reviews yet. Be the first to leave one!</p>
         {% endif %}
-        <!--Enables users to favourite an object-->
-        <form action = "{{ url_for('toggle_favourite_exercise', exercise_id = exercise.id) }}" method = "POST">
-        <!--If the object is already favourited, then a button showing the user that they can remove it is shown. Otherwise, the user is informed that they can favourite it-->
-            {% if is_favourite %}
-                <button type="submit">Remove Favourite</button>
-            {% else %}
-                <button type="submit">Favourite</button>
-            {% endif %}
-        </form>
-        <br><br>
-        <a href="/exercises">Back to Exercises</a>
-    </body>
-</html>
+    </div>
+</div>
+{% endblock %}

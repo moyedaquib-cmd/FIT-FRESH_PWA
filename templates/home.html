@@ -1,21 +1,13 @@
-<!DOCTYPE html>
-<html lang = "en"> 
-    <head> 
-        <meta charset="UTF-8"> 
-        <title>Fit & Fresh</title>
-    </head>
-    <body> 
-        {% with messages = get_flashed_messages() %} 
-            {% if messages %}
-                <ul style="color: green;"> 
-                    {% for message in messages %} 
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-        <h1>WELCOME to Fit&Fresh!</h1> <!--Introduces the PWA-->
-        <a href="/register">Register</a> <!--Link to the register page-->
-        <a href="/login">Login</a> <!--Link to the login page-->
-    </body>
-</html>
+{% extends "base.html" %}
+{% block title %}Fit & Fresh — Train Smarter{% endblock %}
+{% block content %}
+<div class="hero">
+    <p class="hero-eyebrow">Your Performance Platform</p>
+    <h1 class="hero-title">FIT<span>&</span><br>FRESH</h1>
+    <p class="hero-sub">Log workouts, track calories, and discover expert-created exercises, meal plans and routines — all in one place.</p>
+    <div class="hero-actions">
+        <a href="/register" class="btn btn-primary btn-lg">Get Started</a>
+        <a href="/login" class="btn btn-outline btn-lg">Log In</a>
+    </div>
+</div>
+{% endblock %}

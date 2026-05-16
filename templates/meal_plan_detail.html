@@ -1,64 +1,66 @@
-<!DOCTYPE html> 
-<html lang="en"> 
-    <head> 
-        <meta charset="UTF-8"> 
-        <title>{{ plan.name }}</title> 
-    </head>
-    <body> 
-        {% with messages = get_flashed_messages() %} 
-            {% if messages %} 
-                <ul style="color: green;">
-                    {% for message in messages %}
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-        <h2>{{ plan.name }}</h2> <!--Displays the name of the meal plan-->
-        <p>{{ plan.description }}</p> <!--Description of the meal plan-->
-        <hr>
+{% extends "base.html" %}
+{% block title %}{{ plan.name }} — Fit & Fresh{% endblock %}
+{% block content %}
+<div class="page">
+    <a href="{{ url_for('meal_plans') }}" class="back-link">← Back to Meal Plans</a>
+ 
+    <div class="detail-hero">
+        <div class="detail-hero-body">
+            <h2>{{ plan.name }}</h2>
+            <p style="margin-top:0.75rem;">{{ plan.description }}</p>
+            <form action="{{ url_for('toggle_favourite_meal_plan', plan_id=plan.id) }}" method="POST" class="fav-form" style="margin-top:1rem;">
+                {% if is_favourite %}
+                <button type="submit" class="btn btn-fav-active btn-sm">★ Remove Favourite</button>
+                {% else %}
+                <button type="submit" class="btn btn-outline btn-sm">☆ Add to Favourites</button>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+ 
+    <div class="detail-section">
         <h3>Meals Included</h3>
-        <p style="white-space: pre-wrap;">{{ plan.meals }}</p> <!--Displays the meals list, preserving line breaks entered by the trainer-->
-        <hr>
+        <p class="exercises-list">{{ plan.meals }}</p>
+    </div>
+ 
+    <div class="detail-section">
         <h3>Reviews</h3>
-        {% if session.role == "gym_goer" %} <!--Only gym goers can submit reviews-->
-        <form method="POST" action="{{ url_for('add_meal_plan_review', plan_id=plan.id) }}"> <!--Sends the review to the add_meal_plan_review route-->
-            <label>Rating: </label>
-            <select name="rating" required> 
-                <option value="5">★★★★★</option>
-                <option value="4">★★★★</option>
-                <option value="3">★★★</option>
-                <option value="2">★★</option>
-                <option value="1">★</option>
-            </select>
-            <br><br>
-            <textarea name="comment" placeholder="Review this meal plan!" maxlength="400"></textarea> 
-            <br><br>
-            <button type="submit">Submit Review</button>
-        </form>
+        {% if session.role == "gym_goer" %}
+        <div class="review-form">
+            <form method="POST" action="{{ url_for('add_meal_plan_review', plan_id=plan.id) }}">
+                <div class="star-select" style="margin-bottom:0.75rem;">
+                    <label class="form-label">Your Rating</label>
+                    <select name="rating" class="form-control" style="width:auto;" required>
+                        <option value="5">★★★★★</option>
+                        <option value="4">★★★★</option>
+                        <option value="3">★★★</option>
+                        <option value="2">★★</option>
+                        <option value="1">★</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <textarea name="comment" class="form-control" placeholder="Share your thoughts on this meal plan..." maxlength="400"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Submit Review</button>
+            </form>
+        </div>
         {% endif %}
-        {% if reviews %} 
-            <ul>
-                {% for review in reviews %} 
-                    <li>
-                        <strong>{{ review["username"] }}</strong><br> 
-                        <strong>{{ review["rating"] }}/5</strong><br> 
-                        {{ review["comment"] }} 
-                    </li>
-                {% endfor %}
-            </ul>
+ 
+        {% if reviews %}
+        <div class="reviews-list">
+            {% for review in reviews %}
+            <div class="review-card">
+                <div class="review-header">
+                    <span class="review-author">{{ review["username"] }}</span>
+                    <span class="review-stars">{{ "★" * review["rating"] }}{{ "☆" * (5 - review["rating"]) }}</span>
+                </div>
+                <p class="review-comment">{{ review["comment"] }}</p>
+            </div>
+            {% endfor %}
+        </div>
         {% else %}
-            <p>No reviews yet.</p>
+        <p style="color:var(--text-muted);font-size:0.9rem;">No reviews yet. Be the first!</p>
         {% endif %}
-        <hr>
-        <form action="{{ url_for('toggle_favourite_meal_plan', plan_id=plan.id) }}" method="POST">
-            {% if is_favourite %} 
-                <button type="submit">Remove Favourite</button>
-            {% else %}
-                <button type="submit">Favourite</button>
-            {% endif %}
-        </form>
-        <br>
-        <a href="{{ url_for('meal_plans') }}">Back to Meal Plans</a> 
-    </body>
-</html>
+    </div>
+</div>
+{% endblock %}

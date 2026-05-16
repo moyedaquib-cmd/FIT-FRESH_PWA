@@ -1,86 +1,97 @@
-<!DOCTYPE html> 
-<html lang = "en"> 
-    <head>
-        <meta charset="UTF-8"> 
-        <title>Favourites</title>
-    </head>
-    <body> 
-        {% with messages = get_flashed_messages() %} 
-            {% if messages %}
-                <ul style="color: green;"> 
-                    {% for message in messages %}
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-        <h2>My Favourites</h2>
-        
-        <!--EXERCISES SECTION -->
-        <h3>Exercises</h3>
+{% extends "base.html" %}
+{% block title %}My Favourites — Fit & Fresh{% endblock %}
+{% block content %}
+<div class="page">
+    <h2 style="margin-bottom:2rem;">My Favourites</h2>
+ 
+    <!-- EXERCISES -->
+    <div class="fav-section">
+        <div class="fav-section-title">💪 Exercises</div>
         {% if exercises %}
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px">
-                {% for exercise in exercises %}
-                    <div style="border:1px solid #ccc; padding:10px"> 
-                        <h3>{{ exercise.name }}</h3> 
-                        <p><strong>Muscle: </strong> {{ exercise.muscle_group }} </p> 
-                        {% if exercise.image_url %} 
-                            <img src="{{ exercise.image_url }}" width="100%">
-                        {% endif %}
-                        <a href="{{ url_for('exercise_detail', exercise_id = exercise.id) }}">
-                            View Details
-                        </a>
-                    </div> 
-                {% endfor %}
+        <div class="grid-3">
+            {% for exercise in exercises %}
+            <div class="content-card">
+                {% if exercise.image_url %}
+                <img src="{{ exercise.image_url }}" class="content-card-img" alt="{{ exercise.name }}">
+                {% else %}
+                <div class="content-card-img-placeholder">💪</div>
+                {% endif %}
+                <div class="content-card-body">
+                    <div class="content-card-title">{{ exercise.name }}</div>
+                    <span class="badge badge-muscle">{{ exercise.muscle_group }}</span>
+                </div>
+                <div class="content-card-footer">
+                    <a href="{{ url_for('exercise_detail', exercise_id=exercise.id) }}" class="btn btn-outline btn-sm">View Details</a>
+                </div>
             </div>
+            {% endfor %}
+        </div>
         {% else %}
-            <p>No favourited exercies</p>
+        <div class="empty-state" style="padding:2rem;">
+            <p>No favourited exercises yet. Browse the <a href="/exercises">exercise library</a> to save some!</p>
+        </div>
         {% endif %}
-        <br>
-        <hr> 
-
-        <!--MEAL PLANS SECTION-->
-        <h3>Meal Plans & Diets</h3>
-        {% if meal_plans %} 
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px"> 
-                {% for plan in meal_plans %} 
-                    <div style="border:1px solid #ccc; padding:10px"> 
-                        <h3>{{ plan.name }}</h3> 
-                        <p>{{ plan.description }}</p> 
-                        <a href="{{ url_for('meal_plan_detail', plan_id=plan.id) }}">View Details</a> 
-                    </div>
-                {% endfor %}
+    </div>
+ 
+    <hr class="divider">
+ 
+    <!-- MEAL PLANS -->
+    <div class="fav-section">
+        <div class="fav-section-title">🥗 Meal Plans & Diets</div>
+        {% if meal_plans %}
+        <div class="grid-3">
+            {% for plan in meal_plans %}
+            <div class="content-card">
+                <div class="content-card-img-placeholder">🥗</div>
+                <div class="content-card-body">
+                    <div class="content-card-title">{{ plan.name }}</div>
+                    <p class="content-card-meta">{{ plan.description }}</p>
+                </div>
+                <div class="content-card-footer">
+                    <a href="{{ url_for('meal_plan_detail', plan_id=plan.id) }}" class="btn btn-outline btn-sm">View Details</a>
+                </div>
             </div>
+            {% endfor %}
+        </div>
         {% else %}
-            <p>No favourited meal plans</p> 
+        <div class="empty-state" style="padding:2rem;">
+            <p>No favourited meal plans yet. Browse <a href="/meal-plans">meal plans</a> to save some!</p>
+        </div>
         {% endif %}
-        <br>
-        <hr>
-
-        <!--WORKOUT ROUTINES SECTION-->
-        <h3>Workout Routines</h3>
+    </div>
+ 
+    <hr class="divider">
+ 
+    <!-- WORKOUT ROUTINES -->
+    <div class="fav-section">
+        <div class="fav-section-title">🔥 Workout Routines</div>
         {% if routines %}
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px"> 
-                {% for routine in routines %} 
-                    <div style="border:1px solid #ccc; padding:10px"> 
-                        <h3>{{ routine.name }}</h3> 
-                        <p><strong>Difficulty: </strong>{{ routine.difficulty }}</p> 
-                        <p>{{ routine.description }}</p> 
-                        <a href="{{ url_for('routine_detail', routine_id=routine.id) }}">View Details</a>
-                    </div>
-                {% endfor %}
+        <div class="grid-3">
+            {% for routine in routines %}
+            <div class="content-card">
+                <div class="content-card-img-placeholder">🔥</div>
+                <div class="content-card-body">
+                    <div class="content-card-title">{{ routine.name }}</div>
+                    {% if routine.difficulty == "Beginner" %}
+                        <span class="badge badge-beginner">{{ routine.difficulty }}</span>
+                    {% elif routine.difficulty == "Intermediate" %}
+                        <span class="badge badge-intermediate">{{ routine.difficulty }}</span>
+                    {% else %}
+                        <span class="badge badge-advanced">{{ routine.difficulty }}</span>
+                    {% endif %}
+                    <p class="content-card-meta" style="margin-top:0.4rem;">{{ routine.description }}</p>
+                </div>
+                <div class="content-card-footer">
+                    <a href="{{ url_for('routine_detail', routine_id=routine.id) }}" class="btn btn-outline btn-sm">View Details</a>
+                </div>
             </div>
+            {% endfor %}
+        </div>
         {% else %}
-            <p>No favourited workout routines.</p>
+        <div class="empty-state" style="padding:2rem;">
+            <p>No favourited routines yet. Browse <a href="/workout-routines">workout routines</a> to save some!</p>
+        </div>
         {% endif %}
-        <br>
-        <hr>
-
-        {% if session.role == "gym_goer" %}
-            <a href="{{ url_for('gym_goer_dashboard') }}">Back to Dashboard</a>
-        {% else %}
-            <a href="{{ url_for('personal_trainer_dashboard') }}">Back to Dashboard</a>
-        {% endif %}
-        <a href="/">Back to Home</a> 
-    </body>
-</html>
+    </div>
+</div>
+{% endblock %}

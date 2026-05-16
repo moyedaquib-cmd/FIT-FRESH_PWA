@@ -1,28 +1,51 @@
-<!DOCTYPE html> 
-<html lang = "en">
-    <head>
-        <meta charset="UTF-8"> 
-        <title>Gym Goer Dashboard</title> 
-    </head>
-    <body>
-        {% with messages = get_flashed_messages() %} 
-            {% if messages %} 
-                <ul style="color: green;"> 
-                    {% for message in messages %} 
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-        <h1>Gym Goer Dashboard</h1> 
-        <a href="/log-workout">Log Workout</a> <br> <br> <!--Allows the user to log workouts-->
-        <a href="/logout">Logout</a> <!--Sends the user back to the home page and clears the session-->
-        <a href="/workout-history">View Workout History</a> <!--Allows the user to see a list of their logged workouts-->
-        <a href="/log-calories">Track Your Calories</a> <!--Allows the user to track calories-->
-        <a href="/calorie-history">View Calories Tracked</a> <!--Allows the user to see a list of their tracked calories-->
-        <a href="/view-favourites">View Favourites</a> <!--Allows the user to view their saved exercises-->
-        <a href="/exercises">View Exercises</a> <!--Allows the user to view exercises-->
-        <a href="/meal-plans">View Meal Plans</a> <!--Allows the user to view meal plans-->
-        <a href="/workout-routines">View Workout Routines</a> <!--Allows the user to view workout routines-->
-    </body>
-</html>
+{% extends "base.html" %}
+{% block title %}Dashboard — Fit & Fresh{% endblock %}
+{% block content %}
+<div class="page">
+    <h2>Your Dashboard</h2>
+    <p style="color:var(--text-muted);margin-top:0.25rem;">Your Dashboard</p>
+ 
+    <div class="dash-grid">
+        <a href="/log-workout" class="dash-card primary">
+            <div class="dash-card-icon">🏋️</div>
+            <div class="dash-card-title">Log Workout</div>
+            <div class="dash-card-sub">Record your sets, reps and weight</div>
+        </a>
+        <a href="/workout-history" class="dash-card">
+            <div class="dash-card-icon">📋</div>
+            <div class="dash-card-title">Workout History</div>
+            <div class="dash-card-sub">View and edit your logged sessions</div>
+        </a>
+        <a href="/log-calories" class="dash-card">
+            <div class="dash-card-icon">🍽️</div>
+            <div class="dash-card-title">Track Calories</div>
+            <div class="dash-card-sub">Log your meals and nutrition</div>
+        </a>
+        <a href="/calorie-history" class="dash-card">
+            <div class="dash-card-icon">📊</div>
+            <div class="dash-card-title">Calorie History</div>
+            <div class="dash-card-sub">Browse your tracked meals</div>
+        </a>
+        <a href="/exercises" class="dash-card">
+            <div class="dash-card-icon">💪</div>
+            <div class="dash-card-title">Exercises</div>
+            <div class="dash-card-sub">Browse the trainer exercise library</div>
+        </a>
+        <a href="/meal-plans" class="dash-card">
+            <div class="dash-card-icon">🥗</div>
+            <div class="dash-card-title">Meal Plans</div>
+            <div class="dash-card-sub">Discover trainer-curated diets</div>
+        </a>
+        <a href="/workout-routines" class="dash-card">
+            <div class="dash-card-icon">🔥</div>
+            <div class="dash-card-title">Routines</div>
+            <div class="dash-card-sub">Follow expert workout programs</div>
+        </a>
+        <a href="/view-favourites" class="dash-card">
+            <div class="dash-card-icon">⭐</div>
+            <div class="dash-card-title">Favourites</div>
+            <div class="dash-card-sub">Your saved content</div>
+        </a>
+    </div>
+</div>
+{% endblock %}

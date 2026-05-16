@@ -1,44 +1,46 @@
-<!DOCTYPE html> 
-<html lang = "en"> 
-    <head> 
-        <meta charset="UTF-8">
-        <title>View Exercise</title> 
-    </head>
-    <body> 
-        {% with messages = get_flashed_messages() %} 
-            {% if messages %} 
-                <ul style="color: green;"> 
-                    {% for message in messages %} 
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
+{% extends "base.html" %}
+{% block title %}Exercises — Fit & Fresh{% endblock %}
+{% block content %}
+<div class="page">
+    <div class="page-header">
+        <h2>Exercise Library</h2>
+        {% if session.role == "trainer" %}
+        <a href="/add-exercise" class="btn btn-primary">+ Add Exercise</a>
+        {% endif %}
+    </div>
+ 
+    {% if exercises %}
+    <div class="grid-3">
+        {% for exercise in exercises %}
+        <div class="content-card">
+            {% if exercise.image_url %}
+            <img src="{{ exercise.image_url }}" class="content-card-img" alt="{{ exercise.name }}">
+            {% else %}
+            <div class="content-card-img-placeholder">💪</div>
             {% endif %}
-        {% endwith %}
-        <h2>Exercises</h2>
-        <!--If there are exercise, they are displayed in a grid. Otherwise, the user is informed that there are no exercises-->
-        {% if exercises %} 
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px"> <!--Creates a 3 column grid with spacing between columns. Each exercise is a grid item-->
-                {% for exercise in exercises %} <!--Loop creates a grid item per exercise-->
-                    <div style="border:1px solid #ccc; padding:10px"> <!--Each grid item has border and padding-->
-                        <h3>{{ exercise.name }}</h3> <!--Retrieves name of exercise from table-->
-                        <p><strong>Muscle: </strong> {{ exercise.muscle_group }} </p> 
-                        {% if exercise.image_url %}
-                            <img src="{{ exercise.image_url }}" width="100%">
-                        {% endif %}
-                        <a href="{{ url_for('exercise_detail', exercise_id = exercise.id) }}"> <!--When the user clicks on the link, the PWA takes them to the page where details are shown-->
-                            View Details</a>
-                    </div> 
-                {% endfor %}
+            <div class="content-card-body">
+                <div class="content-card-title">{{ exercise.name }}</div>
+                <span class="badge badge-muscle">{{ exercise.muscle_group }}</span>
+                {% if exercise.difficulty == "Beginner" %}
+                    <span class="badge badge-beginner">{{ exercise.difficulty }}</span>
+                {% elif exercise.difficulty == "Intermediate" %}
+                    <span class="badge badge-intermediate">{{ exercise.difficulty }}</span>
+                {% else %}
+                    <span class="badge badge-advanced">{{ exercise.difficulty }}</span>
+                {% endif %}
             </div>
-        {% else %}
-            <p>No exercises yet.</p>
-        {% endif %}
-        <hr> 
-        {% if session.role == "gym_goer" %}
-            <a href="{{ url_for('gym_goer_dashboard') }}">Back to Dashboard</a>
-        {% else %}
-            <a href="{{ url_for('personal_trainer_dashboard') }}">Back to Dashboard</a>
-        {% endif %}
-        <a href="/">Back to Home</a> 
-    </body>
-</html>
+            <div class="content-card-footer">
+                <a href="{{ url_for('exercise_detail', exercise_id=exercise.id) }}" class="btn btn-outline btn-sm">View Details</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">💪</div>
+        <h3>No Exercises Yet</h3>
+        <p>Trainers haven't uploaded any exercises yet. Check back soon.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

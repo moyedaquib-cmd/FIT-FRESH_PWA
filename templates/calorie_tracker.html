@@ -1,56 +1,51 @@
-<!DOCTYPE html> 
-<html lang = "en"> 
-    <head>
-        <meta charset="UTF-8">
-        <title>Calorie Viewing</title>
-    </head>
-    <body>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <ul style="color: green;"> 
-                    {% for message in messages %} 
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-        <h2>View Your Calories</h2> 
-        {%if entries %} <!--If the user has logs, it shows a table, otherwise it informs the user that there are no calories tracked-->
-            <table border="1" cellpadding = "5"> <!--Creates a table with a border and spacing-->
+{% extends "base.html" %}
+{% block title %}Calorie History — Fit & Fresh{% endblock %}
+{% block content %}
+<div class="page">
+    <div class="page-header">
+        <h2>Calorie History</h2>
+        <a href="/log-calories" class="btn btn-primary">+ Log Meal</a>
+    </div>
+ 
+    {% if entries %}
+    <div class="table-wrap">
+        <table>
+            <thead>
                 <tr>
-                    <!--Table Headers-->
-                    <th>Date</th> 
+                    <th>Date</th>
                     <th>Time</th>
                     <th>Meal</th>
                     <th>Calories</th>
                     <th>Actions</th>
                 </tr>
-            {% for entry in entries %} <!--Loops through each entry-->
-            <tr>
-                <!--Table rows that retrieve data from a particular database-->
-                <td>{{ entry.entry_date.strftime("%d %b %Y")}}</td> 
-                <td>{{ entry.local_time.strftime("%I:%M %p") }}</td> 
-                <td>{{ entry.meal}}</td> 
-                <td>{{ entry.calories }}</td> 
-                <td>
-                    <a href="{{ url_for('edit_calories', entry_id = entry.id) }}">Edit</a> <!--Allows the user to edit the data-->
-                    <form action = "{{ url_for('delete_calories', entry_id = entry.id) }}" method = "POST" style = "display:inline;"> <!--Allows the user to delete the data. Inline styling keeps button next to edit-->
-                        <button type = "submit">Delete</button> <!--Delete button-->
-                    </form>
-                </td>
-            </tr>
-            {% endfor %} 
-            </table>
-        {% else %}
-            <p>No Calories Tracked</p>
-        {% endif %} 
-        <br>
-        <hr> 
-        {% if session.role == "gym_goer" %}
-            <a href="{{ url_for('gym_goer_dashboard') }}">Back to Dashboard</a>
-        {% else %}
-            <a href="{{ url_for('personal_trainer_dashboard') }}">Back to Dashboard</a>
-        {% endif %}
-        <a href="/">Back to Home</a>
-    </body>
-</html>
+            </thead>
+            <tbody>
+                {% for entry in entries %}
+                <tr>
+                    <td style="color:var(--text-muted);">{{ entry.entry_date.strftime("%d %b %Y") }}</td>
+                    <td style="color:var(--text-muted);">{{ entry.local_time.strftime("%I:%M %p") }}</td>
+                    <td><strong>{{ entry.meal }}</strong></td>
+                    <td>{{ entry.calories }} kcal</td>
+                    <td>
+                        <div class="table-actions">
+                            <a href="{{ url_for('edit_calories', entry_id=entry.id) }}" class="btn btn-outline btn-sm">Edit</a>
+                            <form action="{{ url_for('delete_calories', entry_id=entry.id) }}" method="POST">
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">🍽️</div>
+        <h3>No Meals Tracked</h3>
+        <p>Start logging your meals to track your nutrition.</p>
+        <a href="/log-calories" class="btn btn-primary" style="margin-top:1rem;">Log Your First Meal</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="theme-color" content="#08080f">
+        <title>{% block title %}Fit & Fresh{% endblock %}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        {% block head %}{% endblock %}
+    </head>
+    <body>
+        <nav class="navbar">
+            <a href="/" class="navbar-logo">FIT<span>&</span>FRESH</a>
+            {% if session.user_id %}
+            <ul class="navbar-links">
+                <li><a href="/exercises">Exercises</a></li>
+                <li><a href="/meal-plans">Meal Plans</a></li>
+                <li><a href="/workout-routines">Routines</a></li>
+                <li><a href="/view-favourites">Favourites</a></li>
+                {% if session.role == "gym_goer" %}
+                <li><a href="/gym-goer-dashboard">Dashboard</a></li>
+                {% else %}
+                <li><a href="/personal-trainer-dashboard">Dashboard</a></li>
+                {% endif %}
+            </ul>
+            <div class="navbar-right">
+                <a href="/logout" class="btn btn-outline btn-sm">Logout</a>
+            </div>
+            {% else %}
+            <div class="navbar-right">
+                <a href="/login" class="btn btn-ghost btn-sm">Login</a>
+                <a href="/register" class="btn btn-primary btn-sm">Get Started</a>
+            </div>
+            {% endif %}
+        </nav>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div style="max-width:1200px;margin:1rem auto;padding:0 1.5rem;position:relative;z-index:1;">
+                    <ul class = "flash-list">
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </body>
+</html>

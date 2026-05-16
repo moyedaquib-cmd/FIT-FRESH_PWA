@@ -1,65 +1,75 @@
-<!DOCTYPE html> 
-<html lang="en"> 
-    <head> 
-        <meta charset="UTF-8"> 
-        <title>{{ routine.name }}</title>
-    </head>
-    <body> 
-        {% with messages = get_flashed_messages() %} 
-            {% if messages %} 
-                <ul style="color: green;">
-                    {% for message in messages %} 
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-        <h2>{{ routine.name }}</h2> <!--Displays the name of the routine-->
-        <p><strong>Difficulty: </strong>{{ routine.difficulty }}</p> <!--Displays the difficulty level-->
-        <p>{{ routine.description }}</p> <!--Description of the routine-->
-        <hr>
+{% extends "base.html" %}
+{% block title %}{{ routine.name }} — Fit & Fresh{% endblock %}
+{% block content %}
+<div class="page">
+    <a href="{{ url_for('workout_routines') }}" class="back-link">← Back to Routines</a>
+ 
+    <div class="detail-hero">
+        <div class="detail-hero-body">
+            <h2>{{ routine.name }}</h2>
+            <div class="detail-meta">
+                {% if routine.difficulty == "Beginner" %}
+                    <span class="badge badge-beginner">{{ routine.difficulty }}</span>
+                {% elif routine.difficulty == "Intermediate" %}
+                    <span class="badge badge-intermediate">{{ routine.difficulty }}</span>
+                {% else %}
+                    <span class="badge badge-advanced">{{ routine.difficulty }}</span>
+                {% endif %}
+            </div>
+            <p>{{ routine.description }}</p>
+            <form action="{{ url_for('toggle_favourite_workout_routine', routine_id=routine.id) }}" method="POST" class="fav-form" style="margin-top:1rem;">
+                {% if is_favourite %}
+                <button type="submit" class="btn btn-fav-active btn-sm">★ Remove Favourite</button>
+                {% else %}
+                <button type="submit" class="btn btn-outline btn-sm">☆ Add to Favourites</button>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+ 
+    <div class="detail-section">
         <h3>Exercises in This Routine</h3>
-        <p style="white-space: pre-wrap;">{{ routine.exercises_list }}</p> <!--Displays the exercises list, preserving line breaks entered by the trainer-->
-        <hr>
+        <p class="exercises-list">{{ routine.exercises_list }}</p>
+    </div>
+ 
+    <div class="detail-section">
         <h3>Reviews</h3>
-        {% if session.role == "gym_goer" %} 
-        <form method="POST" action="{{ url_for('add_workout_routine_review', routine_id=routine.id) }}"> 
-            <label>Rating: </label>
-            <select name="rating" required>
-                <option value="5">★★★★★</option>
-                <option value="4">★★★★</option>
-                <option value="3">★★★</option>
-                <option value="2">★★</option>
-                <option value="1">★</option>
-            </select>
-            <br><br>
-            <textarea name="comment" placeholder="Review this routine!" maxlength="400"></textarea> 
-            <br><br>
-            <button type="submit">Submit Review</button> 
-        </form>
+        {% if session.role == "gym_goer" %}
+        <div class="review-form">
+            <form method="POST" action="{{ url_for('add_workout_routine_review', routine_id=routine.id) }}">
+                <div class="star-select" style="margin-bottom:0.75rem;">
+                    <label class="form-label">Your Rating</label>
+                    <select name="rating" class="form-control" style="width:auto;" required>
+                        <option value="5">★★★★★</option>
+                        <option value="4">★★★★</option>
+                        <option value="3">★★★</option>
+                        <option value="2">★★</option>
+                        <option value="1">★</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <textarea name="comment" class="form-control" placeholder="Share your thoughts on this routine..." maxlength="400"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Submit Review</button>
+            </form>
+        </div>
         {% endif %}
+ 
         {% if reviews %}
-            <ul>
-                {% for review in reviews %} 
-                    <li>
-                        <strong>{{ review["username"] }}</strong><br>
-                        <strong>{{ review["rating"] }}/5</strong><br> 
-                        {{ review["comment"] }} 
-                    </li>
-                {% endfor %}
-            </ul>
+        <div class="reviews-list">
+            {% for review in reviews %}
+            <div class="review-card">
+                <div class="review-header">
+                    <span class="review-author">{{ review["username"] }}</span>
+                    <span class="review-stars">{{ "★" * review["rating"] }}{{ "☆" * (5 - review["rating"]) }}</span>
+                </div>
+                <p class="review-comment">{{ review["comment"] }}</p>
+            </div>
+            {% endfor %}
+        </div>
         {% else %}
-            <p>No reviews yet.</p> 
+        <p style="color:var(--text-muted);font-size:0.9rem;">No reviews yet. Be the first!</p>
         {% endif %}
-        <hr>
-        <form action="{{ url_for('toggle_favourite_workout_routine', routine_id=routine.id) }}" method="POST">
-            {% if is_favourite %} 
-                <button type="submit">Remove Favourite</button>
-            {% else %}
-                <button type="submit">Favourite</button>
-            {% endif %}
-        </form>
-        <br>
-        <a href="{{ url_for('workout_routines') }}">Back to Routines</a> 
-    </body>
-</html>
+    </div>
+</div>
+{% endblock %}

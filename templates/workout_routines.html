@@ -1,40 +1,42 @@
-<!DOCTYPE html> 
-<html lang="en"> 
-    <head>
-        <meta charset="UTF-8"> 
-        <title>Workout Routines</title> 
-    </head>
-    <body> 
-        {% with messages = get_flashed_messages() %} 
-            {% if messages %} 
-                <ul style="color: green;">
-                    {% for message in messages %}
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
+{% extends "base.html" %}
+{% block title %}Workout Routines — Fit & Fresh{% endblock %}
+{% block content %}
+<div class="page">
+    <div class="page-header">
         <h2>Workout Routines</h2>
-        {% if routines %} 
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px">
-                {% for routine in routines %} 
-                    <div style="border:1px solid #ccc; padding:10px">
-                        <h3>{{ routine.name }}</h3> <!--Retrieves name of routine from table-->
-                        <p><strong>Difficulty: </strong>{{ routine.difficulty }}</p> <!--Displays the difficulty level of the routine-->
-                        <p>{{ routine.description }}</p> <!--Description of the routine-->
-                        <a href="{{ url_for('routine_detail', routine_id=routine.id) }}">View Details</a> 
-                    </div>
-                {% endfor %}
+        {% if session.role == "trainer" %}
+        <a href="/add-workout-routine" class="btn btn-primary">+ Add Routine</a>
+        {% endif %}
+    </div>
+ 
+    {% if routines %}
+    <div class="grid-3">
+        {% for routine in routines %}
+        <div class="content-card">
+            <div class="content-card-img-placeholder">🔥</div>
+            <div class="content-card-body">
+                <div class="content-card-title">{{ routine.name }}</div>
+                {% if routine.difficulty == "Beginner" %}
+                    <span class="badge badge-beginner">{{ routine.difficulty }}</span>
+                {% elif routine.difficulty == "Intermediate" %}
+                    <span class="badge badge-intermediate">{{ routine.difficulty }}</span>
+                {% else %}
+                    <span class="badge badge-advanced">{{ routine.difficulty }}</span>
+                {% endif %}
+                <p class="content-card-meta" style="margin-top:0.4rem;">{{ routine.description }}</p>
             </div>
-        {% else %}
-            <p>No workout routines yet.</p> 
-        {% endif %}
-        <hr> 
-        {% if session.role == "gym_goer" %}
-            <a href="{{ url_for('gym_goer_dashboard') }}">Back to Dashboard</a>
-        {% else %}
-            <a href="{{ url_for('personal_trainer_dashboard') }}">Back to Dashboard</a>
-        {% endif %}
-        <a href="/">Back to Home</a> 
-    </body>
-</html>
+            <div class="content-card-footer">
+                <a href="{{ url_for('routine_detail', routine_id=routine.id) }}" class="btn btn-outline btn-sm">View Details</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">🔥</div>
+        <h3>No Routines Yet</h3>
+        <p>Trainers haven't uploaded any workout routines yet.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
