@@ -7,6 +7,17 @@ import pytz #A timezone database to convert to other timezones
 app = Flask(__name__) #Creates the flask application
 app.config["SECRET_KEY"] = "oJvneTznic84TgELjsKA" #This is a secret key used by flask to lock the login sessions so that people with no knowledge of the key cant access important information and tamper with cookies.
 
+@app.template_filter("fmt_num") #Formats numbers by removing unnecessary trailing zeroes
+def fmt_num(value):
+    try: 
+        f = round(float(value), 2) #Rounds to a max of 2 decimal places
+        #If the number is a whole number, it's displayed with no decimal points, otherwise all trailing zeroes are removed
+        if f == int(f):
+            return str(int(f))
+        return f'{f:.2f}'.rstrip("0")
+    except:
+        return value
+
 def local_time(utc_dt_str): #A function that Converts UTC to Sydney Time
     local_tz = pytz.timezone("Australia/Sydney") #The timezone it converts to is Sydney, Australia
     utc_dt = datetime.strptime(utc_dt_str, "%Y-%m-%d %H:%M:%S") #Converts the stored UTC string into a datetime object
@@ -61,6 +72,7 @@ def login():
         return "Invalid username or password", 401 #401 Error indicates that the request failed due to unauthorised credentials.
     session["user_id"] = user["id"] #Stores the user's unique ID allowing easy identification of the logged-in user
     session["role"] = user["role"] #Stores the role of the user to enable role-based access control
+    session["username"] = user["username"] #Stores the username 
     #Based on the user's role, they're redirected to a particular dashboard
     if user["role"] == "gym_goer": 
         flash("Logged in successfully") 

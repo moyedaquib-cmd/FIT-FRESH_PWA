@@ -3,6 +3,13 @@
 {% block content %}
 <div class="page">
     <div class="page-header">
+            <div>
+                {% if session.role == "gym_goer" %}
+                <a href="{{ url_for('gym_goer_dashboard') }}" class="back-link">← Back to Dashboard</a>
+                {% else %}
+                <a href="{{ url_for('personal_trainer_dashboard') }}" class="back-link">← Back to Dashboard</a>
+                {% endif %}
+            </div>
         <h2>Workout History</h2>
         <a href="/log-workout" class="btn btn-primary">+ Log Workout</a>
     </div>
@@ -27,7 +34,7 @@
                     <td><strong>{{ workout.exercise }}</strong></td>
                     <td>{{ workout.sets }}</td>
                     <td>{{ workout.reps }}</td>
-                    <td>{{ workout.weight }} kg</td>
+                    <td>{{ workout.weight | fmt_num}} kg</td>
                     <td>
                         <div class="table-actions">
                             <a href="{{ url_for('edit_workout', workout_id=workout.id) }}" class="btn btn-outline btn-sm">Edit</a>
@@ -43,7 +50,7 @@
     </div>
     {% else %}
     <div class="empty-state">
-        <div class="empty-state-icon">🏋️</div>
+        <div class="empty-state-icon"><i class="ti ti-barbell" aria-hidden="true"></i></div>
         <h3>No Workouts Logged</h3>
         <p>Start tracking your training sessions.</p>
         <a href="/log-workout" class="btn btn-primary" style="margin-top:1rem;">Log Your First Workout</a>

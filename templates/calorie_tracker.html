@@ -3,7 +3,14 @@
 {% block content %}
 <div class="page">
     <div class="page-header">
-        <h2>Calorie History</h2>
+        <div>
+            {% if session.role == "gym_goer" %}
+            <a href="{{ url_for('gym_goer_dashboard') }}" class="back-link">← Back to Dashboard</a>
+            {% else %}
+            <a href="{{ url_for('personal_trainer_dashboard') }}" class="back-link">← Back to Dashboard</a>
+            {% endif %}
+            <h2>Calorie History</h2>
+        </div>
         <a href="/log-calories" class="btn btn-primary">+ Log Meal</a>
     </div>
  
@@ -25,7 +32,7 @@
                     <td style="color:var(--text-muted);">{{ entry.entry_date.strftime("%d %b %Y") }}</td>
                     <td style="color:var(--text-muted);">{{ entry.local_time.strftime("%I:%M %p") }}</td>
                     <td><strong>{{ entry.meal }}</strong></td>
-                    <td>{{ entry.calories }} kcal</td>
+                    <td>{{ entry.calories | fmt_num }} kcal</td>
                     <td>
                         <div class="table-actions">
                             <a href="{{ url_for('edit_calories', entry_id=entry.id) }}" class="btn btn-outline btn-sm">Edit</a>
@@ -41,7 +48,7 @@
     </div>
     {% else %}
     <div class="empty-state">
-        <div class="empty-state-icon">🍽️</div>
+        <div class="empty-state-icon"><i class="ti ti-apple" aria-hidden="true"></i></div>
         <h3>No Meals Tracked</h3>
         <p>Start logging your meals to track your nutrition.</p>
         <a href="/log-calories" class="btn btn-primary" style="margin-top:1rem;">Log Your First Meal</a>

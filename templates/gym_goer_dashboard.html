@@ -2,47 +2,47 @@
 {% block title %}Dashboard — Fit & Fresh{% endblock %}
 {% block content %}
 <div class="page">
-    <h2>Your Dashboard</h2>
-    <p style="color:var(--text-muted);margin-top:0.25rem;">Your Dashboard</p>
+    <h2>Welcome, {{ session.username }}</h2>
+    <p style="color:var(--text-muted);margin-top:0.25rem;">Gym-Goer Dashboard</p>
  
     <div class="dash-grid">
         <a href="/log-workout" class="dash-card primary">
-            <div class="dash-card-icon">🏋️</div>
+            <div class="dash-card-icon"><i class="ti ti-barbell" aria-hidden="true"></i></div>
             <div class="dash-card-title">Log Workout</div>
             <div class="dash-card-sub">Record your sets, reps and weight</div>
         </a>
         <a href="/workout-history" class="dash-card">
-            <div class="dash-card-icon">📋</div>
+            <div class="dash-card-icon"><i class="ti ti-clipboard-list" aria-hidden="true"></i></div>
             <div class="dash-card-title">Workout History</div>
             <div class="dash-card-sub">View and edit your logged sessions</div>
         </a>
         <a href="/log-calories" class="dash-card">
-            <div class="dash-card-icon">🍽️</div>
+            <div class="dash-card-icon"><i class="ti ti-apple" aria-hidden="true"></i></div>
             <div class="dash-card-title">Track Calories</div>
             <div class="dash-card-sub">Log your meals and nutrition</div>
         </a>
         <a href="/calorie-history" class="dash-card">
-            <div class="dash-card-icon">📊</div>
+            <div class="dash-card-icon"><i class="ti ti-leaf" aria-hidden="true"></i></div>
             <div class="dash-card-title">Calorie History</div>
             <div class="dash-card-sub">Browse your tracked meals</div>
         </a>
         <a href="/exercises" class="dash-card">
-            <div class="dash-card-icon">💪</div>
+            <div class="dash-card-icon"><i class="ti ti-dumbbell" aria-hidden="true"></i></div>
             <div class="dash-card-title">Exercises</div>
             <div class="dash-card-sub">Browse the trainer exercise library</div>
         </a>
         <a href="/meal-plans" class="dash-card">
-            <div class="dash-card-icon">🥗</div>
+            <div class="dash-card-icon"><i class="ti ti-salad" aria-hidden="true"></i></div>
             <div class="dash-card-title">Meal Plans</div>
             <div class="dash-card-sub">Discover trainer-curated diets</div>
         </a>
         <a href="/workout-routines" class="dash-card">
-            <div class="dash-card-icon">🔥</div>
+            <div class="dash-card-icon"><i class="ti ti-flame" aria-hidden="true"></i></div>
             <div class="dash-card-title">Routines</div>
             <div class="dash-card-sub">Follow expert workout programs</div>
         </a>
         <a href="/view-favourites" class="dash-card">
-            <div class="dash-card-icon">⭐</div>
+            <div class="dash-card-icon"><i class="ti ti-star" aria-hidden="true"></i></div>
             <div class="dash-card-title">Favourites</div>
             <div class="dash-card-sub">Your saved content</div>
         </a>
