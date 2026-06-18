@@ -13,7 +13,9 @@
     <div class="grid-3">
         {% for plan in meal_plans %}
         <div class="content-card">
-            <div class="content-card-img-placeholder">🥗</div>
+            <div class="content-card-img-placeholder">
+                <i class="ti ti-salad" style="font-size:2.5rem;"></i>
+            </div>
             <div class="content-card-body">
                 <div class="content-card-title">{{ plan.name }}</div>
                 <p class="content-card-meta">{{ plan.description }}</p>
@@ -26,7 +28,9 @@
     </div>
     {% else %}
     <div class="empty-state">
-        <div class="empty-state-icon">🥗</div>
+        <div class="empty-state-icon">
+            <i class="ti ti-salad"></i>
+        </div>
         <h3>No Meal Plans Yet</h3>
         <p>Trainers haven't uploaded any meal plans yet.</p>
     </div>

@@ -10,7 +10,8 @@
         <form action="/login" method="POST">
             <div class="form-group">
                 <label class="form-label">Username</label>
-                <input type="text" name="username" class="form-control" placeholder="Enter your username" required>
+                <input type="text" name="username" id="username" class="form-control" placeholder="Enter your username" required>
+                <p class="field-error" id="usernameErr"></p>
             </div>
             <div class="form-group">
                 <label class="form-label">Password</label>
@@ -18,13 +19,36 @@
                     <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
                     <button type="button" class="password-toggle" onclick="togglePassword()">👁</button>
                 </div>
+                <p class="field-error" id="passwordErr"></p>
             </div>
             <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top:0.5rem;">Log In</button>
         </form>
     </div>
     <p class="auth-switch">Don't have an account? <a href="/register">Register here</a></p>
 </div>
+{% endblock %}
+{% block head %}
 <script>
-function togglePassword() {const p = document.getElementById("password"); p.type = p.type === "password" ? "text" : "password";}
+    function togglePassword() {const p = document.getElementById("password"); p.type = p.type === "password" ? "text" : "password";}
+
+    document.addEventListener('DOMContentLoaded', () => {
+        function validate(id, errId, checks) {
+            const el = document.getElementById(id);
+            const err = document.getElementById(errId);
+            if (!el) return;
+            el.addEventListener('input', () => {
+                const val = el.value.trim();
+                let msg = '';
+                for (const [test, message] of checks) {
+                    if (!test(val)) { msg = message; break; }
+                }
+                err.textContent = msg;
+                el.classList.toggle('input-error', !!msg && val.length > 0);
+                el.classList.toggle('input-valid', !msg && val.length > 0);
+            });
+        }
+        validate('username', 'usernameErr', [[v => v.length >= 1, 'Please enter your username']]);
+        validate('password', 'passwordErr', [[v => v.length >= 1, 'Please enter your password']]);
+    });
 </script>
 {% endblock %}

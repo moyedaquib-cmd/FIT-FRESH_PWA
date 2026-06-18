@@ -5,22 +5,82 @@
     <a href="{{ url_for('personal_trainer_dashboard') }}" class="back-link">← Back to Dashboard</a>
     <h2 style="margin-bottom:1.5rem;">Diet</h2>
     <div class="form-card">
-        <form method="POST">
+        <form method="POST" id="addMealForm">
             <div class="form-group">
                 <label class="form-label">Plan Name</label>
-                <input name="name" class="form-control" placeholder="e.g. 2500 Cal Muscle Building Plan" required>
+                <input name="name" id="planName" class="form-control" placeholder="e.g. 2500 Cal Muscle Building Plan" required>
+                <p class="field-error" id="planNameErr"></p>
             </div>
             <div class="form-group">
                 <label class="form-label">Description</label>
-                <textarea name="description" class="form-control" placeholder="Describe this meal plan and who it's for..." required></textarea>
+                <textarea name="description" id="planDesc" class="form-control" placeholder="Describe this meal plan and who it's for..." required></textarea>
+                <p class="field-error" id="planDescErr"></p>
+            </div>
+            <p class="form-hint" style="margin-bottom:0.75rem;">Add meals under each category. List each meal on a new line. Leave a category empty if it's not used.</p>
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="ti ti-sunrise"></i> 
+                    Breakfast
+                </label>
+                <textarea name="breakfast" id="breakfast" class="form-control" rows="3" placeholder="Oats with protein powder&#10;Greek yoghurt with berries"></textarea>
             </div>
             <div class="form-group">
-                <label class="form-label">Meals</label>
-                <p class="form-hint" style="margin-bottom:0.4rem;">List each meal on a new line</p>
-                <textarea name="meals" class="form-control" rows="8" placeholder="Breakfast: Oats with protein powder&#10;Snack: Greek yoghurt&#10;Lunch: Chicken rice and veg&#10;..." required></textarea>
+                <label class="form-label">
+                    <i class="ti ti-sun"></i> 
+                    Lunch
+                </label>
+                <textarea name="lunch" id="lunch" class="form-control" rows="3" placeholder="Chicken, rice and vegetables&#10;Tuna salad wrap"></textarea>
             </div>
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="ti ti-moon"></i> 
+                    Dinner
+                </label>
+                <textarea name="dinner" id="dinner" class="form-control" rows="3" placeholder="Salmon with sweet potato&#10;Lean beef stir fry"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="ti ti-apple"></i> 
+                    Snacks
+                </label>
+                <textarea name="snack" id="snack" class="form-control" rows="3" placeholder="Almonds&#10;Protein shake&#10;Banana"></textarea>
+            </div>
+            <p class="field-error" id="mealsErr"></p>
             <button type="submit" class="btn btn-primary btn-full">Add Meal Plan</button>
         </form>
     </div>
 </div>
+{% endblock %}
+{% block head %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        function validate(id, errId, checks) {
+            const el = document.getElementById(id);
+            const err = document.getElementById(errId);
+            if (!el) return;
+            el.addEventListener('input', () => {
+                const val = el.value.trim();
+                let msg = '';
+                for (const [test, message] of checks) {
+                    if (!test(val)) { msg = message; break; }
+                }
+                err.textContent = msg;
+                el.classList.toggle('input-error', !!msg);
+                el.classList.toggle('input-valid', !msg && val.length > 0);
+            });
+        }
+        validate('planName',  'planNameErr',  [[v => v.length >= 2, 'Please enter a plan name']]);
+        validate('planDesc',  'planDescErr',  [[v => v.length >= 10, 'Description must be at least 10 characters']]);
+        const form = document.getElementById('addMealForm');
+        const mealsErr = document.getElementById('mealsErr');
+        form.addEventListener('submit', (e) => {
+            const cats = ['breakfast', 'lunch', 'dinner', 'snack'];
+            const hasMeal = cats.some(id => document.getElementById(id).value.trim().length > 0);
+            if (!hasMeal) {
+                e.preventDefault();
+                mealsErr.textContent = 'Please add at least one meal in any category';
+            }
+        });
+    });
+</script>
 {% endblock %}

@@ -15,35 +15,107 @@
                 <button type="submit" class="btn btn-outline btn-sm">☆ Add to Favourites</button>
                 {% endif %}
             </form>
+
+            {% if is_owner %}
+            <div class="owner-actions">
+                <button type="button" class="btn btn-outline btn-sm" onclick="toggleEdit()">✎ Edit</button>
+                <form action="{{ url_for('delete_meal_plan', plan_id=plan.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this meal plan? This cannot be undone.');">
+                    <button type="submit" class="btn btn-danger btn-sm">🗑 Delete</button>
+                </form>
+            </div>
+            {% endif %}
         </div>
     </div>
  
+    {% if is_owner %}
+    <div class="detail-section" id="editForm" style="display:none;">
+        <h3>Edit Meal Plan</h3>
+        <form method="POST" action="{{ url_for('edit_meal_plan', plan_id=plan.id) }}">
+            <div class="form-group">
+                <label class="form-label">Plan Name</label>
+                <input name="name" class="form-control" value="{{ plan.name }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea name="description" class="form-control" rows="3" required>{{ plan.description }}</textarea> 
+            </div>
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="ti ti-sunrise"></i>
+                    Breakfast
+                </label>
+                <textarea name="breakfast" class="form-control" rows="3">{% for cat, meals in grouped_meals %}{% if cat == "Breakfast" %}{% for m in meals %}{{ m.description }}{% endfor %}{% endif %}{% endfor %}</textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="ti ti-moon"></i>
+                    Dinner
+                </label>
+                <textarea name="dinner" class="form-control" rows="3">{% for cat, meals in grouped_meals %}{% if cat == "Dinner" %}{% for m in meals %}{{ m.description }}{% endfor %}{% endif %}{% endfor %}</textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="ti ti-apple"></i>
+                    Snacks
+                </label>
+                <textarea name="snack" class="form-control" rows="3">{% for cat, meals in grouped_meals %}{% if cat == "Snack" %}{% for m in meals %}{{ m.description }}{% endfor %}{% endif %}{% endfor %}</textarea>
+            </div>
+            <div class="flex gap-1">
+                <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="toggleEdit()">Cancel</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
     <div class="detail-section">
         <h3>Meals Included</h3>
-        <p class="exercises-list">{{ plan.meals }}</p>
+        {% if grouped_meals %}
+        {% for category, meals in grouped_meals %}
+        <div class="meal-category">
+            <div class="meal-category-heading">
+                {% if category == "Breakfast" %}<i class="ti ti-sunrise"></i>
+                {% elif category == "Lunch" %}<i class="ti ti-sun"></i>
+                {% elif category == "Dinner" %}<i class="ti ti-moon"></i>
+                {% else %}<i class="ti ti-apple"></i>{% endif %}
+                <span>{{ category }}</span>
+            </div>
+            <ul class="meal-list">
+                {% for meal in meals %}
+                <li>{{ meal.description }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p style="color:var(--text-muted);font-size:0.9rem;">No meals listed for this plan.</p>
+        {% endif %}
     </div>
  
     <div class="detail-section">
         <h3>Reviews</h3>
-        {% if session.role == "gym_goer" %}
+        {% if session.user_id and not is_owner and not has_reviewed %}
         <div class="review-form">
             <form method="POST" action="{{ url_for('add_meal_plan_review', plan_id=plan.id) }}">
-                <div class="star-select" style="margin-bottom:0.75rem;">
-                    <label class="form-label">Your Rating</label>
-                    <select name="rating" class="form-control" style="width:auto;" required>
-                        <option value="5">★★★★★</option>
-                        <option value="4">★★★★</option>
-                        <option value="3">★★★</option>
-                        <option value="2">★★</option>
-                        <option value="1">★</option>
-                    </select>
+                <input type="hidden" name="rating" id="ratingInput" value="">
+                <label class="form-label" style="margin-bottom:0.4rem;">Your Rating</label>
+                <div class="star-rating-widget" id="starWidget">
+                    <span class="rating-hint" id="ratingHint">Select a rating</span>
+                    <span class="star" data-val="1">★</span>
+                    <span class="star" data-val="2">★</span>
+                    <span class="star" data-val="3">★</span>
+                    <span class="star" data-val="4">★</span>
+                    <span class="star" data-val="5">★</span>
+                    <span class="rating-hint" id="ratingHint">Select a rating</span>
                 </div>
                 <div class="form-group">
-                    <textarea name="comment" class="form-control" placeholder="Share your thoughts on this meal plan..." maxlength="400"></textarea>
+                    <textarea name="comment" class="form-control" placeholder="Share your thoughts..." maxlength="400"></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary btn-sm">Submit Review</button>
+                <button type="submit" class="btn btn-primary btn-sm" id="reviewSubmit">Submit Review</button>
             </form>
         </div>
+        {% elif is_owner %}
+        <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem;">You can't review your own content.</p>
         {% endif %}
  
         {% if reviews %}
@@ -51,7 +123,13 @@
             {% for review in reviews %}
             <div class="review-card">
                 <div class="review-header">
-                    <span class="review-author">{{ review["username"] }}</span>
+                    <span class="review-author">
+                        {{ review["username"] }}
+                        {% if review["role"] == "trainer" %}
+                        <span class="badge badge-muscle" style="margin-left:0.4rem;">Trainer</span>
+                        {% endif %}
+                    </span>
+                    
                     <span class="review-stars">{{ "★" * review["rating"] }}{{ "☆" * (5 - review["rating"]) }}</span>
                 </div>
                 <p class="review-comment">{{ review["comment"] }}</p>
@@ -59,8 +137,50 @@
             {% endfor %}
         </div>
         {% else %}
-        <p style="color:var(--text-muted);font-size:0.9rem;">No reviews yet. Be the first!</p>
+        <p style="color:var(--text-muted);font-size:0.9rem;">No reviews yet. Be the first to leave one!</p>
         {% endif %}
     </div>
 </div>
+{% endblock %}
+{% block head %}
+<script>
+    function toggleEdit() {
+        const form = document.getElementById('editForm');
+        if (form) {
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+            if (form.style.display === 'block') form.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const stars = document.querySelectorAll('#starWidget .star');
+        const input = document.getElementById('ratingInput');
+        const hint = document.getElementById('ratingHint');
+        const labels = ['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'];
+        let selected = 0;
+        if (!stars.length) return;
+        stars.forEach((star, i) => {
+            star.addEventListener('mouseenter', () => {
+                stars.forEach((s, j) => s.classList.toggle('lit', j <= i));
+                hint.textContent = labels[i + 1];
+            });
+            star.addEventListener('mouseleave', () => {
+                stars.forEach((s, j) => { s.classList.remove('lit'); s.classList.toggle('selected', j < selected); });
+                hint.textContent = selected ? labels[selected] : 'Select a rating';
+            });
+            star.addEventListener('click', () => {
+                selected = i + 1; input.value = selected;
+                stars.forEach((s, j) => s.classList.toggle('selected', j < selected));
+                hint.textContent = labels[selected];
+            });
+        });
+        document.getElementById('reviewSubmit')?.addEventListener('click', (e) => {
+            if (!input.value) { 
+                e.preventDefault(); 
+                hint.textContent = '⚠ Please select a rating first'; 
+                hint.style.color = '#fca5a5'; 
+            }
+        });
+    });
+</script>
 {% endblock %}

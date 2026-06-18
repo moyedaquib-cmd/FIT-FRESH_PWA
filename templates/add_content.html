@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}Add Content — Fit & Fresh{% endblock %}
+{% block content %}
+<div class="page-sm">
+    <a href="{{ url_for('personal_trainer_dashboard') }}" class="back-link">← Back to Dashboard</a>
+    <h2 style="margin-bottom:1rem;">Add Content</h2>
+ 
+    <div class="content-tabs" id="contentTabs">
+        <button type="button" class="content-tab active" data-target="exerciseForm"><i class="ti ti-dumbbell"></i> Exercise</button>
+        <button type="button" class="content-tab" data-target="mealForm"><i class="ti ti-salad"></i> Meal Plan</button>
+        <button type="button" class="content-tab" data-target="routineForm"><i class="ti ti-flame"></i> Routine</button>
+    </div>
+ 
+    <div class="form-card" style="margin-top:1.25rem;">
+
+        <form method="POST" action="{{ url_for('add_exercise') }}" id="exerciseForm" class="content-form">
+            <div class="form-group">
+                <label class="form-label">Exercise Name</label>
+                <input name="name" id="exName" class="form-control" placeholder="e.g. Barbell Back Squat">
+                <p class="field-error" id="exNameErr"></p>
+            </div>
+            <div class="form-group">
+                <label class="form-label">How to Perform</label>
+                <p class="form-hint" style="margin-bottom:0.5rem;">Number each step for automatic formatting (e.g. <strong>1. Stand with feet shoulder-width apart</strong>). You can also use bullet points (- or •) or write plain text.</p>
+                <textarea name="description" id="exDesc" class="form-control" rows="7" placeholder="1. Stand with feet shoulder-width apart&#10;2. Grip the bar just outside your legs&#10;3. Brace your core and keep your back straight&#10;4. Drive through your heels to stand up"></textarea>
+                <p class="field-error" id="exDescErr"></p>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Muscle Group</label>
+                <input name="muscle_group" id="exMuscle" class="form-control" placeholder="e.g. Quadriceps, Glutes">
+                <p class="field-error" id="exMuscleErr"></p>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Image URL <span style="color:var(--text-dim);font-weight:400;text-transform:none;">(optional)</span></label>
+                <input name="image_url" id="exImg" class="form-control" placeholder="https://example.com/image.jpg">
+                <p class="field-error" id="exImgErr"></p>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Difficulty</label>
+                <select name="difficulty" class="form-control">
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">Add Exercise</button>
+        </form>
+ 
+
+        <form method="POST" action="{{ url_for('add_meal_plan') }}" id="mealForm" class="content-form" style="display:none;">
+            <div class="form-group">
+                <label class="form-label">Plan Name</label>
+                <input name="name" id="planName" class="form-control" placeholder="e.g. 2500 Cal Muscle Building Plan">
+                <p class="field-error" id="planNameErr"></p>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea name="description" id="planDesc" class="form-control" placeholder="Describe this meal plan and who it's for..."></textarea>
+                <p class="field-error" id="planDescErr"></p>
+            </div>
+            <p class="form-hint" style="margin-bottom:0.75rem;">Add meals under each category. List each meal on a new line. Leave a category empty if it's not used.</p>
+            <div class="form-group">
+                <label class="form-label"><i class="ti ti-sunrise"></i> Breakfast</label>
+                <textarea name="breakfast" id="breakfast" class="form-control" rows="3" placeholder="Oats with protein powder&#10;Greek yoghurt with berries"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label"><i class="ti ti-sun"></i> Lunch</label>
+                <textarea name="lunch" id="lunch" class="form-control" rows="3" placeholder="Chicken, rice and vegetables&#10;Tuna salad wrap"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label"><i class="ti ti-moon"></i> Dinner</label>
+                <textarea name="dinner" id="dinner" class="form-control" rows="3" placeholder="Salmon with sweet potato&#10;Lean beef stir fry"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label"><i class="ti ti-apple"></i> Snacks</label>
+                <textarea name="snack" id="snack" class="form-control" rows="3" placeholder="Almonds&#10;Protein shake&#10;Banana"></textarea>
+            </div>
+            <p class="field-error" id="mealsErr"></p>
+            <button type="submit" class="btn btn-primary btn-full">Add Meal Plan</button>
+        </form>
+ 
+
+        <form method="POST" action="{{ url_for('add_workout_routine') }}" id="routineForm" class="content-form" style="display:none;">
+            <div class="form-group">
+                <label class="form-label">Routine Name</label>
+                <input name="name" id="routineName" class="form-control" placeholder="e.g. 4-Day Upper/Lower Split">
+                <p class="field-error" id="routineNameErr"></p>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea name="description" id="routineDesc" class="form-control" placeholder="Describe this routine and who it's designed for..."></textarea>
+                <p class="field-error" id="routineDescErr"></p>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Difficulty</label>
+                <select name="difficulty" class="form-control">
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Exercises</label>
+                <p class="form-hint" style="margin-bottom:0.4rem;">List each exercise on a new line</p>
+                <textarea name="exercises_list" id="routineEx" class="form-control" rows="8" placeholder="Barbell Back Squat — 4x6&#10;Romanian Deadlift — 3x10&#10;Leg Press — 3x12&#10;..."></textarea>
+                <p class="field-error" id="routineExErr"></p>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">Add Routine</button>
+        </form>
+ 
+    </div>
+</div>
+{% endblock %}
+{% block head %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const tabs = document.querySelectorAll('#contentTabs .content-tab');
+        const forms = document.querySelectorAll('.content-form');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                forms.forEach(f => f.style.display = 'none'); //Hide all forms
+                document.getElementById(tab.dataset.target).style.display = 'block'; //Show the chosen one
+            });
+        });
+        function validate(inputId, errId, checks) {
+            const el = document.getElementById(inputId);
+            const err = document.getElementById(errId);
+            if (!el) return;
+            el.addEventListener('input', () => {
+                const val = el.value.trim();
+                let msg = '';
+                for (const [test, message] of checks) {
+                    if (!test(val)) { msg = message; break; }
+                }
+                err.textContent = msg;
+                el.classList.toggle('input-error', !!msg);
+                el.classList.toggle('input-valid', !msg && val.length > 0);
+            });
+        }
+        validate('exName',   'exNameErr',   [[v => v.length >= 2, 'Name must be at least 2 characters']]);
+        validate('exDesc',   'exDescErr',   [[v => v.length >= 10, 'Please describe the exercise with at least 10 characters']]);
+        validate('exMuscle', 'exMuscleErr', [[v => v.length >= 2, 'Please enter a muscle group']]);
+        validate('exImg',    'exImgErr',    [[v => v === '' || v.startsWith('http'), 'Must be a valid URL starting with http']]);
+        validate('planName', 'planNameErr', [[v => v.length >= 2, 'Please enter a plan name']]);
+        validate('planDesc', 'planDescErr', [[v => v.length >= 10, 'Description must be at least 10 characters']]);
+        validate('routineName', 'routineNameErr', [[v => v.length >= 2, 'Please enter a routine name']]);
+        validate('routineDesc', 'routineDescErr', [[v => v.length >= 10, 'Description must be at least 10 characters']]);
+        validate('routineEx',   'routineExErr',   [[v => v.length >= 3, 'Please list at least one exercise']]);
+        document.getElementById('exerciseForm').addEventListener('submit', (e) => {
+            const fields = ['exName', 'exDesc', 'exMuscle'];
+            if (fields.some(id => document.getElementById(id).value.trim() === '')) {
+                e.preventDefault();
+                if (document.getElementById('exNameErr')) document.getElementById('exNameErr').textContent = 'Please fill in all required fields';
+            }
+        });
+        document.getElementById('mealForm').addEventListener('submit', (e) => {
+            const cats = ['breakfast', 'lunch', 'dinner', 'snack'];
+            const hasMeal = cats.some(id => document.getElementById(id).value.trim().length > 0);
+            const nameOk = document.getElementById('planName').value.trim() !== '';
+            const descOk = document.getElementById('planDesc').value.trim() !== '';
+            if (!nameOk || !descOk || !hasMeal) {
+                e.preventDefault();
+                document.getElementById('mealsErr').textContent = !hasMeal ? 'Please add at least one meal in any category' : 'Please fill in all required fields';
+            }
+        });
+        document.getElementById('routineForm').addEventListener('submit', (e) => {
+            const fields = ['routineName', 'routineDesc', 'routineEx'];
+            if (fields.some(id => document.getElementById(id).value.trim() === '')) {
+                e.preventDefault();
+                if (document.getElementById('routineExErr')) document.getElementById('routineExErr').textContent = 'Please fill in all required fields';
+            }
+        });
+    });
+</script>
+{% endblock %}

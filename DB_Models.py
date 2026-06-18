@@ -52,5 +52,8 @@ def init_db():
     #Review_Routine table stores all the user reviews and ratings for workout routins
     cursor.execute("CREATE TABLE IF NOT EXISTS review_routine (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, routine_id INTEGER NOT NULL, rating INTEGER NOT NULL, comment TEXT, created_at TEXT NOT NULL DEFAULT (DATETIME('now')), FOREIGN KEY (user_id) REFERENCES user(id), FOREIGN KEY (routine_id) REFERENCES workout_routine(id), UNIQUE (user_id, routine_id))")
 
+    #Meal table stored individual meals belonging to a meal plan, which is tagged with a category
+    cursor.execute("CREATE TABLE IF NOT EXISTS meal (id INTEGER PRIMARY KEY AUTOINCREMENT, meal_plan_id INTEGER NOT NULL, category TEXT NOT NULL, description TEXT NOT NULL, FOREIGN KEY (meal_plan_id) REFERENCES meal_plan(id))")
+
     conn.commit() #Saves all the table creations
     conn.close() #Closes the connection

@@ -5,14 +5,16 @@
     <a href="{{ url_for('personal_trainer_dashboard') }}" class="back-link">← Back to Dashboard</a>
     <h2 style="margin-bottom:1.5rem;">Add Workout Routine</h2>
     <div class="form-card">
-        <form method="POST">
+        <form method="POST" id="addRoutineForm">
             <div class="form-group">
                 <label class="form-label">Routine Name</label>
-                <input name="name" class="form-control" placeholder="e.g. 4-Day Upper/Lower Split" required>
+                <input name="name" id="routineName" class="form-control" placeholder="e.g. 4-Day Upper/Lower Split" required>
+                <p class="field-error" id="routineNameErr"></p>
             </div>
             <div class="form-group">
                 <label class="form-label">Description</label>
-                <textarea name="description" class="form-control" placeholder="Describe this routine and who it's designed for..." required></textarea>
+                <textarea name="description" id="routineDesc" class="form-control" placeholder="Describe this routine and who it's designed for..." required></textarea>
+                <p class="field-error" id="routineDescErr"></p>
             </div>
             <div class="form-group">
                 <label class="form-label">Difficulty</label>
@@ -25,10 +27,35 @@
             <div class="form-group">
                 <label class="form-label">Exercises</label>
                 <p class="form-hint" style="margin-bottom:0.4rem;">List each exercise on a new line</p>
-                <textarea name="exercises_list" class="form-control" rows="8" placeholder="Barbell Back Squat — 4x6&#10;Romanian Deadlift — 3x10&#10;Leg Press — 3x12&#10;..." required></textarea>
+                <textarea name="exercises_list" id="routineEx" class="form-control" rows="8" placeholder="Barbell Back Squat — 4x6&#10;Romanian Deadlift — 3x10&#10;Leg Press — 3x12&#10;..." required></textarea>
+                <p class="field-error" id="routineExErr"></p>
             </div>
             <button type="submit" class="btn btn-primary btn-full">Add Routine</button>
         </form>
     </div>
 </div>
+{% endblock %}
+{% block head %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        function validate(id, errId, checks) {
+            const el = document.getElementById(id);
+            const err = document.getElementById(errId);
+            if (!el) return;
+            el.addEventListener('input', () => {
+                const val = el.value.trim();
+                let msg = '';
+                for (const [test, message] of checks) {
+                    if (!test(val)) { msg = message; break; }
+                }
+                err.textContent = msg;
+                el.classList.toggle('input-error', !!msg);
+                el.classList.toggle('input-valid', !msg && val.length > 0);
+            });
+        }
+        validate('routineName', 'routineNameErr', [[v => v.length >= 2, 'Please enter a routine name']]);
+        validate('routineDesc', 'routineDescErr', [[v => v.length >= 10, 'Description must be at least 10 characters']]);
+        validate('routineEx',   'routineExErr',   [[v => v.length >= 3, 'Please list at least one exercise']]);
+    });
+</script>
 {% endblock %}

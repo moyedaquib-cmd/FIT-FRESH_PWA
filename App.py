@@ -142,9 +142,22 @@ def workout_history():
     if "user_id" not in session:  
         return redirect(url_for("home")) 
     conn = get_db()    
-    workouts = conn.execute( "SELECT * FROM workout WHERE user_id = ? ORDER BY workout_date DESC",(session["user_id"],)).fetchall() #Retrieves all workouts for the logged-in user, sorted by most recent first
+    workouts = conn.execute( "SELECT * FROM workout WHERE user_id = ? ORDER BY workout_date DESC, id DESC",(session["user_id"],)).fetchall() #Retrieves all workouts for the logged-in user, sorted by most recent first
     conn.close()
-    return render_template("workout_history.html", workouts = workouts) #Returns the page with workout data
+    grouped_workouts = {} #Workouts can be grouped by date so the user can view them under specific date headings
+    for workout in workouts:
+        date_key = workout["workout_date"]
+        if date_key not in grouped_workouts:
+            grouped_workouts[date_key] = [] #Creates a new list the first time a date is seen
+        grouped_workouts[date_key].append(workout) #Adds the workout to the date's list
+    grouped_list = []    
+    for date_key, day_workouts in grouped_workouts.items(): #Displays a list of information stored
+        try:
+            formatted = datetime.strptime(date_key, "%Y-%m-%d").strftime("%A, %d %B %Y")
+        except (ValueError, TypeError): #Converts from statistical looking dates to friendly readable timestamps
+            formatted = date_key
+        grouped_list.append((date_key, formatted, day_workouts))
+    return render_template("workout_history.html", workouts = workouts, grouped_workouts = grouped_list) #Returns the page with workout data
 
 #The page where the user can log calories
 @app.route("/log-calories", methods = ["GET", "POST"]) 
@@ -294,15 +307,22 @@ def exercise_detail(exercise_id):
     if not exercise:
         conn.close()
         return "Exercise not found", 404
-    reviews = conn.execute("SELECT review_exercise.*, user.username FROM review_exercise JOIN user ON review_exercise.user_id = user.id WHERE review_exercise.exercise_id = ?", (exercise_id,)).fetchall() #Retrieves all reviews for the object and joins to the user table to get the username of the reviewers
+    reviews = conn.execute("SELECT review_exercise.*, user.username, user.role FROM review_exercise JOIN user ON review_exercise.user_id = user.id WHERE review_exercise.exercise_id = ?", (exercise_id,)).fetchall() #Retrieves all reviews for the object and joins to the user table to get the username of the reviewers
     is_favourite = False
 
     #Checks if the logged-in user has favourited the exercise
     if "user_id" in session:
         fav = conn.execute("SELECT id FROM favourite_exercise WHERE user_id = ? AND exercise_id = ?", (session["user_id"], exercise_id)).fetchone()
         is_favourite = fav is not None #If exercise_fav is a row, is_favourite becomes True otherwise if it is None, is_favourite becomes False
+    is_owner = "user_id" in session and exercise["trainer_id"] == session["user_id"] #True if the logged-in trainer created the content
+    
+    #Tracks whether the logged-in user has already reviewd this exercise
+    has_reviewed = False
+    if "user_id" in session:
+        existing = conn.execute("SELECT id FROM review_exercise WHERE user_id = ? AND exercise_id = ?", (session["user_id"], exercise_id)).fetchone()
+        has_reviewed = existing is not None
     conn.close()
-    return render_template("exercise_detail.html", exercise = exercise, is_favourite = is_favourite, reviews = reviews) 
+    return render_template("exercise_detail.html", exercise = exercise, is_favourite = is_favourite, reviews = reviews, is_owner = is_owner, has_reviewed = has_reviewed) 
 
 #A feature that allows user to favourite an exercise and save it
 @app.route("/toggle-favourite-exercise/<int:exercise_id>", methods = ["POST"]) 
@@ -331,14 +351,22 @@ def add_review_exercise(exercise_id):
         return redirect(url_for("home")) 
     rating = float(request.form.get("rating")) 
     comment = request.form.get("comment")
+    
     #Doesn't allow invalid ratings
     if rating < 1 or rating > 5:
         flash("Rating must be between 1 and 5")
         return redirect(url_for("exercise_detail", exercise_id = exercise_id)) 
     conn = get_db()
-    existing_review = conn.execute("SELECT id FROM review_exercise WHERE user_id = ? AND exercise_id = ?",(session["user_id"], exercise_id)).fetchone() #Checks if the user has already reviewed this exercise
+
+    #Blocks trainer from reviewing their own content
+    exercise = conn.execute("SELECT trainer_id FROM exercise WHERE id = ?", (exercise_id,)).fetchone()
+    if exercise and exercise["trainer_id"] == session["user_id"]:
+        conn.close()
+        flash("You can't review your own content")
+        return redirect(url_for("exercise_detail", exercise_id = exercise_id))
     
     #The user is not allowed to leave more than 1 review
+    existing_review = conn.execute("SELECT id FROM review_exercise WHERE user_id = ? AND exercise_id = ?",(session["user_id"], exercise_id)).fetchone() #Checks if the user has already reviewed this exercise
     if existing_review:
         conn.close()
         flash("You can't leave more than 1 review")
@@ -387,13 +415,29 @@ def meal_plan_detail(plan_id):
     if not plan:
         conn.close()
         return "Meal plan not found", 404
-    reviews = conn.execute("SELECT review_meal_plan.*, user.username FROM review_meal_plan JOIN user ON review_meal_plan.user_id = user.id WHERE review_meal_plan.meal_plan_id = ?", (plan_id,)).fetchall() 
+    reviews = conn.execute("SELECT review_meal_plan.*, user.username, user.role FROM review_meal_plan JOIN user ON review_meal_plan.user_id = user.id WHERE review_meal_plan.meal_plan_id = ?", (plan_id,)).fetchall() 
     is_favourite = False
     if "user_id" in session:
         fav = conn.execute("SELECT id FROM favourite_meal_plan WHERE user_id = ? AND meal_plan_id = ?", (session["user_id"], plan_id)).fetchone()
         is_favourite = fav is not None
-        conn.close()
-        return render_template("meal_plan_detail.html", plan=plan, is_favourite=is_favourite, reviews=reviews)
+    is_owner = "user_id" in session and plan["trainer_id"] == session["user_id"]
+    
+    #Tracks whether users have already reviewed the plan
+    has_reviewed = False
+    if "user_id" in session:
+        existing = conn.execute("SELECT id FROM review_meal_plan WHERE user_id = ? AND meal_plan_id = ?", (session["user_id"], plan_id)).fetchone()
+        has_reviewed = existing is not None
+
+    #Fetch all meals for this plan and group them by category
+    all_meals = conn.execute("SELECT * FROM meal WHERE meal_plan_id = ?", (plan_id,)).fetchall()
+    category_order = ["Breakfast", "Lunch", "Dinner", "Snack"]
+    grouped_meals = [] # A list of category and meals so that template loops in order
+    for category in category_order:
+        meals_in_cat = [m for m in all_meals if m["category"] == category] #Fetches all meals in the category
+        if meals_in_cat:
+            grouped_meals.append((category, meals_in_cat))
+    conn.close()
+    return render_template("meal_plan_detail.html", plan=plan, is_favourite=is_favourite, reviews=reviews, is_owner = is_owner, grouped_meals = grouped_meals, has_reviewed=has_reviewed)
 
 #Allows trainers to add a meal plan
 @app.route("/add-meal-plan", methods = ["GET", "POST"])
@@ -404,11 +448,19 @@ def add_meal_plan():
     if request.method == "POST":
         name = request.form["name"]
         description = request.form["description"]
-        meals = request.form["meals"]
-        if not name or not description or not meals:
-            return "Please fill in all fielda", 400
+        categories = {"Breakfast": request.form.get("breakfast", ""), "Lunch": request.form.get("lunch", ""), "Dinner": request.form.get("dinner", ""), "Snack": request.form.get("snack", "")} #Fetched meals from four separate category textareas
+        if not name or not description:
+            return "Please fill in all fields", 400
+        if not any(text.strip() for text in categories.values()):
+            return "Please add at least one meal", 400
         conn = get_db()
-        conn.execute("INSERT INTO meal_plan (name, description, meals, trainer_id) VALUES (?, ?, ?, ?)", (name, description, meals, session["user_id"]))
+        cursor = conn.execute("INSERT INTO meal_plan (name, description, meals, trainer_id) VALUES (?, ?, ?, ?)", (name, description, "See structured meals", session["user_id"]))
+        new_plan_id = cursor.lastrowid
+        for category, text in categories.items(): #Each catgegroy is split into lines and each line becomes its own meal row
+            for line in text.split("\n"): #Each line is treated as a separate meal
+                meal_desc = line.strip()
+                if meal_desc:
+                    conn.execute("INSERT INTO meal (meal_plan_id, category, description) VALUES (?, ?, ?)", (new_plan_id, category, meal_desc))
         conn.commit()
         conn.close()
         flash("Meal plan added successfully!")
@@ -443,6 +495,15 @@ def add_meal_plan_review(plan_id):
         flash("Rating must be between 1 and 5")
         return redirect(url_for("meal_plan_detail", plan_id = plan_id))
     conn = get_db()
+    
+    #Blocks trainers from reviewing their own content
+    plan = conn.execute("SELECT trainer_id FROM meal_plan WHERE id = ?", (plan_id,)).fetchone()
+    if plan and plan["trainer_id"] == session["user_id"]:
+        conn.close()
+        flash("You can't review your own content")
+        return redirect(url_for("meal_plan_detail", plan_id = plan_id))
+
+    #Users can't leave more than 1 review    
     existing = conn.execute("SELECT id FROM review_meal_plan WHERE user_id = ? AND meal_plan_id = ?", (session["user_id"], plan_id)).fetchone()
     if existing:
         conn.close()
@@ -472,13 +533,18 @@ def routine_detail(routine_id):
     if not routine:
         conn.close()
         return "Routine not found", 404
-    reviews = conn.execute("SELECT review_routine.*, user.username FROM review_routine JOIN user ON review_routine.user_id = user.id WHERE review_routine.routine_id = ?", (routine_id,)).fetchall() 
+    reviews = conn.execute("SELECT review_routine.*, user.username, user.role FROM review_routine JOIN user ON review_routine.user_id = user.id WHERE review_routine.routine_id = ?", (routine_id,)).fetchall() 
     is_favourite = False
     if "user_id" in session:
         fav = conn.execute("SELECT id FROM favourite_routine WHERE user_id = ? AND routine_id = ?", (session["user_id"], routine_id)).fetchone()
         is_favourite = fav is not None
+    is_owner = "user_id" in session and routine["trainer_id"] == session["user_id"]
+    has_reviewed = False
+    if "user_id" in session:
+        existing = conn.execute("SELECT id FROM review_routine WHERE user_id = ? AND routine_id = ?", (session["user_id"], routine_id)).fetchone()
+        has_reviewed = existing is not None
     conn.close()
-    return render_template("workout_routine_detail.html", routine=routine, is_favourite=is_favourite, reviews=reviews)
+    return render_template("workout_routine_detail.html", routine=routine, is_favourite=is_favourite, reviews=reviews, is_owner=is_owner, has_reviewed=has_reviewed)
 
 #Allows trainers to create a workout routine
 @app.route("/add-workout-routine", methods=["GET", "POST"])
@@ -529,6 +595,11 @@ def add_workout_routine_review(routine_id):
         flash("Rating must be between 1 and 5")
         return redirect(url_for("routine_detail", routine_id=routine_id))
     conn = get_db()
+    routine = conn.execute("SELECT trainer_id FROM workout_routine WHERE id = ?", (routine_id,)).fetchone()
+    if routine and routine["trainer_id"] == session["user_id"]:
+        conn.close()
+        flash("You can't review your own content")
+        return redirect(url_for("routine_detail", routine_id=routine_id))
     existing = conn.execute("SELECT id FROM review_routine WHERE user_id = ? AND routine_id = ?", (session["user_id"], routine_id)).fetchone() #Checks if the user has already reviewed this routine
     if existing: #Prevents more than one review per routine per user
         conn.close()
@@ -551,6 +622,166 @@ def view_favourites():
     favourite_workout_routines = conn.execute("SELECT workout_routine.* FROM workout_routine JOIN favourite_routine ON favourite_routine.routine_id = workout_routine.id WHERE favourite_routine.user_id = ?", (session["user_id"],)).fetchall() #Retrieves favourited workout routines
     conn.close()
     return render_template("view_favourites.html", exercises = favourite_exercises, meal_plans = favourite_meal_plans, routines = favourite_workout_routines) # Returns the page, displaying it to the user. The template can loop, showcasing each piece of data
+
+#Allows trainers to edit exercises they created
+@app.route("/edit-exercise/<int:exercise_id>", methods=["POST"])
+def edit_exercise(exercise_id):
+    if "user_id" not in session or session.get("role") == "gym_goer": 
+        return redirect(url_for("home"))
+    conn = get_db()
+    exercise = conn.execute("SELECT * FROM exercise WHERE id = ?", (exercise_id,)).fetchone() 
+    if not exercise:
+        conn.close()
+        return "Exercise not found", 404
+    if exercise["trainer_id"] != session["user_id"]:
+        conn.close()
+        return "You can only edit your own content", 403
+    name = request.form.get("name")
+    description = request.form.get("description")
+    muscle_group = request.form.get("muscle_group")
+    image_url = request.form.get("image_url")
+    difficulty = request.form.get("difficulty")
+    if not name or not description or not muscle_group or not difficulty:
+        conn.close()
+        return "Please fill in all fields", 400
+    conn.execute("UPDATE exercise SET name = ?, description = ?, muscle_group = ?, image_url = ?, difficulty = ? WHERE id = ?", (name, description, muscle_group, image_url, difficulty, exercise_id))
+    conn.commit()
+    conn.close()
+    flash("Exercise updated successfully!")
+    return redirect(url_for("exercise_detail", exercise_id=exercise_id))
+
+#Allows a trainer to delete an exercise they created
+@app.route("/delete-exercise/<int:exercise_id>", methods=["POST"])
+def delete_exercise(exercise_id):
+    if "user_id" not in session or session.get("role") == "gym_goer":
+        return redirect(url_for("home"))
+    conn = get_db()
+    exercise = conn.execute("SELECT * FROM exercise WHERE id = ?", (exercise_id,)).fetchone()
+    if not exercise:
+        conn.close()
+        return "Exercise not found", 404
+    if exercise["trainer_id"] != session["user_id"]: #Ownership check
+        conn.close()
+        return "You can only delete your own content", 403
+    #Deletes related favourites and reviews first to maintain referential integrity
+    conn.execute("DELETE FROM favourite_exercise WHERE exercise_id = ?", (exercise_id,))
+    conn.execute("DELETE FROM review_exercise WHERE exercise_id = ?", (exercise_id,))
+    conn.execute("DELETE FROM exercise WHERE id = ?", (exercise_id,))
+    conn.commit()
+    conn.close()
+    flash("Exercise deleted successfully!")
+    return redirect(url_for("exercises"))
+
+#Allows a trainer to edit a meal plan they created
+@app.route("/edit-meal-plan/<int:plan_id>", methods=["POST"])
+def edit_meal_plan(plan_id):
+    if "user_id" not in session or session.get("role") == "gym_goer":
+        return redirect(url_for("home"))
+    conn = get_db()
+    plan = conn.execute("SELECT * FROM meal_plan WHERE id = ?", (plan_id,)).fetchone()
+    if not plan:
+        conn.close()
+        return "Meal plan not found", 404
+    if plan["trainer_id"] != session["user_id"]: #Ownership check
+        conn.close()
+        return "You can only edit your own content", 403
+    name = request.form.get("name")
+    description = request.form.get("description")
+    categories = {"Breakfast": request.form.get("breakfast", ""), "Lunch": request.form.get("lunch", ""), "Dinner": request.form.get("dinner", ""), "Snack": request.form.get("snack", "")}
+    if not name or not description:
+        conn.close()
+        return "Please fill in all fields", 400
+    if not any(text.strip() for text in categories.values()):
+        conn.close()
+        return "Please add at least one meal", 400
+    conn.execute("UPDATE meal_plan SET name = ?, description = ? WHERE id = ?", (name, description, plan_id)) 
+    conn.execute("DELETE FROM meal WHERE meal_plan_id = ?", (plan_id,)) #Deletes all existing meals for this plans then re-inserts the updated ones
+    for category, text in categories.items():
+        for line in text.split("\n"):
+            meal_desc = line.strip()
+            if meal_desc:
+                conn.execute("INSERT INTO meal (meal_plan_id, category, description) VALUES (?, ?, ?)", (plan_id, category, meal_desc))
+    conn.commit()
+    conn.close()
+    flash("Meal plan updated successfully!")
+    return redirect(url_for("meal_plan_detail", plan_id=plan_id))
+
+#Allows a trainer to delete a meal plan they created
+@app.route("/delete-meal-plan/<int:plan_id>", methods=["POST"])
+def delete_meal_plan(plan_id):
+    if "user_id" not in session or session.get("role") == "gym_goer":
+        return redirect(url_for("home"))
+    conn = get_db()
+    plan = conn.execute("SELECT * FROM meal_plan WHERE id = ?", (plan_id,)).fetchone()
+    if not plan:
+        conn.close()
+        return "Meal plan not found", 404
+    if plan["trainer_id"] != session["user_id"]: #Ownership check
+        conn.close()
+        return "You can only delete your own content", 403
+    conn.execute("DELETE FROM favourite_meal_plan WHERE meal_plan_id = ?", (plan_id,))
+    conn.execute("DELETE FROM review_meal_plan WHERE meal_plan_id = ?", (plan_id,))
+    conn.execute("DELETE FROM meal_plan WHERE meal_plan_id = ?", (plan_id,))
+    conn.execute("DELETE FROM meal WHERE meal_plan_id = ?", (plan_id,))
+    conn.commit()
+    conn.close()
+    flash("Meal plan deleted successfully!")
+    return redirect(url_for("meal_plans"))
+
+#Allows a trainer to edit a workout routine they created
+@app.route("/edit-workout-routine/<int:routine_id>", methods=["POST"])
+def edit_workout_routine(routine_id):
+    if "user_id" not in session or session.get("role") == "gym_goer":
+        return redirect(url_for("home"))
+    conn = get_db()
+    routine = conn.execute("SELECT * FROM workout_routine WHERE id = ?", (routine_id,)).fetchone()
+    if not routine:
+        conn.close()
+        return "Routine not found", 404
+    if routine["trainer_id"] != session["user_id"]: #Ownership check
+        conn.close()
+        return "You can only edit your own content", 403
+    name = request.form.get("name")
+    description = request.form.get("description")
+    difficulty = request.form.get("difficulty")
+    exercises_list = request.form.get("exercises_list")
+    if not name or not description or not difficulty or not exercises_list:
+        conn.close()
+        return "Please fill in all fields", 400
+    conn.execute("UPDATE workout_routine SET name = ?, description = ?, difficulty = ?, exercises_list = ? WHERE id = ?", (name, description, difficulty, exercises_list, routine_id))
+    conn.commit()
+    conn.close()
+    flash("Workout routine updated successfully!")
+    return redirect(url_for("routine_detail", routine_id=routine_id))
+
+#Allows a trainer to delete a workout routine they created
+@app.route("/delete-workout-routine/<int:routine_id>", methods=["POST"])
+def delete_workout_routine(routine_id):
+    if "user_id" not in session or session.get("role") == "gym_goer":
+        return redirect(url_for("home"))
+    conn = get_db()
+    routine = conn.execute("SELECT * FROM workout_routine WHERE id = ?", (routine_id,)).fetchone()
+    if not routine:
+        conn.close()
+        return "Routine not found", 404
+    if routine["trainer_id"] != session["user_id"]: #Ownership check
+        conn.close()
+        return "You can only delete your own content", 403
+    conn.execute("DELETE FROM favourite_routine WHERE routine_id = ?", (routine_id,))
+    conn.execute("DELETE FROM review_routine WHERE routine_id = ?", (routine_id,))
+    conn.execute("DELETE FROM workout_routine WHERE id = ?", (routine_id,))
+    conn.commit()
+    conn.close()
+    flash("Workout routine deleted successfully!")
+    return redirect(url_for("workout_routines"))
+
+#Single unified page for trainers where they can add exercises, meal plans and routines. The form posts to the relevant existing route
+@app.route("/add-content")
+def add_content():
+    if "user_id" not in session or session.get("role") == "gym_goer":
+        flash("Access denied!")
+        return redirect(url_for("home"))
+    return render_template("add_content.html")
 
 #Logs out the user by clearing their session
 @app.route("/logout") 

@@ -20,7 +20,7 @@
                     <span class="badge badge-advanced">{{ exercise.difficulty }}</span>
                 {% endif %}
             </div>
-            <p>{{ exercise.description }}</p>
+            <div id="exerciseSteps" data-raw="{{ exercise.description }}"></div>
             <form action="{{ url_for('toggle_favourite_exercise', exercise_id=exercise.id) }}" method="POST" class="fav-form">
                 {% if is_favourite %}
                 <button type="submit" class="btn btn-fav-active btn-sm">★ Remove Favourite</button>
@@ -28,30 +28,78 @@
                 <button type="submit" class="btn btn-outline btn-sm">☆ Add to Favourites</button>
                 {% endif %}
             </form>
+            {% if is_owner %}
+            <div class="owner-actions">
+                <button type="button" class="btn btn-outline btn-sm" onclick="toggleEdit()">✎ Edit</button>
+                <form action="{{ url_for('delete_exercise', exercise_id=exercise.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this exercise? This cannot be undone.');">
+                    <button type="submit" class="btn btn-danger btn-sm">🗑 Delete</button>
+                </form>
+            </div>
+            {% endif %}
         </div>
     </div>
  
+    {% if is_owner %}
+    <div class="detail-section" id="editForm" style="display:none;">
+        <h3>Edit Exercise</h3>
+        <form method="POST" action="{{ url_for('edit_exercise', exercise_id=exercise.id) }}">
+            <div class="form-group">
+                <label class="form-label">Exercise Name</label>
+                <input name="name" class="form-control" value="{{ exercise.name }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">How to Perform</label>
+                <textarea name="description" class="form-control" rows="6" required>{{ exercise.description }}</textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Muscle Group</label>
+                <input name="muscle_group" class="form-control" value="{{ exercise.muscle_group }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label"> Image URL 
+                    <span style="color:var(--text-dim);font-weight:400;text-transform:none;">(optional)</span>
+                </label>
+                <input name="image_url" class="form-control" value="{{ exercise.image_url or '' }}">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Difficulty</label>
+                <select name="difficulty" class="form-control" required>
+                    <option value="Beginner" {% if exercise.difficulty == "Beginner" %}selected{% endif %}>Beginner</option>
+                    <option value="Intermediate" {% if exercise.difficulty == "Intermediate" %}selected{% endif %}>Intermediate</option>
+                    <option value="Advanced" {% if exercise.difficulty == "Advanced" %}selected{% endif %}>Advanced</option>
+                </select>
+            </div>
+            <div class="flex gap-1">
+                <button type="submit" class="btn btn-primary btn-sm" id="reviewSubmit">Save Changes</button>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="toggleEdit()">Cancel</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
     <div class="detail-section">
         <h3>Reviews</h3>
-        {% if session.role == "gym_goer" %}
+        {% if session.user_id and not is_owner and not has_reviewed %}
         <div class="review-form">
             <form method="POST" action="{{ url_for('add_review_exercise', exercise_id=exercise.id) }}">
-                <div class="star-select" style="margin-bottom:0.75rem;">
-                    <label class="form-label">Your Rating</label>
-                    <select name="rating" class="form-control" style="width:auto;" required>
-                        <option value="5">★★★★★</option>
-                        <option value="4">★★★★</option>
-                        <option value="3">★★★</option>
-                        <option value="2">★★</option>
-                        <option value="1">★</option>
-                    </select>
+                <input type="hidden" name="rating" id="ratingInput" value="">
+                <label class="form-label" style="margin-bottom:0.4rem;">Your Rating</label>
+                <div class="star-rating-widget" id="starWidget">
+                    <span class="rating-hint" id="ratingHint">Select a rating</span>
+                    <span class="star" data-val="1">★</span>
+                    <span class="star" data-val="2">★</span>
+                    <span class="star" data-val="3">★</span>
+                    <span class="star" data-val="4">★</span>
+                    <span class="star" data-val="5">★</span>
                 </div>
                 <div class="form-group">
-                    <textarea name="comment" class="form-control" placeholder="Share your thoughts on this exercise..." maxlength="400"></textarea>
+                    <textarea name="comment" class="form-control" placeholder="Share your thoughts..." maxlength="400"></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary btn-sm">Submit Review</button>
+                <button type="submit" class="btn btn-primary btn-sm" id="reviewSubmit">Submit Review</button>
             </form>
         </div>
+        {% elif is_owner %}
+        <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem;">You can't review your own content.</p>
         {% endif %}
  
         {% if reviews %}
@@ -59,7 +107,12 @@
             {% for review in reviews %}
             <div class="review-card">
                 <div class="review-header">
-                    <span class="review-author">{{ review["username"] }}</span>
+                    <span class="review-author">
+                        {{ review["username"] }}
+                        {% if review["role"] == "trainer" %}
+                        <span class="badge badge-muscle" style="margin-left:0.4rem;">Trainer</span>
+                        {% endif %}
+                    </span>
                     <span class="review-stars">{{ "★" * review["rating"] }}{{ "☆" * (5 - review["rating"]) }}</span>
                 </div>
                 <p class="review-comment">{{ review["comment"] }}</p>
@@ -71,4 +124,85 @@
         {% endif %}
     </div>
 </div>
+{% endblock %}
+{% block head %}
+<script>
+    function toggleEdit() {
+        const form = document.getElementById('editForm');
+        if (form) {
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+            if (form.style.display === 'block') form.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const stars = document.querySelectorAll('#starWidget .star');
+        const input = document.getElementById('ratingInput');
+        const hint = document.getElementById('ratingHint');
+        const labels = ['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent']; 
+        let selected = 0;
+ 
+        if (stars.length) {
+            stars.forEach((star, i) => {
+                star.addEventListener('mouseenter', () => {
+                    stars.forEach((s, j) => s.classList.toggle('lit', j <= i));
+                    hint.textContent = labels[i + 1];
+                });
+                star.addEventListener('mouseleave', () => {
+                    stars.forEach((s, j) => {
+                        s.classList.remove('lit');
+                        s.classList.toggle('selected', j < selected);
+                    });
+                    hint.textContent = selected ? labels[selected] : 'Select a rating';
+                });
+                star.addEventListener('click', () => {
+                    selected = i + 1;
+                    input.value = selected;
+                    stars.forEach((s, j) => s.classList.toggle('selected', j < selected));
+                    hint.textContent = labels[selected];
+                });
+            });
+            document.getElementById('reviewSubmit')?.addEventListener('click', (e) => {
+                if (!input.value) {
+                    e.preventDefault();
+                    hint.textContent = '⚠ Please select a rating first';
+                    hint.style.color = '#fca5a5';
+                }
+            });
+        }
+        
+        const stepsEl = document.getElementById('exerciseSteps');
+        if (stepsEl) {
+            const raw = stepsEl.dataset.raw || '';
+            const lines = raw.split('\n').map(l => l.trim()).filter(l => l);
+            const isNumbered = lines.every(l => /^\d+[\.\)]/.test(l));
+            const isBullet = lines.every(l => /^[-•*]/.test(l));
+ 
+            if (isNumbered) {
+                const ul = document.createElement('ol');
+                ul.className = 'steps-list';
+                lines.forEach(l => {
+                    const li = document.createElement('li');
+                    li.textContent = l.replace(/^\d+[\.\)]\s*/, '');
+                    ul.appendChild(li);
+                });
+                stepsEl.appendChild(ul);
+            } else if (isBullet) {
+                const ul = document.createElement('ul');
+                ul.className = 'bullet-list';
+                lines.forEach(l => {
+                    const li = document.createElement('li');
+                    li.textContent = l.replace(/^[-•*]\s*/, '');
+                    ul.appendChild(li);
+                });
+                stepsEl.appendChild(ul);
+            } else {
+                const p = document.createElement('p');
+                p.style.whiteSpace = 'pre-wrap';
+                p.textContent = raw;
+                stepsEl.appendChild(p);
+            }
+        }
+    });
+</script>
 {% endblock %}

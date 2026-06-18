@@ -4,22 +4,13 @@
 <div class="page">
     <h2>Welcome, {{ session.username }}</h2>
     <p style="color:var(--text-muted);margin-top:0.25rem;">Personal Trainer Dashboard</p>
- 
     <div class="dash-grid">
-        <a href="/add-exercise" class="dash-card primary">
-            <div class="dash-card-icon"><i class="ti ti-circle-plus" aria-hidden="true"></i></div>
-            <div class="dash-card-title">Add Exercise</div>
-            <div class="dash-card-sub">Upload a new exercise to the library</div>
-        </a>
-        <a href="/add-meal-plan" class="dash-card primary">
-            <div class="dash-card-icon"><i class="ti ti-salad" aria-hidden="true"></i></div>
-            <div class="dash-card-title">Add Meal Plan</div>
-            <div class="dash-card-sub">Create a new diet or nutrition plan</div>
-        </a>
-        <a href="/add-workout-routine" class="dash-card primary">
-            <div class="dash-card-icon"><i class="ti ti-flame" aria-hidden="true"></i></div>
-            <div class="dash-card-title">Add Routine</div>
-            <div class="dash-card-sub">Build a full workout program</div>
+        <a href="/add-content" class="dash-card primary">
+            <div class="dash-card-icon">
+                <i class="ti ti-circle-plus" aria-hidden="true"></i>
+            </div>
+            <div class="dash-card-title">Add content</div>
+            <div class="dash-card-sub">Upload an exercise, meal plan or routine</div>
         </a>
         <a href="/exercises" class="dash-card">
             <div class="dash-card-icon"><i class="ti ti-dumbbell" aria-hidden="true"></i></div>

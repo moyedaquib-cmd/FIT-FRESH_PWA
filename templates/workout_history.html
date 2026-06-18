@@ -13,8 +13,24 @@
         <h2>Workout History</h2>
         <a href="/log-workout" class="btn btn-primary">+ Log Workout</a>
     </div>
- 
+    
+    <div class="page-header-actions">
+        <div class="unit-toggle" id="unitToggle">
+            <button type="button" class="unit-btn active" data-unit="kg">kg</button>
+            <button type="button" class="unit-btn" data-unit="lbs">lbs</button>
+        </div>
+        <a href="/log-workout" class="btn btn-primary">+ Log Workout</a>
+    </div>
+
     {% if workouts %}
+    {% for date_key, formatted_date, day_workouts in grouped_workouts %}
+    <div class="date-group">
+        <div class="date-group-heading">
+            <i class="ti ti-calendar-event"></i>
+            <span>{{ formatted_date }}</span>
+            <span class="date-group-count">{{ day_workouts | length }} workout{{ 's' if day_workouts | length != 1 else '' }}</span>
+        </div>
+    </div>
     <div class="table-wrap">
         <table>
             <thead>
@@ -34,7 +50,10 @@
                     <td><strong>{{ workout.exercise }}</strong></td>
                     <td>{{ workout.sets }}</td>
                     <td>{{ workout.reps }}</td>
-                    <td>{{ workout.weight | fmt_num}} kg</td>
+                    <td>
+                        <span class="weight-value" data-kg="{{ workout.weight }}">{{ workout.weight | fmt_num }}</span>
+                        <span class="weight-unit">kg</span>
+                    </td>
                     <td>
                         <div class="table-actions">
                             <a href="{{ url_for('edit_workout', workout_id=workout.id) }}" class="btn btn-outline btn-sm">Edit</a>
@@ -48,6 +67,7 @@
             </tbody>
         </table>
     </div>
+    {% endfor %}
     {% else %}
     <div class="empty-state">
         <div class="empty-state-icon"><i class="ti ti-barbell" aria-hidden="true"></i></div>
@@ -57,4 +77,35 @@
     </div>
     {% endif %}
 </div>
+{% endblock %}
+{% block head %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const KG_TO_LBS = 2.20462; //Conversion factor from kilograms to pounds
+        const toggle = document.getElementById('unitToggle');
+        if (!toggle) return;
+        const buttons = toggle.querySelectorAll('.unit-btn');
+        
+        function fmt(n) {
+            const rounded = Math.round(n * 100) / 100;
+            return rounded % 1 === 0 ? rounded.toString() : rounded.toString();
+        }
+        
+        function setUnit(unit) {
+            document.querySelectorAll('.weight-value').forEach(el => {
+                const kg = parseFloat(el.dataset.kg); //The original stored weight in kg
+                if (unit === 'lbs') {
+                    el.textContent = fmt(kg * KG_TO_LBS); //Converts kg to lbs for display
+                } else {
+                    el.textContent = fmt(kg); //Shows the original kg value
+                }
+            });
+            document.querySelectorAll('.weight-unit').forEach(el => { el.textContent = unit; });
+            buttons.forEach(b => b.classList.toggle('active', b.dataset.unit === unit));
+        }
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => setUnit(btn.dataset.unit));
+        });
+    });
+</script>
 {% endblock %}

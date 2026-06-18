@@ -6,7 +6,10 @@
  
     <!-- EXERCISES -->
     <div class="fav-section">
-        <div class="fav-section-title">💪 Exercises</div>
+        <div class="fav-section-title">
+            <i class="ti ti-dumbbell" style="font-size:2.5rem;"></i>
+            Exercises
+        </div>
         {% if exercises %}
         <div class="grid-3">
             {% for exercise in exercises %}
@@ -14,7 +17,9 @@
                 {% if exercise.image_url %}
                 <img src="{{ exercise.image_url }}" class="content-card-img" alt="{{ exercise.name }}">
                 {% else %}
-                <div class="content-card-img-placeholder">💪</div>
+                <div class="content-card-img-placeholder">
+                    <i class="ti ti-dumbbell" style="font-size:2.5rem;"></i>
+                </div>
                 {% endif %}
                 <div class="content-card-body">
                     <div class="content-card-title">{{ exercise.name }}</div>
@@ -37,12 +42,17 @@
  
     <!-- MEAL PLANS -->
     <div class="fav-section">
-        <div class="fav-section-title">🥗 Meal Plans & Diets</div>
+        <div class="fav-section-title">]
+            <i class="ti ti-salad"></i>
+            Meal Plans & Diets
+        </div>
         {% if meal_plans %}
         <div class="grid-3">
             {% for plan in meal_plans %}
             <div class="content-card">
-                <div class="content-card-img-placeholder">🥗</div>
+                <div class="content-card-img-placeholder">
+                    <i class="ti ti-salad" style="font-size:2.5rem;"></i>
+                </div>
                 <div class="content-card-body">
                     <div class="content-card-title">{{ plan.name }}</div>
                     <p class="content-card-meta">{{ plan.description }}</p>
@@ -64,12 +74,17 @@
  
     <!-- WORKOUT ROUTINES -->
     <div class="fav-section">
-        <div class="fav-section-title">🔥 Workout Routines</div>
+        <div class="fav-section-title">
+            <i class="ti ti-flame"></i>
+            Workout Routines
+        </div>
         {% if routines %}
         <div class="grid-3">
             {% for routine in routines %}
             <div class="content-card">
-                <div class="content-card-img-placeholder">🔥</div>
+                <div class="content-card-img-placeholder">
+                    <i class="ti ti-flame" style="font-size:2.5rem;"></i>
+                </div>
                 <div class="content-card-body">
                     <div class="content-card-title">{{ routine.name }}</div>
                     {% if routine.difficulty == "Beginner" %}

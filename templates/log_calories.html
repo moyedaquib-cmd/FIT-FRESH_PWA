@@ -5,17 +5,42 @@
     <a href="{{ url_for('gym_goer_dashboard') if session.role == 'gym_goer' else url_for('personal_trainer_dashboard') }}" class="back-link">← Back to Dashboard</a>
     <h2 style="margin-bottom:1.5rem;">Track Calories</h2>
     <div class="form-card">
-        <form method="POST">
+        <form method="POST" id="logCaloriesForm">
             <div class="form-group">
                 <label class="form-label">Meal</label>
-                <input type="text" name="meal" class="form-control" placeholder="e.g. Bacon and Eggs" required>
+                <input type="text" name="meal" id="meal" class="form-control" placeholder="e.g. Bacon and Eggs" required>
+                <p class="field-error" id="mealErr"></p>
             </div>
             <div class="form-group">
                 <label class="form-label">Calories</label>
-                <input type="number" name="calories" class="form-control" placeholder="e.g. 650" min="0" step="0.1" required>
+                <input type="number" name="calories" id="calories" class="form-control" placeholder="e.g. 650" min="0" step="0.01" required>
+                <p class="field-error" id="caloriesErr"></p>
             </div>
             <button type="submit" class="btn btn-primary btn-full btn-lg">Save Entry</button>
         </form>
     </div>
 </div>
+{% endblock %}
+{% block head %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        function validate(id, errId, checks) {
+            const el = document.getElementById(id);
+            const err = document.getElementById(errId);
+            if (!el) return;
+            el.addEventListener('input', () => {
+                const val = el.value.trim();
+                let msg = '';
+                for (const [test, message] of checks) {
+                    if (!test(val)) { msg = message; break; }
+                }
+                err.textContent = msg;
+                el.classList.toggle('input-error', !!msg);
+                el.classList.toggle('input-valid', !msg && val.length > 0);
+            });
+        }
+        validate('meal',     'mealErr',     [[v => v.length >= 2, 'Please enter a meal name']]);
+        validate('calories', 'caloriesErr', [[v => v !== '', 'Required'], [v => parseFloat(v) >= 0, 'Calories cannot be negative'], [v => parseFloat(v) <= 10000, 'Please enter a realistic calorie value']]);
+    });
+</script>
 {% endblock %}

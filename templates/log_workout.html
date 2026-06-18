@@ -5,27 +5,112 @@
     <a href="{{ url_for('gym_goer_dashboard') if session.role == 'gym_goer' else url_for('personal_trainer_dashboard') }}" class="back-link">← Back to Dashboard</a>
     <h2 style="margin-bottom:1.5rem;">Log Workout</h2>
     <div class="form-card">
-        <form action="/log-workout" method="POST">
+        <form action="/log-workout" method="POST" id="logWorkoutForm">
             <div class="form-group">
                 <label class="form-label">Exercise Name</label>
-                <input type="text" name="exercise" class="form-control" placeholder="e.g. Bench Press" required>
+                <input type="text" name="exercise" id="exerciseName" class="form-control" placeholder="e.g. Bench Press" required>
+                <p class="field-error" id="exerciseNameErr"></p>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
                 <div class="form-group">
                     <label class="form-label">Sets</label>
-                    <input type="number" name="sets" class="form-control" placeholder="4" min="1" required>
+                    <input type="number" name="sets" id = "sets" class="form-control" placeholder="4" min="1" required>
+                    <p class="field-error" id="setsErr"></p>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Reps</label>
-                    <input type="number" name="reps" class="form-control" placeholder="8" min="1" required>
+                    <input type="number" name="reps" id = "reps" class="form-control" placeholder="8" min="1" required>
+                    <p class="field-error" id="repsErr"></p>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Weight (kg)</label>
-                    <input type="number" name="weight" class="form-control" placeholder="60" step="0.1" min="0" required>
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;">
+                        <label class="form-label" id="weightLabel">Weight (kg)</label>
+                        <div class="unit-toggle unit-toggle-sm" id="unitToggle">
+                            <button type="button" class="unit-btn active" data-unit="kg">kg</button>
+                            <button type="button" class="unit-btn" data-unit="lbs">lbs</button>
+                        </div>
+                    </div>
+                    <input type="number" name="weight" id = "weight" class="form-control" placeholder="60" step="0.01" min="0" required>
+                    <p class="form-hint" id="weightHint" style="margin-top:0.3rem;"></p>
+                    <p class="field-error" id="weightErr"></p>
                 </div>
             </div>
             <button type="submit" class="btn btn-primary btn-full btn-lg">Save Workout</button>
         </form>
     </div>
 </div>
+{% endblock %}
+{% block head %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        function validate(id, errId, checks) {
+            const el = document.getElementById(id);
+            const err = document.getElementById(errId);
+            if (!el) return;
+            el.addEventListener('input', () => {
+                const val = el.value.trim();
+                let msg = '';
+                for (const [test, message] of checks) {
+                    if (!test(val)) { msg = message; break; }
+                }
+                err.textContent = msg;
+                el.classList.toggle('input-error', !!msg);
+                el.classList.toggle('input-valid', !msg && val.length > 0);
+            });
+        }
+        validate('exerciseName', 'exerciseNameErr', [[v => v.length >= 2, 'Please enter an exercise name']]);
+        validate('sets',   'setsErr',   [[v => v !== '', 'Required'], [v => parseInt(v) >= 1, 'Sets must be at least 1'], [v => parseInt(v) <= 100, 'Are you sure? That seems like a lot of sets']]);
+        validate('reps',   'repsErr',   [[v => v !== '', 'Required'], [v => parseInt(v) >= 1, 'Reps must be at least 1'], [v => parseInt(v) <= 1000, 'Please enter a realistic rep count']]);
+        validate('weight', 'weightErr', [[v => v !== '', 'Required'], [v => parseFloat(v) >= 0, 'Weight cannot be negative'], [v => parseFloat(v) <= 2500, 'Please enter a realistic weight']]); 
+
+        const KG_TO_LBS = 2.20462; 
+        const toggle = document.getElementById('unitToggle');
+        const weightInput = document.getElementById('weight');
+        const weightLabel = document.getElementById('weightLabel');
+        const weightHint = document.getElementById('weightHint');
+        const form = document.getElementById('logWorkoutForm');
+        let currentUnit = 'kg'; 
+
+        function updateHint() {
+            const val = parseFloat(weightInput.value);
+            if (isNaN(val)) { weightHint.textContent = ''; return; }
+            if (currentUnit === 'lbs') {
+                const kg = val / KG_TO_LBS; 
+                weightHint.textContent = `Will be saved as ${Math.round(kg * 100) / 100} kg`;
+            } else {
+                weightHint.textContent = ''; 
+            }
+        }
+
+        if (toggle) {
+            toggle.querySelectorAll('.unit-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const newUnit = btn.dataset.unit;
+                    if (newUnit === currentUnit) return;
+                    const val = parseFloat(weightInput.value);
+                    if (!isNaN(val)) {
+                        if (newUnit === 'lbs') weightInput.value = Math.round(val * KG_TO_LBS * 100) / 100; 
+                        else weightInput.value = Math.round(val / KG_TO_LBS * 100) / 100;
+                    }
+                    currentUnit = newUnit;
+                    weightLabel.textContent = `Weight (${newUnit})`;
+                    toggle.querySelectorAll('.unit-btn').forEach(b => b.classList.toggle('active', b.dataset.unit === newUnit));
+                    updateHint();
+                });
+            });
+            weightInput.addEventListener('input', updateHint);
+        }
+
+        if (form) {
+            form.addEventListener('submit', (e) => {
+                if (currentUnit === 'lbs') {
+                    const val = parseFloat(weightInput.value);
+                    if (!isNaN(val)) {
+                        weightInput.value = Math.round(val / KG_TO_LBS * 100) / 100; 
+                    }
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}

@@ -16,7 +16,9 @@
             {% if exercise.image_url %}
             <img src="{{ exercise.image_url }}" class="content-card-img" alt="{{ exercise.name }}">
             {% else %}
-            <div class="content-card-img-placeholder">💪</div>
+            <div class="content-card-img-placeholder">
+                <i class="ti ti-dumbbell" style="font-size:2.5rem;"></i>
+            </div>
             {% endif %}
             <div class="content-card-body">
                 <div class="content-card-title">{{ exercise.name }}</div>

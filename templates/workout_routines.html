@@ -13,7 +13,9 @@
     <div class="grid-3">
         {% for routine in routines %}
         <div class="content-card">
-            <div class="content-card-img-placeholder">🔥</div>
+            <div class="content-card-img-placeholder">
+                <i class="ti ti-flame" style="font-size:2.5rem;"></i>
+            </div>
             <div class="content-card-body">
                 <div class="content-card-title">{{ routine.name }}</div>
                 {% if routine.difficulty == "Beginner" %}
@@ -33,7 +35,9 @@
     </div>
     {% else %}
     <div class="empty-state">
-        <div class="empty-state-icon">🔥</div>
+        <div class="empty-state-icon">
+            <i class="ti ti-flame"></i>
+        </div>
         <h3>No Routines Yet</h3>
         <p>Trainers haven't uploaded any workout routines yet.</p>
     </div>
