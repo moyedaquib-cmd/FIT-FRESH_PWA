@@ -11,20 +11,20 @@
                 <input type="text" name="exercise" id="exerciseName" class="form-control" placeholder="e.g. Bench Press" required>
                 <p class="field-error" id="exerciseNameErr"></p>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+            <div class="workout-stats-grid">
                 <div class="form-group">
-                    <label class="form-label">Sets</label>
+                    <label class="form-label stat-label">Sets</label>
                     <input type="number" name="sets" id = "sets" class="form-control" placeholder="4" min="1" required>
                     <p class="field-error" id="setsErr"></p>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Reps</label>
+                    <label class="form-label stat-label">Reps</label>
                     <input type="number" name="reps" id = "reps" class="form-control" placeholder="8" min="1" required>
                     <p class="field-error" id="repsErr"></p>
                 </div>
                 <div class="form-group">
-                    <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;">
-                        <label class="form-label" id="weightLabel">Weight (kg)</label>
+                    <div class="stat-label weight-label-row">
+                        <label class="form-label" id="weightLabel">Weight</label>
                         <div class="unit-toggle unit-toggle-sm" id="unitToggle">
                             <button type="button" class="unit-btn active" data-unit="kg">kg</button>
                             <button type="button" class="unit-btn" data-unit="lbs">lbs</button>
@@ -62,7 +62,6 @@
         validate('sets',   'setsErr',   [[v => v !== '', 'Required'], [v => parseInt(v) >= 1, 'Sets must be at least 1'], [v => parseInt(v) <= 100, 'Are you sure? That seems like a lot of sets']]);
         validate('reps',   'repsErr',   [[v => v !== '', 'Required'], [v => parseInt(v) >= 1, 'Reps must be at least 1'], [v => parseInt(v) <= 1000, 'Please enter a realistic rep count']]);
         validate('weight', 'weightErr', [[v => v !== '', 'Required'], [v => parseFloat(v) >= 0, 'Weight cannot be negative'], [v => parseFloat(v) <= 2500, 'Please enter a realistic weight']]); 
-
         const KG_TO_LBS = 2.20462; 
         const toggle = document.getElementById('unitToggle');
         const weightInput = document.getElementById('weight');
@@ -70,18 +69,6 @@
         const weightHint = document.getElementById('weightHint');
         const form = document.getElementById('logWorkoutForm');
         let currentUnit = 'kg'; 
-
-        function updateHint() {
-            const val = parseFloat(weightInput.value);
-            if (isNaN(val)) { weightHint.textContent = ''; return; }
-            if (currentUnit === 'lbs') {
-                const kg = val / KG_TO_LBS; 
-                weightHint.textContent = `Will be saved as ${Math.round(kg * 100) / 100} kg`;
-            } else {
-                weightHint.textContent = ''; 
-            }
-        }
-
         if (toggle) {
             toggle.querySelectorAll('.unit-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -93,14 +80,10 @@
                         else weightInput.value = Math.round(val / KG_TO_LBS * 100) / 100;
                     }
                     currentUnit = newUnit;
-                    weightLabel.textContent = `Weight (${newUnit})`;
                     toggle.querySelectorAll('.unit-btn').forEach(b => b.classList.toggle('active', b.dataset.unit === newUnit));
-                    updateHint();
                 });
             });
-            weightInput.addEventListener('input', updateHint);
         }
-
         if (form) {
             form.addEventListener('submit', (e) => {
                 if (currentUnit === 'lbs') {

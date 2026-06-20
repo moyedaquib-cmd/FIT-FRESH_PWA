@@ -39,6 +39,12 @@ def register_page():
     role = request.form.get("role")
     if not username or not password or not role: #Stops empty submissions to prevent incomplete database records. Returns HTTP 400 (Bad Request)
         return "Please fill in all the fields", 400
+    if len(username) <3 or len(username) > 50: #Username length check
+        flash("Username must be between 3 and 50 characters")
+        return redirect(url_for("register_page"))
+    if len(password) < 6: #Password length check
+        flash("Password must be at least 6 characters")
+        return redirect(url_for("register_page"))
     conn = get_db() #Creates a database connection
     cursor = conn.cursor() #Creates a cursor object which acts as a connector between the python code and SQLite
     existing_user = cursor.execute("SELECT id FROM user WHERE username = ?", (username,)).fetchone() #Checks for duplicate usernames by querying the user table
@@ -449,12 +455,13 @@ def add_meal_plan():
         name = request.form["name"]
         description = request.form["description"]
         categories = {"Breakfast": request.form.get("breakfast", ""), "Lunch": request.form.get("lunch", ""), "Dinner": request.form.get("dinner", ""), "Snack": request.form.get("snack", "")} #Fetched meals from four separate category textareas
+        image_url = request.form.get("image_url", "")
         if not name or not description:
             return "Please fill in all fields", 400
         if not any(text.strip() for text in categories.values()):
             return "Please add at least one meal", 400
         conn = get_db()
-        cursor = conn.execute("INSERT INTO meal_plan (name, description, meals, trainer_id) VALUES (?, ?, ?, ?)", (name, description, "See structured meals", session["user_id"]))
+        cursor = conn.execute("INSERT INTO meal_plan (name, description, meals, image_url, trainer_id) VALUES (?, ?, ?, ?, ?)", (name, description, "See structured meals", image_url, session["user_id"]))
         new_plan_id = cursor.lastrowid
         for category, text in categories.items(): #Each catgegroy is split into lines and each line becomes its own meal row
             for line in text.split("\n"): #Each line is treated as a separate meal
@@ -557,10 +564,11 @@ def add_workout_routine():
         description = request.form["description"]
         difficulty = request.form["difficulty"]
         exercises_list = request.form["exercises_list"] #A text list of exercises included in this routine
+        image_url = request.form.get("image_url", "")
         if not name or not description or not difficulty or not exercises_list:
             return "Please fill in all fields", 400
         conn = get_db()
-        conn.execute("INSERT INTO workout_routine (name, description, difficulty, exercises_list, trainer_id) VALUES (?, ?, ?, ?, ?)", (name, description, difficulty, exercises_list, session["user_id"])) #Inserts the new routine into the workout_routine table
+        conn.execute("INSERT INTO workout_routine (name, description, difficulty, exercises_list, image_url, trainer_id) VALUES (?, ?, ?, ?, ?, ?)", (name, description, difficulty, exercises_list, image_url, session["user_id"])) #Inserts the new routine into the workout_routine table
         conn.commit()
         conn.close()
         flash("Workout routine added successfully!")
@@ -688,13 +696,14 @@ def edit_meal_plan(plan_id):
     name = request.form.get("name")
     description = request.form.get("description")
     categories = {"Breakfast": request.form.get("breakfast", ""), "Lunch": request.form.get("lunch", ""), "Dinner": request.form.get("dinner", ""), "Snack": request.form.get("snack", "")}
+    image_url = request.form.get("image_url", "")
     if not name or not description:
         conn.close()
         return "Please fill in all fields", 400
     if not any(text.strip() for text in categories.values()):
         conn.close()
         return "Please add at least one meal", 400
-    conn.execute("UPDATE meal_plan SET name = ?, description = ? WHERE id = ?", (name, description, plan_id)) 
+    conn.execute("UPDATE meal_plan SET name = ?, description = ?, image_url = ? WHERE id = ?", (name, description, image_url, plan_id)) 
     conn.execute("DELETE FROM meal WHERE meal_plan_id = ?", (plan_id,)) #Deletes all existing meals for this plans then re-inserts the updated ones
     for category, text in categories.items():
         for line in text.split("\n"):
@@ -745,10 +754,11 @@ def edit_workout_routine(routine_id):
     description = request.form.get("description")
     difficulty = request.form.get("difficulty")
     exercises_list = request.form.get("exercises_list")
+    image_url = request.form.get("image_url", "")
     if not name or not description or not difficulty or not exercises_list:
         conn.close()
         return "Please fill in all fields", 400
-    conn.execute("UPDATE workout_routine SET name = ?, description = ?, difficulty = ?, exercises_list = ? WHERE id = ?", (name, description, difficulty, exercises_list, routine_id))
+    conn.execute("UPDATE workout_routine SET name = ?, description = ?, difficulty = ?, exercises_list = ?, image_url = ? WHERE id = ?", (name, description, difficulty, exercises_list, image_url, routine_id))
     conn.commit()
     conn.close()
     flash("Workout routine updated successfully!")

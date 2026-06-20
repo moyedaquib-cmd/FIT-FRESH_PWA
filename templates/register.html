@@ -78,6 +78,23 @@
             password.classList.toggle('input-error', !!msg && val.length > 0);
             password.classList.toggle('input-valid', !msg && val.length > 0);
         });
+        form.addEventListener('submit', (e) => {
+            const uVal = username.value.trim();
+            const pVal = password.value;
+            let blocked = false;
+            if (uVal.length < 3 || uVal.length > 50 || !/^[a-zA-Z0-9_]+$/.test(uVal)) {
+                usernameErr.textContent = 'Please enter a valid username (3-50 chars, letters/numbers/underscores)';
+                username.classList.add('input-error');
+                blocked = true;
+            }
+            
+            if (pVal.length < 6) {
+                passErr.textContent = 'Password must be at least 6 characters';
+                password.classList.add('input-error');
+                blocked = true;
+            }
+            if (blocked) e.preventDefault(); 
+        });
     });
 </script>
 {% endblock %}

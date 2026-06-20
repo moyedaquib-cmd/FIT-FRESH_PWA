@@ -85,15 +85,16 @@
                 <input type="hidden" name="rating" id="ratingInput" value="">
                 <label class="form-label" style="margin-bottom:0.4rem;">Your Rating</label>
                 <div class="star-rating-widget" id="starWidget">
-                    <span class="rating-hint" id="ratingHint">Select a rating</span>
                     <span class="star" data-val="1">★</span>
                     <span class="star" data-val="2">★</span>
                     <span class="star" data-val="3">★</span>
                     <span class="star" data-val="4">★</span>
                     <span class="star" data-val="5">★</span>
                 </div>
-                <div class="form-group">
-                    <textarea name="comment" class="form-control" placeholder="Share your thoughts..." maxlength="400"></textarea>
+                <span class="rating-hint" id="ratingHint">Select a rating</span>
+                <div class="form-group" style="margin-top:1rem;">
+                    <textarea name="comment" id="reviewComment" class="form-control" placeholder="Share your thoughts..." maxlength="100"></textarea>
+                    <div class="char-counter" id="charCounter">0 / 100</div> 
                 </div>
                 <button type="submit" class="btn btn-primary btn-sm" id="reviewSubmit">Submit Review</button>
             </form>
@@ -170,7 +171,16 @@
                 }
             });
         }
-        
+        const comment = document.getElementById('reviewComment');
+        const counter = document.getElementById('charCounter');
+        if (comment && counter) {
+            comment.addEventListener('input', () => {
+                const len = comment.value.length;
+                counter.textContent = `${len} / 100`;
+                counter.classList.toggle('char-warn', len >= 85); 
+                counter.classList.toggle('char-max', len >= 100); 
+            });
+        }
         const stepsEl = document.getElementById('exerciseSteps');
         if (stepsEl) {
             const raw = stepsEl.dataset.raw || '';

@@ -16,6 +16,11 @@
                 <textarea name="description" id="planDesc" class="form-control" placeholder="Describe this meal plan and who it's for..." required></textarea>
                 <p class="field-error" id="planDescErr"></p>
             </div>
+            <div class="form-group">
+                <label class="form-label">Image URL <span style="color:var(--text-dim);font-weight:400;text-transform:none;">(optional)</span></label>
+                <input name="image_url" id="planImg" class="form-control" placeholder="https://example.com/image.jpg">
+                <p class="field-error" id="planImgErr"></p>
+            </div>
             <p class="form-hint" style="margin-bottom:0.75rem;">Add meals under each category. List each meal on a new line. Leave a category empty if it's not used.</p>
             <div class="form-group">
                 <label class="form-label">
@@ -71,6 +76,7 @@
         }
         validate('planName',  'planNameErr',  [[v => v.length >= 2, 'Please enter a plan name']]);
         validate('planDesc',  'planDescErr',  [[v => v.length >= 10, 'Description must be at least 10 characters']]);
+        validate('planImg',  'planImgErr',  [[v => v === '' || v.startsWith('http'), 'Must be a valid URL starting with http']]);
         const form = document.getElementById('addMealForm');
         const mealsErr = document.getElementById('mealsErr');
         form.addEventListener('submit', (e) => {

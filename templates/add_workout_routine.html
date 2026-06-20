@@ -25,6 +25,11 @@
                 </select>
             </div>
             <div class="form-group">
+                <label class="form-label">Image URL <span style="color:var(--text-dim);font-weight:400;text-transform:none;">(optional)</span></label>
+                <input name="image_url" id="routineImg" class="form-control" placeholder="https://example.com/image.jpg">
+                <p class="field-error" id="routineImgErr"></p>
+            </div>
+            <div class="form-group">
                 <label class="form-label">Exercises</label>
                 <p class="form-hint" style="margin-bottom:0.4rem;">List each exercise on a new line</p>
                 <textarea name="exercises_list" id="routineEx" class="form-control" rows="8" placeholder="Barbell Back Squat — 4x6&#10;Romanian Deadlift — 3x10&#10;Leg Press — 3x12&#10;..." required></textarea>
@@ -56,6 +61,7 @@
         validate('routineName', 'routineNameErr', [[v => v.length >= 2, 'Please enter a routine name']]);
         validate('routineDesc', 'routineDescErr', [[v => v.length >= 10, 'Description must be at least 10 characters']]);
         validate('routineEx',   'routineExErr',   [[v => v.length >= 3, 'Please list at least one exercise']]);
+        validate('routineImg',  'planImgErr',  [[v => v === '' || v.startsWith('http'), 'Must be a valid URL starting with http']]);
     });
 </script>
 {% endblock %}

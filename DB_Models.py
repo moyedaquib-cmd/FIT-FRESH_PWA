@@ -6,9 +6,11 @@ DB_PATH = os.path.join(basedir, "instance", "app.db") #The location of the DB fi
 #Opens and returns a connection to the SQLite3 database.
 def get_db():
     os.makedirs(os.path.dirname(DB_PATH), exist_ok = True) #Creates the instance folder if it doesn't exist
-    conn = sqlite3.connect(DB_PATH) #Connects to the database file
+    conn = sqlite3.connect(DB_PATH, timeout = 10) #Connects to the database file. Timeout = 10 makes SQLite wait up to 10 seconds for a lock to clear instead of causing an error.
     conn.row_factory = sqlite3.Row #Allows columns to be accessed by name instead of index
     conn.execute("PRAGMA foreign_keys = ON") #Enforces foreign key constraints
+    conn.execute("PRAGMA journal_mod = WAL") #Write-Ahead Logging lets reads and writes happen at the same time, greatly reducing "database is locked" errors
+    conn.execute("PRAGMA busy_timeout = 10000") #Backup lock wait of 10 seconds at the SQLIte engine level
     return conn
 
 #Creates all tables if they don't exist. 
@@ -35,7 +37,7 @@ def init_db():
     cursor.execute("CREATE TABLE IF NOT EXISTS review_exercise (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, exercise_id INTEGER NOT NULL, rating INTEGER NOT NULL, comment TEXT, created_at TEXT NOT NULL DEFAULT (DATETIME('now')), FOREIGN KEY (user_id) REFERENCES user(id), FOREIGN KEY (exercise_id) REFERENCES exercise(id), UNIQUE (user_id, exercise_id))")
     
     #MealPlan Table stores the diets and meal plans created by trainer
-    cursor.execute("CREATE TABLE IF NOT EXISTS meal_plan (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT NOT NULL, meals TEXT NOT NULL, trainer_id INTEGER NOT NULL, FOREIGN KEY (trainer_id) REFERENCES user(id))")
+    cursor.execute("CREATE TABLE IF NOT EXISTS meal_plan (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT NOT NULL, meals TEXT NOT NULL, image_url TEXT, trainer_id INTEGER NOT NULL, FOREIGN KEY (trainer_id) REFERENCES user(id))")
 
     #Favourite_MealPlan table stores the meal plans a user has favourite
     cursor.execute("CREATE TABLE IF NOT EXISTS favourite_meal_plan (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, meal_plan_id INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES user(id), FOREIGN KEY (meal_plan_id) REFERENCES meal_plan(id), UNIQUE (user_id, meal_plan_id))") 
@@ -44,7 +46,7 @@ def init_db():
     cursor.execute("CREATE TABLE IF NOT EXISTS review_meal_plan (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, meal_plan_id INTEGER NOT NULL, rating INTEGER NOT NULL, comment TEXT, created_at TEXT NOT NULL DEFAULT (DATETIME('now')), FOREIGN KEY (user_id) REFERENCES user(id), FOREIGN KEY (meal_plan_id) REFERENCES meal_plan(id), UNIQUE (user_id, meal_plan_id))")
 
     #Workout_Routine table stores workout outines created by trainers
-    cursor.execute("CREATE TABLE IF NOT EXISTS workout_routine (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT NOT NULL, difficulty TEXT, exercises_list TEXT NOT NULL, trainer_id INTEGER NOT NULL, FOREIGN KEY (trainer_id) REFERENCES user(id))")
+    cursor.execute("CREATE TABLE IF NOT EXISTS workout_routine (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT NOT NULL, difficulty TEXT, exercises_list TEXT NOT NULL, image_url TEXT, trainer_id INTEGER NOT NULL, FOREIGN KEY (trainer_id) REFERENCES user(id))")
 
     #Favourite_Routine table stores workout routines a user has favourited
     cursor.execute("CREATE TABLE IF NOT EXISTS favourite_routine (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, routine_id INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES user(id), FOREIGN KEY (routine_id) REFERENCES workout_routine(id), UNIQUE (user_id, routine_id))")

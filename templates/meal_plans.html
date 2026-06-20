@@ -8,14 +8,17 @@
         <a href="/add-meal-plan" class="btn btn-primary">+ Add Meal Plan</a>
         {% endif %}
     </div>
- 
     {% if meal_plans %}
     <div class="grid-3">
         {% for plan in meal_plans %}
         <div class="content-card">
+            {% if plan.image_url %}
+            <img src="{{ plan.image_url }}" class="content-card-img" alt="{{ plan.name }}">
+            {% else %}
             <div class="content-card-img-placeholder">
                 <i class="ti ti-salad" style="font-size:2.5rem;"></i>
             </div>
+            {% endif %}
             <div class="content-card-body">
                 <div class="content-card-title">{{ plan.name }}</div>
                 <p class="content-card-meta">{{ plan.description }}</p>

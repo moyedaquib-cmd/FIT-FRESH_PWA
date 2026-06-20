@@ -3,6 +3,7 @@
 {% block content %}
 <div class="page">
     <div class="page-header">
+        <a href="{{ url_for('gym_goer_dashboard') if session.role == 'gym_goer' else url_for('personal_trainer_dashboard') }}" class="back-link">← Back to Dashboard</a>
         <h2>Exercise Library</h2>
         {% if session.role == "trainer" %}
         <a href="/add-exercise" class="btn btn-primary">+ Add Exercise</a>
@@ -39,7 +40,9 @@
     </div>
     {% else %}
     <div class="empty-state">
-        <div class="empty-state-icon">💪</div>
+        <div class="empty-state-icon">
+            <i class="ti ti-dumbbell"></i>
+        </div> 
         <h3>No Exercises Yet</h3>
         <p>Trainers haven't uploaded any exercises yet. Check back soon.</p>
     </div>

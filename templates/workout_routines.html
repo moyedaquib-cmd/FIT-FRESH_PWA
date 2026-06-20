@@ -8,14 +8,17 @@
         <a href="/add-workout-routine" class="btn btn-primary">+ Add Routine</a>
         {% endif %}
     </div>
- 
     {% if routines %}
     <div class="grid-3">
         {% for routine in routines %}
         <div class="content-card">
+            {% if routine.image_url %}
+            <img src="{{ routine.image_url }}" class="content-card-img" alt="{{ routine.name }}">
+            {% else %}
             <div class="content-card-img-placeholder">
                 <i class="ti ti-flame" style="font-size:2.5rem;"></i>
             </div>
+            {% endif %}
             <div class="content-card-body">
                 <div class="content-card-title">{{ routine.name }}</div>
                 {% if routine.difficulty == "Beginner" %}

@@ -36,13 +36,23 @@
         </nav>
         {% with messages = get_flashed_messages() %}
             {% if messages %}
-                <div style="max-width:1200px;margin:1rem auto;padding:0 1.5rem;position:relative;z-index:1;">
-                    <ul class = "flash-list">
-                        {% for message in messages %}
-                            <li>{{ message }}</li>
-                        {% endfor %}
-                    </ul>
+                <div class="toast-container" id="toastContainer">
+                    {% for message in messages %}
+                    <div class="toast">
+                        <i class="ti ti-circle-check toast-icon"></i>
+                        <span class="toast-msg">{{ message }}</span>
+                        <button type="button" class="toast-close" onclick="this.parentElement.remove()">×</button>
+                    </div>
+                    {% endfor %}
                 </div>
+                <script>
+                    document.querySelectorAll('#toastContainer .toast').forEach((toast, i) => {
+                        setTimeout(() => {
+                            toast.classList.add('toast-hide');
+                            setTimeout(() => toast.remove(), 400);
+                        }, 4000 + (i * 300));
+                    });
+                </script>
             {% endif %}
         {% endwith %}
         {% block content %}{% endblock %}
