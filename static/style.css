@@ -340,3 +340,13 @@ td {padding: 0.85rem 1rem; font-size: 0.9rem; color: var(--text); vertical-align
   .workout-stats-grid .form-group { margin-bottom: 1.25rem; }
   .stat-label { min-height: auto; }
 }
+.bg-image {position: relative;}
+.bg-image::before {content: ''; position: fixed; inset: 0; z-index: -1; background-size: cover; background-position: center; background-repeat: no-repeat; opacity: 0.30; pointer-events: none;}
+.bg-image::after {content: ''; position: fixed; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(8,8,15,0.75) 0%, rgba(8,8,15,0.88) 60%, rgba(8,8,15,0.95) 100%); pointer-events: none;}
+
+.bg-home::before    { background-image: url("/static/images/IMG1.jpg"); }
+.bg-trainer::before { background-image: url("/static/images/IMG2.jpg"); }
+.bg-gymgoer::before { background-image: url("/static/images/IMG3.jpeg"); }
+
+.bg-home.bg-image::before { opacity: 0.22; background-position: center center; } 
+.bg-home.bg-image::after {background: linear-gradient(180deg, rgba(8,8,15,0.78) 0%, rgba(8,8,15,0.82) 50%, rgba(8,8,15,0.9) 100%);} 
