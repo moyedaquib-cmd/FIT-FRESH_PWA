@@ -4,12 +4,19 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="theme-color" content="#08080f">
+        <link rel="manifest" href="/manifest.json">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="Fit & Fresh">
+        <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/icon-192.png') }}">
         <title>{% block title %}Fit & Fresh{% endblock %}</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"> 
         {% block head %}{% endblock %}
     </head>
     <body>
+        <div id="offline-banner">⚠️ You are currently <strong>offline</strong>. You can view pages you have already visited but saving changes requires an internet connection. </div>
         <nav class="navbar">
             <a href="/" class="navbar-logo">FIT<span>&</span>FRESH</a>
             {% if session.user_id %}
@@ -56,5 +63,26 @@
             {% endif %}
         {% endwith %}
         {% block content %}{% endblock %}
+        <script>
+            if ("serviceWorker" in navigator) {
+                window.addEventListener("load", () => {
+                    navigator.serviceWorker.register("/service-worker.js")
+                        .then((reg) => console.log("Service worker registered, scope:", reg.scope))
+                        .catch((err) => console.error("Service worker registration failed:", err));
+                });
+            }
+            const offlineBanner = document.getElementById("offline-banner");
+            function updateOnlineStatus() {
+                const offline = !navigator.onLine;
+                if (offlineBanner) offlineBanner.classList.toggle("visible", offline);
+                document.querySelectorAll("form button[type='submit'], form input[type='submit']").forEach((btn) => {
+                    btn.disabled = offline;
+                    btn.title = offline ? "Requires an internet connection" : "";
+                });
+            }
+            window.addEventListener("online", updateOnlineStatus);
+            window.addEventListener("offline", updateOnlineStatus);
+            updateOnlineStatus();
+        </script>
     </body>
 </html>

@@ -2,9 +2,8 @@
 {% block title %}My Favourites — Fit & Fresh{% endblock %}
 {% block content %}
 <div class="page">
+    <a href="{{ url_for('gym_goer_dashboard') if session.role == 'gym_goer' else url_for('personal_trainer_dashboard') }}" class="back-link">← Back to Dashboard</a>
     <h2 style="margin-bottom:2rem;">My Favourites</h2>
- 
-    <!-- EXERCISES -->
     <div class="fav-section">
         <div class="fav-section-title">
             <i class="ti ti-dumbbell" style="font-size:2.5rem;"></i>
@@ -39,10 +38,8 @@
     </div>
  
     <hr class="divider">
- 
-    <!-- MEAL PLANS -->
     <div class="fav-section">
-        <div class="fav-section-title">]
+        <div class="fav-section-title">
             <i class="ti ti-salad"></i>
             Meal Plans & Diets
         </div>
@@ -50,9 +47,13 @@
         <div class="grid-3">
             {% for plan in meal_plans %}
             <div class="content-card">
+                {% if plan.image_url %}
+                <img src="{{ plan.image_url }}" class="content-card-img" alt="{{ plan.name }}">
+                {% else %}
                 <div class="content-card-img-placeholder">
                     <i class="ti ti-salad" style="font-size:2.5rem;"></i>
                 </div>
+                {% endif %}
                 <div class="content-card-body">
                     <div class="content-card-title">{{ plan.name }}</div>
                     <p class="content-card-meta">{{ plan.description }}</p>
@@ -71,8 +72,6 @@
     </div>
  
     <hr class="divider">
- 
-    <!-- WORKOUT ROUTINES -->
     <div class="fav-section">
         <div class="fav-section-title">
             <i class="ti ti-flame"></i>
@@ -82,9 +81,13 @@
         <div class="grid-3">
             {% for routine in routines %}
             <div class="content-card">
+                {% if routine.image_url %}
+                <img src="{{ routine.image_url }}" class="content-card-img" alt="{{ routine.name }}">
+                {% else %}
                 <div class="content-card-img-placeholder">
                     <i class="ti ti-flame" style="font-size:2.5rem;"></i>
                 </div>
+                {% endif %}
                 <div class="content-card-body">
                     <div class="content-card-title">{{ routine.name }}</div>
                     {% if routine.difficulty == "Beginner" %}

@@ -3,6 +3,7 @@
 {% block content %}
 <div class="page">
     <div class="page-header">
+        <a href="{{ url_for('gym_goer_dashboard') if session.role == 'gym_goer' else url_for('personal_trainer_dashboard') }}" class="back-link">← Back to Dashboard</a>
         <h2>Workout Routines</h2>
         {% if session.role == "trainer" %}
         <a href="/add-workout-routine" class="btn btn-primary">+ Add Routine</a>
@@ -29,6 +30,7 @@
                     <span class="badge badge-advanced">{{ routine.difficulty }}</span>
                 {% endif %}
                 <p class="content-card-meta" style="margin-top:0.4rem;">{{ routine.description }}</p>
+                <p class="content-card-author">by {{ routine.trainer_username }}</p>
             </div>
             <div class="content-card-footer">
                 <a href="{{ url_for('routine_detail', routine_id=routine.id) }}" class="btn btn-outline btn-sm">View Details</a>

@@ -350,3 +350,16 @@ td {padding: 0.85rem 1rem; font-size: 0.9rem; color: var(--text); vertical-align
 
 .bg-home.bg-image::before { opacity: 0.22; background-position: center center; } 
 .bg-home.bg-image::after {background: linear-gradient(180deg, rgba(8,8,15,0.78) 0%, rgba(8,8,15,0.82) 50%, rgba(8,8,15,0.9) 100%);} 
+
+.offline-page {display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; text-align: center; gap: 0.5rem;}
+.offline-icon {font-size: 4.5rem; color: var(--accent); margin-bottom: 0.5rem;}
+.offline-page p {color: var(--text-muted); max-width: 420px;}
+
+#offline-banner {display: none; position: relative; z-index: 50; background: rgba(245, 158, 11, 0.18); border: 1px solid #f59e0b; border-radius: 10px; padding: 0.75rem 1rem; margin: 0 auto 1.5rem; max-width: 1200px; font-size: 0.9rem; color: #fbbf24; text-align: center;}
+#offline-banner.visible { display: block; }
+
+.content-card-author {margin-top: 0.5rem; font-size: 0.8rem; color: var(--accent); font-weight: 500;}
+.detail-author {margin-top: 0.25rem; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--accent); font-weight: 500;}
+
+.btn:disabled,
+button:disabled {opacity: 0.45; cursor: not-allowed; filter: grayscale(40%);}

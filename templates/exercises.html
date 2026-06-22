@@ -31,6 +31,7 @@
                 {% else %}
                     <span class="badge badge-advanced">{{ exercise.difficulty }}</span>
                 {% endif %}
+                <p class="content-card-author">by {{ exercise.trainer_username }}</p>
             </div>
             <div class="content-card-footer">
                 <a href="{{ url_for('exercise_detail', exercise_id=exercise.id) }}" class="btn btn-outline btn-sm">View Details</a>

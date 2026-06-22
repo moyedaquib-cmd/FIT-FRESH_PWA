@@ -10,6 +10,7 @@
         {% endif %}
         <div class="detail-hero-body">
             <h2>{{ routine.name }}</h2>
+            <p class="detail-author">by {{ routine.trainer_username }}</p>
             <div class="detail-meta">
                 {% if routine.difficulty == "Beginner" %}
                     <span class="badge badge-beginner">{{ routine.difficulty }}</span>
@@ -64,6 +65,7 @@
                     Image URL 
                     <span style="color:var(--text-dim);font-weight:400;text-transform:none;">(optional)</span>
                 </label>
+                <input name="image_url" class="form-control" value="{{ routine.image_url or '' }}">
             </div>
             <div class="form-group">
                 <label class="form-label">Exercises</label>
@@ -98,8 +100,8 @@
                 </div>
                 <span class="rating-hint" id="ratingHint">Select a rating</span>
                 <div class="form-group" style="margin-top:1rem;">
-                    <textarea name="comment" id="reviewComment" class="form-control" placeholder="Share your thoughts..." maxlength="100"></textarea>
-                    <div class="char-counter" id="charCounter">0 / 100</div> 
+                    <textarea name="comment" id="reviewComment" class="form-control" placeholder="Share your thoughts..." maxlength="400"></textarea>
+                    <div class="char-counter" id="charCounter">0 / 400</div> 
                 </div>
                 <button type="submit" class="btn btn-primary btn-sm" id="reviewSubmit">Submit Review</button>
             </form>
@@ -174,9 +176,9 @@
         if (comment && counter) {
             comment.addEventListener('input', () => {
                 const len = comment.value.length;
-                counter.textContent = `${len} / 100`;
-                counter.classList.toggle('char-warn', len >= 85);
-                counter.classList.toggle('char-max', len >= 100);
+                counter.textContent = `${len} / 400`;
+                counter.classList.toggle('char-warn', len >= 350);
+                counter.classList.toggle('char-max', len >= 400);
             });
         }
     });

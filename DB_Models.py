@@ -9,7 +9,7 @@ def get_db():
     conn = sqlite3.connect(DB_PATH, timeout = 10) #Connects to the database file. Timeout = 10 makes SQLite wait up to 10 seconds for a lock to clear instead of causing an error.
     conn.row_factory = sqlite3.Row #Allows columns to be accessed by name instead of index
     conn.execute("PRAGMA foreign_keys = ON") #Enforces foreign key constraints
-    conn.execute("PRAGMA journal_mod = WAL") #Write-Ahead Logging lets reads and writes happen at the same time, greatly reducing "database is locked" errors
+    conn.execute("PRAGMA journal_mode = WAL") #Write-Ahead Logging lets reads and writes happen at the same time, greatly reducing "database is locked" errors
     conn.execute("PRAGMA busy_timeout = 10000") #Backup lock wait of 10 seconds at the SQLIte engine level
     return conn
 

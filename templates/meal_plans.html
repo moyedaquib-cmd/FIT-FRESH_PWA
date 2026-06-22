@@ -3,6 +3,7 @@
 {% block content %}
 <div class="page">
     <div class="page-header">
+        <a href="{{ url_for('gym_goer_dashboard') if session.role == 'gym_goer' else url_for('personal_trainer_dashboard') }}" class="back-link">← Back to Dashboard</a>
         <h2>Meal Plans & Diets</h2>
         {% if session.role == "trainer" %}
         <a href="/add-meal-plan" class="btn btn-primary">+ Add Meal Plan</a>
@@ -22,6 +23,7 @@
             <div class="content-card-body">
                 <div class="content-card-title">{{ plan.name }}</div>
                 <p class="content-card-meta">{{ plan.description }}</p>
+                <p class="content-card-author">by {{ plan.trainer_username }}</p>
             </div>
             <div class="content-card-footer">
                 <a href="{{ url_for('meal_plan_detail', plan_id=plan.id) }}" class="btn btn-outline btn-sm">View Details</a>

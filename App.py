@@ -1,5 +1,6 @@
 import os #Allows python to interact with the operating system
-from flask import Flask, request, redirect, url_for, render_template, session, flash #Flask: a lightweight web framework for Python that allows the creation of PWA, request: Allows Python to access data sent by the user, redirect: Send the user to a different URL, url_for: Uses the name of a function to create a URL path, render_template: Allows the use of Jinja2 to develop dynamic HTML pages, session: Allows users to store data across multiple HTTP requests, flash: Provides messages to the user that they can view
+import re #Allows regular expression checks for server-side validation
+from flask import Flask, request, redirect, url_for, render_template, session, flash, send_from_directory #Flask: a lightweight web framework for Python that allows the creation of PWA, request: Allows Python to access data sent by the user, redirect: Send the user to a different URL, url_for: Uses the name of a function to create a URL path, render_template: Allows the use of Jinja2 to develop dynamic HTML pages, session: Allows users to store data across multiple HTTP requests, flash: Provides messages to the user that they can view, send_from_direction: Serves the service worker and manifest for PWA offline support
 from DB_Models import get_db, init_db #Allows the database to be connected to the SQLite tables
 from datetime import datetime #Datetime allows date and time to be viewed by the user
 from werkzeug.security import generate_password_hash, check_password_hash #Werkzeug allows the hashing of passwords. generate_password_hash creates a hash from a password and check_password_hash checks the password with the hashed versions to verify the account
@@ -23,6 +24,11 @@ def local_time(utc_dt_str): #A function that Converts UTC to Sydney Time
     utc_dt = datetime.strptime(utc_dt_str, "%Y-%m-%d %H:%M:%S") #Converts the stored UTC string into a datetime object
     return utc_dt.replace(tzinfo=pytz.utc).astimezone(local_tz) #Replaces UTC with the timezone of Sydney Australia
 
+def is_valid_image_url(url): #Server-side check for image URLs
+    if not url or url.strip() == "": #A blank URL is allowed as the field is optional
+        return True
+    return url.strip().startswith("http") #If a URL is provided it must start with http
+
 #Home Page
 @app.route("/") #Tells flask to run the function below this decorator when someone visits the url
 def home(): #The function that runs when someone visits the url
@@ -41,6 +47,9 @@ def register_page():
         return "Please fill in all the fields", 400
     if len(username) <3 or len(username) > 50: #Username length check
         flash("Username must be between 3 and 50 characters")
+        return redirect(url_for("register_page"))
+    if not re.match(r"^[a-zA-Z0-9_]+$", username): #Server side check that the username only contains letters, numbers and underscores
+        flash("Username can only contain letters, numbers and underscores")
         return redirect(url_for("register_page"))
     if len(password) < 6: #Password length check
         flash("Password must be at least 6 characters")
@@ -75,7 +84,8 @@ def login():
         flash("Invalid username or password") 
         return redirect(url_for("login")) 
     if not check_password_hash(user["password_hash"], password): #Checks the hashed password with the user table and compares the plaintext and hashed versions to see if the password is correct
-        return "Invalid username or password", 401 #401 Error indicates that the request failed due to unauthorised credentials.
+        flash("Invalid username or password") #Indicates to the user that the request failed due to unauthorised credentials.
+        return redirect(url_for("login"))
     session["user_id"] = user["id"] #Stores the user's unique ID allowing easy identification of the logged-in user
     session["role"] = user["role"] #Stores the role of the user to enable role-based access control
     session["username"] = user["username"] #Stores the username 
@@ -301,7 +311,7 @@ def delete_calories(entry_id):
 @app.route("/exercises") 
 def exercises():  
     conn = get_db()
-    all_exercises = conn.execute("SELECT * FROM exercise").fetchall() #Retrieves every object from the table
+    all_exercises = conn.execute("SELECT exercise.*, user.username as trainer_username FROM exercise JOIN user ON exercise.trainer_id = user.id").fetchall() #Retrieves every object from the table
     conn.close()
     return render_template("exercises.html", exercises = all_exercises) #Returns the page, displaying it to the user. The template can loop, showcasing each piece of data
 
@@ -309,7 +319,7 @@ def exercises():
 @app.route("/exercise/<int:exercise_id>") 
 def exercise_detail(exercise_id):  
     conn = get_db()
-    exercise = conn.execute("SELECT * FROM exercise WHERE id = ?", (exercise_id,)).fetchone() #Retrieves a particular object through searching by ID
+    exercise = conn.execute("SELECT exercise.*, user.username as trainer_username FROM exercise JOIN user ON exercise.trainer_id = user.id WHERE exercise.id = ?", (exercise_id,)).fetchone() #Retrieves a particular object through searching by ID
     if not exercise:
         conn.close()
         return "Exercise not found", 404
@@ -395,6 +405,9 @@ def add_exercise():
         muscle_group = request.form["muscle_group"]
         image_url = request.form.get("image_url")
         difficulty = request.form["difficulty"]
+        if not is_valid_image_url(image_url): #Server-side image URL validation
+            flash("Image URL must start with http")
+            return redirect(url_for("add_content")) 
         conn = get_db()
         conn.execute("INSERT INTO exercise (name, description, muscle_group, difficulty, image_url, trainer_id) VALUES (?, ?, ?, ?, ?, ?)", (name, description, muscle_group, difficulty, image_url, session["user_id"])) #Inserts the new exercise into the exercise table
         conn.commit()
@@ -409,7 +422,7 @@ def add_exercise():
 @app.route("/meal-plans")
 def meal_plans():
     conn = get_db()
-    all_meal_plans = conn.execute("SELECT * FROM meal_plan").fetchall() 
+    all_meal_plans = conn.execute("SELECT meal_plan.*, user.username AS trainer_username FROM meal_plan JOIN user ON meal_plan.trainer_id = user.id").fetchall() 
     conn.close()
     return render_template("meal_plans.html", meal_plans = all_meal_plans)
 
@@ -417,7 +430,7 @@ def meal_plans():
 @app.route("/meal-plan/<int:plan_id>")
 def meal_plan_detail(plan_id):
     conn = get_db()
-    plan = conn.execute("SELECT * FROM meal_plan WHERE id = ?", (plan_id,)).fetchone() 
+    plan = conn.execute("SELECT meal_plan.*, user.username AS trainer_username FROM meal_plan JOIN user ON meal_plan.trainer_id = user.id WHERE meal_plan.id = ?", (plan_id,)).fetchone() 
     if not plan:
         conn.close()
         return "Meal plan not found", 404
@@ -460,6 +473,9 @@ def add_meal_plan():
             return "Please fill in all fields", 400
         if not any(text.strip() for text in categories.values()):
             return "Please add at least one meal", 400
+        if not is_valid_image_url(image_url): 
+            flash("Image URL must start with http")
+            return redirect(url_for("add_content")) 
         conn = get_db()
         cursor = conn.execute("INSERT INTO meal_plan (name, description, meals, image_url, trainer_id) VALUES (?, ?, ?, ?, ?)", (name, description, "See structured meals", image_url, session["user_id"]))
         new_plan_id = cursor.lastrowid
@@ -528,7 +544,7 @@ def add_meal_plan_review(plan_id):
 @app.route("/workout-routines")
 def workout_routines():
     conn = get_db()
-    all_workout_routines = conn.execute("SELECT * FROM workout_routine").fetchall()
+    all_workout_routines = conn.execute("SELECT workout_routine.*, user.username AS trainer_username FROM workout_routine JOIN user ON workout_routine.trainer_id = user.id").fetchall()
     conn.close()
     return render_template("workout_routines.html", routines = all_workout_routines)
 
@@ -536,7 +552,7 @@ def workout_routines():
 @app.route("/workout-routines/<int:routine_id>")
 def routine_detail(routine_id):
     conn = get_db()
-    routine = conn.execute("SELECT * FROM workout_routine WHERE id = ?", (routine_id,)).fetchone()
+    routine = conn.execute("SELECT workout_routine.*, user.username AS trainer_username FROM workout_routine JOIN user ON workout_routine.trainer_id = user.id WHERE workout_routine.id = ?", (routine_id,)).fetchone()
     if not routine:
         conn.close()
         return "Routine not found", 404
@@ -567,6 +583,9 @@ def add_workout_routine():
         image_url = request.form.get("image_url", "")
         if not name or not description or not difficulty or not exercises_list:
             return "Please fill in all fields", 400
+        if not is_valid_image_url(image_url): 
+            flash("Image URL must start with http")
+            return redirect(url_for("add_content")) 
         conn = get_db()
         conn.execute("INSERT INTO workout_routine (name, description, difficulty, exercises_list, image_url, trainer_id) VALUES (?, ?, ?, ?, ?, ?)", (name, description, difficulty, exercises_list, image_url, session["user_id"])) #Inserts the new routine into the workout_routine table
         conn.commit()
@@ -652,6 +671,9 @@ def edit_exercise(exercise_id):
     if not name or not description or not muscle_group or not difficulty:
         conn.close()
         return "Please fill in all fields", 400
+    if not is_valid_image_url(image_url): 
+            flash("Image URL must start with http")
+            return redirect(url_for("exercise_detail", exercise_id=exercise_id)) 
     conn.execute("UPDATE exercise SET name = ?, description = ?, muscle_group = ?, image_url = ?, difficulty = ? WHERE id = ?", (name, description, muscle_group, image_url, difficulty, exercise_id))
     conn.commit()
     conn.close()
@@ -703,6 +725,9 @@ def edit_meal_plan(plan_id):
     if not any(text.strip() for text in categories.values()):
         conn.close()
         return "Please add at least one meal", 400
+    if not is_valid_image_url(image_url): 
+            flash("Image URL must start with http")
+            return redirect(url_for("meal_plan_detail", plan_id=plan_id)) 
     conn.execute("UPDATE meal_plan SET name = ?, description = ?, image_url = ? WHERE id = ?", (name, description, image_url, plan_id)) 
     conn.execute("DELETE FROM meal WHERE meal_plan_id = ?", (plan_id,)) #Deletes all existing meals for this plans then re-inserts the updated ones
     for category, text in categories.items():
@@ -730,8 +755,8 @@ def delete_meal_plan(plan_id):
         return "You can only delete your own content", 403
     conn.execute("DELETE FROM favourite_meal_plan WHERE meal_plan_id = ?", (plan_id,))
     conn.execute("DELETE FROM review_meal_plan WHERE meal_plan_id = ?", (plan_id,))
-    conn.execute("DELETE FROM meal_plan WHERE meal_plan_id = ?", (plan_id,))
     conn.execute("DELETE FROM meal WHERE meal_plan_id = ?", (plan_id,))
+    conn.execute("DELETE FROM meal_plan WHERE id = ?", (plan_id,))
     conn.commit()
     conn.close()
     flash("Meal plan deleted successfully!")
@@ -758,6 +783,9 @@ def edit_workout_routine(routine_id):
     if not name or not description or not difficulty or not exercises_list:
         conn.close()
         return "Please fill in all fields", 400
+    if not is_valid_image_url(image_url): 
+            flash("Image URL must start with http")
+            return redirect(url_for("routine_detail", routine_id=routine_id)) 
     conn.execute("UPDATE workout_routine SET name = ?, description = ?, difficulty = ?, exercises_list = ?, image_url = ? WHERE id = ?", (name, description, difficulty, exercises_list, image_url, routine_id))
     conn.commit()
     conn.close()
@@ -792,6 +820,21 @@ def add_content():
         flash("Access denied!")
         return redirect(url_for("home"))
     return render_template("add_content.html")
+
+#PWA routes for offline support
+@app.route("/service-worker.js")
+def service_worker():
+    return send_from_directory("static", "service-worker.js", mimetype="application/javascript")
+
+#Serves the web app manifest that makes the PWA installable
+@app.route("/manifest.json")
+def manifest():
+    return send_from_directory("static", "manifest.json", mimetype="application/manifest+json")
+
+#Offline fallback is shown when a user navigates with no connection
+@app.route("/offline")
+def offline():
+    return render_template("offline.html")
 
 #Logs out the user by clearing their session
 @app.route("/logout") 

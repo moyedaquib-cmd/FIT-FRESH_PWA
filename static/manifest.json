@@ -1,0 +1,23 @@
+{
+    "name": "Fit & Fresh",
+    "short_name": "Fit & Fresh",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#08080f",
+    "theme_color": "#08080f",
+    "description": "Track workouts and calories, and discover trainer-created exercises, meal plans and routines — all in one place.",
+    "icons": [
+        {
+            "src": "/static/images/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/static/images/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
