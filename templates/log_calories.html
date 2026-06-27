@@ -1,12 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Track Calories — Fit & Fresh{% endblock %}
 {% block content %}
+<!-- Compact page column container optimized for standalone numerical entry forms -->
 <div class="page-sm">
     <a href="{{ url_for('gym_goer_dashboard') if session.role == 'gym_goer' else url_for('personal_trainer_dashboard') }}" class="back-link">← Back to Dashboard</a>
     <h2 style="margin-bottom:1.5rem;">Track Calories</h2>
     <div class="form-card">
         <form method="POST" id="logCaloriesForm">
             <div class="form-group">
+                <!-- Submits user inputted data payloads to the database -->
                 <label class="form-label">Meal</label>
                 <input type="text" name="meal" id="meal" class="form-control" placeholder="e.g. Bacon and Eggs" required>
                 <p class="field-error" id="mealErr"></p>
@@ -31,6 +33,7 @@
             el.addEventListener('input', () => {
                 const val = el.value.trim();
                 let msg = '';
+                // Cycles text content validations to filter empty names or unrealistic inputs
                 for (const [test, message] of checks) {
                     if (!test(val)) { msg = message; break; }
                 }

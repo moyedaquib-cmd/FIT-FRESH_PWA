@@ -1,9 +1,12 @@
 {% extends "base.html" %}
 {% block title %}My Favourites — Fit & Fresh{% endblock %}
 {% block content %}
+<!-- Main page containing the favourited content -->
 <div class="page">
     <a href="{{ url_for('gym_goer_dashboard') if session.role == 'gym_goer' else url_for('personal_trainer_dashboard') }}" class="back-link">← Back to Dashboard</a>
     <h2 style="margin-bottom:2rem;">My Favourites</h2>
+    
+    <!-- Favourited exercises -->
     <div class="fav-section">
         <div class="fav-section-title">
             <i class="ti ti-dumbbell" style="font-size:2.5rem;"></i>
@@ -36,8 +39,9 @@
         </div>
         {% endif %}
     </div>
- 
     <hr class="divider">
+
+    <!-- Favourited meal plans -->
     <div class="fav-section">
         <div class="fav-section-title">
             <i class="ti ti-salad"></i>
@@ -70,8 +74,9 @@
         </div>
         {% endif %}
     </div>
- 
     <hr class="divider">
+
+    <!-- Favourited workout routines -->
     <div class="fav-section">
         <div class="fav-section-title">
             <i class="ti ti-flame"></i>

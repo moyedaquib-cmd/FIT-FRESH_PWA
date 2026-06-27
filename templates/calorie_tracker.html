@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Calorie History — Fit & Fresh{% endblock %}
 {% block content %}
+<!-- Standard layout container -->
 <div class="page">
     <div class="page-header">
         <div>
+            <!-- Evaluates user role to return users back to their corresponding dashboard -->
             {% if session.role == "gym_goer" %}
             <a href="{{ url_for('gym_goer_dashboard') }}" class="back-link">← Back to Dashboard</a>
             {% else %}
@@ -13,40 +15,51 @@
         </div>
         <a href="/log-calories" class="btn btn-primary">+ Log Meal</a>
     </div>
- 
     {% if entries %}
-    <div class="table-wrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Meal</th>
-                    <th>Calories</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for entry in entries %}
-                <tr>
-                    <td style="color:var(--text-muted);">{{ entry.entry_date.strftime("%d %b %Y") }}</td>
-                    <td style="color:var(--text-muted);">{{ entry.local_time.strftime("%I:%M %p") }}</td>
-                    <td><strong>{{ entry.meal }}</strong></td>
-                    <td>{{ entry.calories | fmt_num }} kcal</td>
-                    <td>
-                        <div class="table-actions">
-                            <a href="{{ url_for('edit_calories', entry_id=entry.id) }}" class="btn btn-outline btn-sm">Edit</a>
-                            <form action="{{ url_for('delete_calories', entry_id=entry.id) }}" method="POST">
-                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    {% for date_key, formatted_date, day_entries in grouped_entries %}
+    
+    <!-- Groups single calorie records into distinct sections based on the date -->
+    <div class="date-group">
+        <div class="date-group-heading">
+            <i class="ti ti-calendar-event"></i>
+            <span>{{ formatted_date }}</span>
+            <!-- Dynamically tracks and appends a grammatical pluralized suffix string matching item counts -->
+            <span class="date-group-count">{{ day_entries | length }} meal{{ 's' if day_entries | length != 1 else '' }}</span>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Meal</th>
+                        <th>Calories</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in day_entries %}
+                    <tr>
+                        <!-- Formats raw timestamps into readable meridian standard times -->
+                        <td style="color:var(--text-muted);">{{ entry.local_time.strftime("%I:%M %p") }}</td>
+                        <td><strong>{{ entry.meal }}</strong></td>
+                        <td>{{ entry.calories | fmt_num }} kcal</td>
+                        <td>
+                            <div class="table-actions">
+                                <a href="{{ url_for('edit_calories', entry_id=entry.id) }}" class="btn btn-outline btn-sm">Edit</a>
+                                <form action="{{ url_for('delete_calories', entry_id=entry.id) }}" method="POST">
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
+    {% endfor %}
     {% else %}
+    <!-- Stand-by view displayed only when no corresponding calorie data rows exist in the system -->
     <div class="empty-state">
         <div class="empty-state-icon"><i class="ti ti-apple" aria-hidden="true"></i></div>
         <h3>No Meals Tracked</h3>

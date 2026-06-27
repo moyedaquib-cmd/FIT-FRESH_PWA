@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Trainer Dashboard — Fit & Fresh{% endblock %}
 {% block content %}
+<!-- Functions the same as gym_goer_dashboard.html -->
 <div class="page bg-image bg-trainer">
     <h2>Welcome, {{ session.username }}</h2>
     <p style="color:var(--text-muted);margin-top:0.25rem;">Personal Trainer Dashboard</p>
@@ -11,21 +12,6 @@
             </div>
             <div class="dash-card-title">Add content</div>
             <div class="dash-card-sub">Upload an exercise, meal plan or routine</div>
-        </a>
-        <a href="/exercises" class="dash-card">
-            <div class="dash-card-icon"><i class="ti ti-dumbbell" aria-hidden="true"></i></div>
-            <div class="dash-card-title">Exercise Library</div>
-            <div class="dash-card-sub">Browse all uploaded exercises</div>
-        </a>
-        <a href="/meal-plans" class="dash-card">
-            <div class="dash-card-icon"><i class="ti ti-clipboard-list" aria-hidden="true"></i></div>
-            <div class="dash-card-title">Meal Plans</div>
-            <div class="dash-card-sub">View all meal plans</div>
-        </a>
-        <a href="/workout-routines" class="dash-card">
-            <div class="dash-card-icon"><i class="ti ti-calendar" aria-hidden="true"></i></div>
-            <div class="dash-card-title">Routines</div>
-            <div class="dash-card-sub">View all workout routines</div>
         </a>
         <a href="/log-workout" class="dash-card">
             <div class="dash-card-icon"><i class="ti ti-barbell" aria-hidden="true"></i></div>
@@ -47,6 +33,21 @@
             <div class="dash-card-title">Calorie History</div>
             <div class="dash-card-sub">Browse tracked nutrition</div>
         </a>
+        <a href="/exercises" class="dash-card">
+            <div class="dash-card-icon"><i class="ti ti-dumbbell" aria-hidden="true"></i></div>
+            <div class="dash-card-title">Exercise Library</div>
+            <div class="dash-card-sub">Browse all uploaded exercises</div>
+        </a>
+        <a href="/meal-plans" class="dash-card">
+            <div class="dash-card-icon"><i class="ti ti-clipboard-list" aria-hidden="true"></i></div>
+            <div class="dash-card-title">Meal Plans</div>
+            <div class="dash-card-sub">View all meal plans</div>
+        </a>
+        <a href="/workout-routines" class="dash-card">
+            <div class="dash-card-icon"><i class="ti ti-calendar" aria-hidden="true"></i></div>
+            <div class="dash-card-title">Routines</div>
+            <div class="dash-card-sub">View all workout routines</div>
+        </a>
         <a href="/view-favourites" class="dash-card">
             <div class="dash-card-icon"><i class="ti ti-star" aria-hidden="true"></i></div>
             <div class="dash-card-title">Favourites</div>
@@ -55,4 +56,3 @@
     </div>
 </div>
 {% endblock %}
- 

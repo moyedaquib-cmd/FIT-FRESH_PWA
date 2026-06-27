@@ -2,16 +2,19 @@
 {% block title %}Edit Entry — Fit & Fresh{% endblock %}
 {% block content %}
 <div class="page-sm">
+    <!-- Returns the user back to calorie history page -->
     <a href="{{ url_for('calorie_history') }}" class="back-link">← Back to Calorie History</a>
     <h2 style="margin-bottom:1.5rem;">Edit Calorie Entry</h2>
-    <div class="form-card">
+    <div class="form-card"> 
         <form method="POST">
             <div class="form-group">
                 <label class="form-label">Meal</label>
+                <!-- Populates the input value property with the previously saved inputs -->
                 <input name="meal" class="form-control" value="{{ entry.meal }}" required>
             </div>
             <div class="form-group">
                 <label class="form-label">Calories</label>
+                <!-- Sets numerical constraint caps -->
                 <input type="number" name="calories" class="form-control" value="{{ entry.calories }}" step="0.1" min="0" required>
             </div>
             <button type="submit" class="btn btn-primary btn-full">Save Changes</button>

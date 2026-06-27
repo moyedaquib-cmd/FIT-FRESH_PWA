@@ -1,5 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap'); /* Imports the "Bebas Neue" bold display font and various weights of the "DM Sans" text font from Google's servers. */
 
+/* Declares global CSS custom properties to maintain a unified color palette, typography theme, and spacing system across the site. */
 :root {
   --bg:          #08080f;
   --bg-card:     #0f0f1a;
@@ -22,56 +23,77 @@
   --nav-h:       64px;
 }
 
+/* Resets the default browser margins and padding while ensuring element sizes include their borders and padding. */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { scroll-behavior: smooth; }
+/* Enables smooth, fluid scrolling transitions instead of abrupt jumps. */
+html { scroll-behavior: smooth; } 
 
+/* Configures the global body typography layout, applies the dark theme background colors, and sets up a subtle neon header ambient glow. */
 body {font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59,130,246,0.08) 0%, transparent 70%);}
 
+/* Overlays a fixed, semi-transparent fractal SVG grain effect across the entire browser viewport to create a textured, dark-mode aesthetic without blocking user clicks. */
 body::before {content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.4;}
 
+/* Applies a consistent typography brand style to all headings using responsive font sizing clamp scales and wide letter spacing. */
 h1, h2, h3 {font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em; line-height: 1.1;}
 h1 { font-size: clamp(2rem, 5vw, 3.5rem); }
 h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); }
 h3 { font-size: clamp(1.2rem, 2vw, 1.6rem); }
 
+/* Configures hyperlinks to use the theme accent color and seamlessly fade to the primary text color when hovered. */
 a { color: var(--accent); text-decoration: none; transition: color .2s; }
 a:hover { color: var(--text); }
 
+/* Sets body text to a subtle muted tone and highlights bold text. */
 p { color: var(--text-muted); }
 strong { color: var(--text); font-weight: 600; }
 
+/* Fixes the navigation bar to the top of the viewport with a frosted-glass blur effect and a subtle bottom border. */
 .navbar {position: sticky; top: 0; z-index: 100; height: var(--nav-h); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; background: rgba(8,8,15,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border);}
 
+/* Styles the navigation logo layout with the custom heading font and highlights the accent text container color. */
 .navbar-logo {font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 0.08em; color: var(--text) !important; display: flex; align-items: center; gap: 6px;}
 .navbar-logo span { color: var(--accent); }
 
+/* Arranges navigation list items horizontally using a flexible layout container with tight element padding and clears default bullet formatting. */
 .navbar-links {display: flex; align-items: center; gap: 0.25rem; list-style: none;}
 
+/* Styles navigation links with muted colors and adds a subtle illuminated background glow effect on hover. */
 .navbar-links a {color: var(--text-muted); font-size: 0.875rem; font-weight: 500; padding: 0.4rem 0.75rem; border-radius: var(--radius); transition: all .2s;}
 .navbar-links a:hover {color: var(--text); background: var(--accent-glow);}
 
+/* Aligns the right-side navbar items horizontally using a flexible layout container with consistent element spacing. */
 .navbar-right {display: flex; align-items: center; gap: 0.75rem;}
 
+/* Centers the main content area horizontally on the screen with responsive side padding. */
 .page {position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem;}
 
+/* Centers a narrower content column layout designed specifically for authentication forms and simple notification cards. */
 .page-sm {max-width: 500px; margin: 0 auto; padding: 3rem 1.5rem 4rem;}
 
+/* Stacks notification messages vertically in a single column layout with uniform element spacing and clears default bullet formatting. */
 .flash-list {list-style: none; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;}
 
+/* Applies a light green style configuration to individual alert message rows using custom border radiuses and semi-transparent fills. */
 .flash-list li {padding: 0.75rem 1rem; border-radius: var(--radius); background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; font-size: 0.9rem; font-weight: 500;}
 
-
+/* Configures standard content cards with container padding and applies an illuminated levitation glow effect upon user mouse hover. */
 .card {background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-lg); padding: 1.5rem; transition: border-color .25s, box-shadow .25s, transform .25s;}
 .card:hover {border-color: var(--accent-line); box-shadow: 0 0 24px var(--accent-glow); transform: translateY(-2px);}
 
+/* Creates responsive, multi-column layouts that automatically wrap and adjust item sizes dynamically based on screen real estate limits. */
 .grid-3 {display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem;}
 .grid-2 {display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.25rem;}
 
-
-.dash-grid {display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem;}
+/* Creates a responsive layout grid that displays 4 equal columns for gym goers, 3 columns for personal trainers, and scales down to 1 column on smaller viewports. */
+.dash-grid {display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 2rem;}
+.bg-trainer.dash-grid {grid-template-columns: repeat(3, 1fr);}
+@media (max-width: 1024px) {.dash-grid, .bg-trainer .dash-grid {grid-template-columns: repeat(2, 1fr);}}
+@media (max-width: 480px)  {.dash-grid, .bg-trainer .dash-grid {grid-template-columns: 1fr;}}
 .dash-card {display: flex; flex-direction: column; align-items: flex-start; gap: 0.5rem; padding: 1.25rem; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-lg); color: var(--text); transition: all .25s; cursor: pointer; text-decoration: none !important;}
 
+/* Configures visual elevations, typographic treatments, sizing variants, and accent/danger state modifiers for the interactive dashboard card. */
 .dash-card:hover {background: var(--bg-raised); border-color: var(--accent-line); box-shadow: 0 0 20px var(--accent-glow); transform: translateY(-3px); color: var(--text) !important;}
 .dash-card-icon { font-size: 1.8rem; }
 .dash-card-title {font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.05em; color: var(--text);}
@@ -81,10 +103,12 @@ strong { color: var(--text); font-weight: 600; }
 .dash-card.danger { border-color: rgba(239,68,68,0.3); }
 .dash-card.danger:hover {border-color: rgba(239,68,68,0.6); box-shadow: 0 0 20px rgba(239,68,68,0.15);}
 
+/* Sets up a clean layout banner heading containing titles and numerical data tracking badges alongside decorative underlining. */
 .section-header {display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border);}
 .section-header h2 { color: var(--text); }
 .section-count {font-size: 0.85rem; color: var(--text-muted); background: var(--bg-raised); padding: 0.2rem 0.6rem; border-radius: 99px;}
 
+/* Configures standard layout containers, interactive transformations, responsive aspect ratios, fallback images, and header borders for content catalog elements. */
 .content-card {background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-lg); overflow: hidden; transition: all .25s; display: flex; flex-direction: column;}
 .content-card:hover {border-color: var(--accent-line); box-shadow: 0 4px 24px var(--accent-glow); transform: translateY(-3px);}
 .content-card-img {width: 100%; height: 160px; object-fit: cover; display: block;}
@@ -94,12 +118,14 @@ strong { color: var(--text); font-weight: 600; }
 .content-card-meta {font-size: 0.8rem; color: var(--text-muted);}
 .content-card-footer {padding: 0.75rem 1.25rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;}
 
+/* Styles inline pill badges and applies distinct semantic color themes for workout difficulty levels */
 .badge {display: inline-block; padding: 0.2rem 0.65rem; border-radius: 99px; font-size: 0.73rem; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase;}
 .badge-beginner { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); }
 .badge-intermediate { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
 .badge-advanced { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
 .badge-muscle { background: var(--accent-glow); color: var(--accent); border: 1px solid var(--accent-line); }
 
+/* Configures standard structure framework layouts, fluid animations, typography properties, sizing formats, and background color states for reusable button component tokens. */
 .btn {display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.6rem 1.25rem; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; border: none; transition: all .2s; text-decoration: none !important; white-space: nowrap;}
 .btn-primary {background: var(--accent); color: #fff;}
 .btn-primary:hover {background: var(--accent-dim); box-shadow: 0 0 16px var(--accent-glow); color: #fff !important; transform: translateY(-1px);}
@@ -113,6 +139,7 @@ strong { color: var(--text); font-weight: 600; }
 .btn-lg { padding: 0.85rem 2rem; font-size: 1rem; }
 .btn-full { width: 100%; justify-content: center; }
 
+/* Sets up structure layouts, focus states, responsive typography spacing, placeholder colors, and clean dropdown arrow graphics for reusable input fields. */
 .form-card {background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-lg); padding: 2rem;}
 .form-group {display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.25rem;}
 .form-label {font-size: 0.85rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.04em; text-transform: uppercase;}
@@ -123,13 +150,16 @@ textarea.form-control { resize: vertical; min-height: 100px; }
 select.form-control {appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237c85a0' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.9rem center; cursor: pointer;}
 .form-control option { background: var(--bg-card); }
 
+/* Creates a relative container layout to float an interactive visibility toggle button over the top right side of secure input fields. */
 .password-field {position: relative; display: flex; align-items: center;}
 .password-field input { flex: 1; }
 .password-toggle {position: absolute; right: 0.75rem; background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 1rem; padding: 0.25rem; transition: color .2s;}
 .password-toggle:hover { color: var(--text); }
 
+/* Styles descriptive helper text or input requirements directly below form control layout fields using a smaller font and muted colors. */
 .form-hint { font-size: 0.8rem; color: var(--text-muted); }
 
+/* Creates a responsive container wrapper, applies precise heading typography alignments, and implements subtle hover row selections for tables. */
 .table-wrap { overflow-x: auto; border-radius: var(--radius-lg); border: 1px solid var(--border-card); }
 table { width: 100%; border-collapse: collapse; }
 thead { background: var(--bg-raised); }
@@ -140,6 +170,7 @@ tbody tr:hover { background: rgba(59,130,246,0.04); }
 td {padding: 0.85rem 1rem; font-size: 0.9rem; color: var(--text); vertical-align: middle;}
 .table-actions { display: flex; gap: 0.5rem; align-items: center; }
 
+/* Configures standard vertical layouts, background elevations, typography weights, highlight warning colors, and text sizes for modular user review cards. */
 .reviews-list { display: flex; flex-direction: column; gap: 0.75rem; margin: 1rem 0; }
 .review-card {background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem;}
 .review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
@@ -147,24 +178,30 @@ td {padding: 0.85rem 1rem; font-size: 0.9rem; color: var(--text); vertical-align
 .review-stars { color: var(--warning); font-size: 0.9rem; letter-spacing: 1px; }
 .review-comment { font-size: 0.875rem; color: var(--text-muted); }
 
+/* Configures standard layout containers, background elevations, border configurations, and flexible alignments for interactive user rating forms. */
 .review-form {background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.5rem;}
 .star-select { display: flex; align-items: center; gap: 0.75rem; }
 .star-select select { width: auto; }
 
+/* Sets up layout constraints, aspect ratios, background configurations, padding scales, and adaptive alignment rules for hero presentation containers. */
 .detail-hero {background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 1.5rem;}
 .detail-hero-img {width: 100%; max-height: 300px; object-fit: cover; display: block;}
 .detail-hero-body { padding: 1.75rem; }
 .detail-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.75rem 0 1rem; }
 
+/* Configures standard padding properties, background elevations, border properties, and decorative section header underlines for content blocks. */
 .detail-section {background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1rem;}
 .detail-section h3 {color: var(--text); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);}
 
+/* Retains natural text spacing and line breaks while displaying multi-line exercise step descriptions in a clean & readable font size. */
 .exercises-list {white-space: pre-wrap; color: var(--text-muted); font-size: 0.9rem; line-height: 1.8;}
 
+/* Styles the bookmark activation button component with theme colors to signify an active item favorite state. */
 .fav-form { margin-top: 0.5rem; }
 .btn-fav-active {background: rgba(245,158,11,0.12); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3);}
 .btn-fav-active:hover {background: rgba(245,158,11,0.2); color: #fcd34d !important;}
 
+/* Configures standard layout constraints, central alignments, decorative neon background radial gradients, typography weights, and scaling fluid title measurements for the landing header components. */
 .hero {min-height: calc(100vh - var(--nav-h)); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 4rem 1.5rem; position: relative;}
 .hero::before {content: ''; position: absolute; top: -10%; left: 50%; transform: translateX(-50%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 65%); pointer-events: none;}
 .hero-eyebrow {font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 1rem;}
@@ -173,33 +210,41 @@ td {padding: 0.85rem 1rem; font-size: 0.9rem; color: var(--text); vertical-align
 .hero-sub {font-size: 1.1rem; color: var(--text-muted); max-width: 500px; margin: 0 auto 2.5rem; line-height: 1.7;}
 .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
 
+/* Centers and brands login and registration headers, applying standard letter spacing scales and navigational redirect link properties. */
 .auth-logo {text-align: center; margin-bottom: 2rem;}
 .auth-logo-text {font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 0.08em; color: var(--text);}
 .auth-logo-text span { color: var(--accent); }
 .auth-switch {text-align: center; margin-top: 1.25rem; font-size: 0.875rem; color: var(--text-muted);}
 .auth-switch a { font-weight: 600; }
 
+/* Arranges main view banners by vertically baseline aligning heading titles alongside functional option controls with flexible responsive wrapping rules. */
 .page-header {display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;} 
 .page-header h2 { color: var(--text); margin-top: 0.5rem; } 
 .page-header-actions { display: flex; gap: 0.85rem; align-items: center; } 
 
+/* Styles back navigation links to display inline with small icons, subtle text sizes, and smooth hover state transitions. */
 .back-link {display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; color: var(--text-muted) !important; margin-bottom: 1.5rem; transition: color .2s;}
 .back-link:hover { color: var(--text) !important; }
 
+/* Centers and styles placeholder screens displayed when data listings, favorites, or workout logs are completely empty. */
 .empty-state {text-align: center; padding: 4rem 2rem; color: var(--text-muted);}
 .empty-state-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
 .empty-state h3 { font-family: 'Bebas Neue', sans-serif; color: var(--text-dim); margin-bottom: 0.5rem; letter-spacing: 0.04em; }
 
+/* Creates a clean horizontal separation line using theme borders with top and bottom margins that split layout content. */
 .divider { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
 
+/* Segregates user bookmarked categories into separate block groups with titles and layout underlines. */
 .fav-section { margin-bottom: 2.5rem; }
 .fav-section-title {font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.05em; color: var(--text); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);}
 
+/* Customizes the width, height, track background, and hover states of the browser's native scrollbar components for modern webkit browsers. */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--text-dim); border-radius: 99px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent-line); }
 
+/* Declares a collection of standard utility helper tokens to rapidly adjust layout spacing margins, text positions, alignment distributions, and flexbox configurations directly inside the HTML. */
 .mt-1 { margin-top: 0.5rem; }
 .mt-2 { margin-top: 1rem; }
 .mt-3 { margin-top: 1.5rem; }
@@ -213,21 +258,25 @@ td {padding: 0.85rem 1rem; font-size: 0.9rem; color: var(--text); vertical-align
 .justify-between { justify-content: space-between; }
 .flex-wrap { flex-wrap: wrap; }
 
+/* Configures the layout alignment, hover scaling animations, active states, and descriptive font hints for an interactive star rating widget. */
 .star-rating-widget {display: flex; gap: 0.15rem; align-items: center; margin: 0.5rem 0 1rem;}
 .star-rating-widget .star {font-size: 2.2rem; color: var(--text-dim); cursor: pointer; transition: color 0.1s, transform 0.12s; user-select: none; line-height: 1;}
 .star-rating-widget .star.lit { color: var(--warning); transform: scale(1.18); }
 .star-rating-widget .star.selected { color: var(--warning); }
 .rating-hint {font-size: 0.8rem; color: var(--text-muted); margin-left: 0.6rem; font-style: italic;}
 
+/* Configures high-visibility validation borders, focal halos, dynamic alert text spacings, and thematic colors for field validation error and success states. */
 .form-control.input-error {border-color: var(--danger) !important; box-shadow: 0 0 0 3px rgba(239,68,68,0.15) !important;}
 .form-control.input-valid {border-color: var(--success) !important; box-shadow: 0 0 0 3px rgba(16,185,129,0.10) !important;}
 .field-error {font-size: 0.78rem; color: #fca5a5; margin-top: 0.3rem; min-height: 1rem; display: flex; align-items: center; gap: 0.25rem;}
 .field-success {font-size: 0.78rem; color: #6ee7b7; margin-top: 0.3rem; min-height: 1rem;}
 
+/* Configures standard layout constraints, smooth dimension transitions, and subtle text label elements for a dynamic password security strength tracker indicator. */
 .strength-bar-wrap {height: 4px; background: var(--bg-raised); border-radius: 99px; margin-top: 0.5rem; overflow: hidden;}
 .strength-bar {height: 100%; border-radius: 99px; width: 0%; transition: width 0.3s, background 0.3s;}
 .strength-label {font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;}
 
+/* Creates custom CSS counter-increment steps, structural flex-start lists, and geometric bullet point icon indicators for informational text presentation components. */
 .steps-list {list-style: none; counter-reset: steps; display: flex; flex-direction: column; gap: 0.75rem; margin: 0.5rem 0;}
 .steps-list li {counter-increment: steps; display: flex; align-items: flex-start; gap: 0.85rem; font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;}
 .steps-list li::before {content: counter(steps); display: flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; background: var(--accent-glow); color: var(--accent); border: 1px solid var(--accent-line); border-radius: 50%; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; margin-top: 1px;}
@@ -235,10 +284,12 @@ td {padding: 0.85rem 1rem; font-size: 0.9rem; color: var(--text); vertical-align
 .bullet-list li {display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;}
 .bullet-list li::before {content: "▸"; color: var(--accent); font-size: 0.9rem; flex-shrink: 0; margin-top: 2px;}
 
+/* Sets standard layout dimensions, fluid element aspect ratios, multi-stop backdrop gradients, boundary highlights, and scaling rules for media banner displays. */
 .content-card-img {width: 100%; height: 180px; object-fit: cover; display: block;}
 .content-card-img-placeholder {width: 100%; height: 180px; background: linear-gradient(135deg, var(--bg-raised), var(--bg-card)); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--accent); border-bottom: 1px solid var(--border);}
 .detail-hero-img {width: 100%; max-height: 380px; object-fit: cover; display: block;}
 
+/* Configures standard layout constraints, center-aligned typography hierarchies, multi-column auto-wrapping grid containers, and hover transformation behaviors for the home page. */
 .home-features {max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 4rem; position: relative; z-index: 1;}
 .home-section-title {font-family: 'Bebas Neue', sans-serif; font-size: clamp(2rem, 5vw, 3rem); letter-spacing: 0.04em; color: var(--text); text-align: center; margin-bottom: 0.4rem;}
 .home-section-sub {text-align: center; color: var(--text-muted); font-size: 1rem; margin-bottom: 2.5rem;}
@@ -249,6 +300,7 @@ td {padding: 0.85rem 1rem; font-size: 0.9rem; color: var(--text); vertical-align
 .feature-card-title {font-family: 'Bebas Neue', sans-serif; font-size: 1.15rem; letter-spacing: 0.04em; color: var(--text); margin-bottom: 0.4rem;}
 .feature-card p { font-size: 0.875rem; line-height: 1.6; }
 
+/* Configures a two-column split section and styles promotional cards for gym-goers and personal trainer dashboards. */
 .home-split {display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 3rem;}
 @media (max-width: 640px) { .home-split { grid-template-columns: 1fr;} }
 .split-card {border-radius: var(--radius-lg); padding: 2rem 2rem 2.25rem;}
@@ -265,20 +317,24 @@ td {padding: 0.85rem 1rem; font-size: 0.9rem; color: var(--text); vertical-align
 .gym-card .split-list li::before { color: var(--accent); }
 .trainer-card .split-list li::before { color: #fff; }
 
+/* Sets up a clean layout divider and handles horizontal item alignments for action buttons displayed exclusively to the content creator. */
 .owner-actions {display: flex; gap: 0.5rem; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);}
 .owner-actions form { display: inline; }
 
+/* Sets up a clean layout header to separate logged records chronologically, featuring a distinct theme color icon and an automated count badge aligned to the far right. */
 .date-group {margin-bottom: 2rem;}
 .date-group-heading {display: flex; align-items: center; gap: 0.6rem; font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 0.04em; color: var(--text); margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);}
 .date-group-heading i {color: var(--accent); font-size: 1.2rem;}
 .date-group-count {margin-left: auto; font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 500; letter-spacing: normal; color: var(--text-muted); background: var(--bg-raised); padding: 0.2rem 0.7rem; border-radius: 99px;}
 
+/* Configures standard layout alignments, micro-interaction hover shifts, sizing modifiers, and active theme toggle fills for buttons. */
 .unit-toggle {display: inline-flex; background: var(--bg-raised); border: 1px solid var(--border-card); border-radius: 99px; padding: 3px; gap: 2px;}
 .unit-btn {background: transparent; border: none; color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 600; padding: 0.3rem 0.85rem; border-radius: 99px; cursor: pointer; transition: all .2s;}
 .unit-btn:hover { color: var(--text); }
 .unit-btn.active {background: var(--accent); color: #fff;}
 .unit-toggle-sm .unit-btn {font-size: 0.72rem; padding: 0.2rem 0.6rem;}
 
+/* Styles distinct chronological food blocks, prominent heading categories, and structural padding configurations for itemized daily calorie listings. */
 .meal-category {margin-bottom: 1.5rem;}
 .meal-category:last-child { margin-bottom: 0; }
 .meal-category-heading {display: flex; align-items: center; gap: 0.5rem; font-family: 'Bebas Neue', sans-serif; font-size: 1.15rem; letter-spacing: 0.04em; color: var(--accent); margin-bottom: 0.6rem;}
@@ -287,12 +343,14 @@ td {padding: 0.85rem 1rem; font-size: 0.9rem; color: var(--text); vertical-align
 .meal-list li {display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.92rem; color: var(--text-muted); line-height: 1.5; padding: 0.5rem 0.75rem; background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius);}
 .meal-list li::before {content: "•"; color: var(--accent); flex-shrink: 0;}
 
+/* Configures standard flexible layouts, micro-interaction hover shifts, sizing modifiers, and active theme fills for tab containers. */
 .content-tabs {display: flex; gap: 0.5rem; background: var(--bg-raised); border: 1px solid var(--border-card); border-radius: var(--radius); padding: 4px;}
 .content-tab {flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.4rem; background: transparent; border: none; color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600; padding: 0.6rem 0.5rem; border-radius: calc(var(--radius) - 2px); cursor: pointer; transition: all .2s;}
 .content-tab:hover { color: var(--text); }
 .content-tab.active {background: var(--accent); color: #fff;}
 .content-tab i { font-size: 1rem; }
 
+/* Sets up a fixed screen stacking zone and builds smooth translate animation entry/exit keyframes for temporary pop-up notification toasts (flash messages). */
 .toast-container {position: fixed; top: calc(var(--nav-h) + 1rem); right: 1.5rem; z-index: 1000; display: flex; flex-direction: column; gap: 0.6rem; max-width: 360px;}
 .toast {display: flex; align-items: center; gap: 0.6rem; background: var(--bg-raised); border: 1px solid var(--accent-line); border-left: 3px solid var(--success); border-radius: var(--radius); padding: 0.85rem 1rem; box-shadow: 0 8px 30px rgba(0,0,0,0.4); animation: toastIn 0.4s cubic-bezier(0.21, 1.02, 0.73, 1);}
 .toast-hide { animation: toastOut 0.4s ease forwards; }
@@ -309,6 +367,7 @@ td {padding: 0.85rem 1rem; font-size: 0.9rem; color: var(--text); vertical-align
 .toast-close {background: none; border: none; color: var(--text-muted); font-size: 1.3rem; line-height: 1; cursor: pointer; padding: 0; transition: color .2s; flex-shrink: 0;}
 .toast-close:hover { color: var(--text); }
 
+/* Configures inline flex layouts, specific color states, smooth scaling transformations, and micro-spacing constraints for an interactive star-based review system. */
 .star-rating-widget {display: inline-flex; gap: 0.25rem; align-items: center;}
 .star-rating-widget .star {font-size: 2rem; color: #2a2f45; cursor: pointer; transition: color 0.12s ease, transform 0.12s ease; user-select: none; line-height: 1;}
 .star-rating-widget .star:hover { transform: scale(1.15); }
@@ -316,25 +375,30 @@ td {padding: 0.85rem 1rem; font-size: 0.9rem; color: var(--text); vertical-align
 .star-rating-widget .star.selected { color: #f59e0b; }
 .rating-hint {display: block; font-size: 0.85rem; color: var(--text-muted); margin-top: 0.4rem; font-weight: 500; min-height: 1.2rem;}
 
+/* Styles text length counters below text areas, applying orange warnings and red indicators as users approach maximum word limit. */
 .char-counter {text-align: right; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem; transition: color .2s;}
 .char-counter.char-warn { color: var(--warning); font-weight: 600; }
 .char-counter.char-max { color: var(--danger); font-weight: 700; }
- 
+
+/* Sets up standardized 200px container dimensions, fluid image scaling properties, complex multi-gradient backdrop designs, and icon transparency controls for content card images. */
 .content-card-img {width: 100%; height: 200px; object-fit: cover; display: block; background: var(--bg-raised);}
 .content-card-img-placeholder {width: 100%; height: 200px; background: radial-gradient(circle at 30% 30%, rgba(59,130,246,0.12), transparent 60%), linear-gradient(135deg, var(--bg-raised), var(--bg-card)); display: flex; align-items: center; justify-content: center; color: var(--accent); border-bottom: 1px solid var(--border);}
 .content-card-img-placeholder i { opacity: 0.55; }
 
+/* Configures inline pill-switch boundaries, background input fields, subtle icon alignments, and focal glow shadows for unit toggles. */
 .unit-toggle {display: inline-flex; background: var(--bg-input); border: 1px solid var(--border-card); border-radius: 99px; padding: 2px; gap: 0;}
 .unit-btn {background: transparent; border: none; color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.7rem; border-radius: 99px; cursor: pointer; transition: all .2s;}
 .unit-btn:hover { color: var(--text); }
 .unit-btn.active {background: var(--accent); color: #fff; box-shadow: 0 0 10px var(--accent-glow);}
 
+/* Generates a uniform three-column numerical grid that aligns exercise parameters while preventing layout displacement caused by fluid labels. */
 .workout-stats-grid {display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; align-items: start;} 
 .workout-stats-grid .form-control {width: 100%; box-sizing: border-box;} 
 .stat-label {display: flex; align-items: center; min-height: 2.1rem; margin-bottom: 0.4rem; white-space: nowrap;} 
 .weight-label-row {justify-content: space-between; gap: 0.5rem;} 
 .weight-label-row .form-label {margin: 0;} 
  
+/* overlays a layered, dimming gradient filter onto a full-screen wallpaper layout image. */
 @media (max-width: 600px) { 
   .workout-stats-grid { grid-template-columns: 1fr; gap: 0; }
   .workout-stats-grid .form-group { margin-bottom: 1.25rem; }
@@ -344,22 +408,28 @@ td {padding: 0.85rem 1rem; font-size: 0.9rem; color: var(--text); vertical-align
 .bg-image::before {content: ''; position: fixed; inset: 0; z-index: -1; background-size: cover; background-position: center; background-repeat: no-repeat; opacity: 0.30; pointer-events: none;}
 .bg-image::after {content: ''; position: fixed; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(8,8,15,0.75) 0%, rgba(8,8,15,0.88) 60%, rgba(8,8,15,0.95) 100%); pointer-events: none;}
 
+/* Links distinct background wallpaper images stored in the local static directory to the home page and trainer / gym-goer dashboards. */
 .bg-home::before    { background-image: url("/static/images/IMG1.jpg"); }
 .bg-trainer::before { background-image: url("/static/images/IMG2.jpg"); }
 .bg-gymgoer::before { background-image: url("/static/images/IMG3.jpeg"); }
 
+/* Applies a softer dark gradient wash to maximize text contrast over the home wallpaper. */
 .bg-home.bg-image::before { opacity: 0.22; background-position: center center; } 
 .bg-home.bg-image::after {background: linear-gradient(180deg, rgba(8,8,15,0.78) 0%, rgba(8,8,15,0.82) 50%, rgba(8,8,15,0.9) 100%);} 
 
+/* Centers layout structures, scales theme icons, and limits description widths for the offline page. */
 .offline-page {display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; text-align: center; gap: 0.5rem;}
 .offline-icon {font-size: 4.5rem; color: var(--accent); margin-bottom: 0.5rem;}
 .offline-page p {color: var(--text-muted); max-width: 420px;}
 
+/* Sets up a notification alert banner that remains hidden by default and becomes visible across the layout during connection failure. */
 #offline-banner {display: none; position: relative; z-index: 50; background: rgba(245, 158, 11, 0.18); border: 1px solid #f59e0b; border-radius: 10px; padding: 0.75rem 1rem; margin: 0 auto 1.5rem; max-width: 1200px; font-size: 0.9rem; color: #fbbf24; text-align: center;}
 #offline-banner.visible { display: block; }
 
+/* Styles author credentials and metadata text with the theme accent color on content cards and detail layouts to highlight the content creator. */
 .content-card-author {margin-top: 0.5rem; font-size: 0.8rem; color: var(--accent); font-weight: 500;}
 .detail-author {margin-top: 0.25rem; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--accent); font-weight: 500;}
 
+/* Dims buttons, blocks cursor interactions, and applies a grayscale filter to visually indicate disabled form states. */
 .btn:disabled,
 button:disabled {opacity: 0.45; cursor: not-allowed; filter: grayscale(40%);}

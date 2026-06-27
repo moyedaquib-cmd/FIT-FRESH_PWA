@@ -19,7 +19,7 @@ def init_db():
     cursor = conn.cursor() #Creates a cursor object from the database connection allowing interaction with data
     
     #Users table stores registered accounts
-    cursor.execute("CREATE TABLE IF NOT EXISTS user (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL, role TEXT NOT NULL)") #Text not null makes it so that no empty information is collected. Additionally, "UNIQUE" makes it so tjhat no duplicate information is collected
+    cursor.execute("CREATE TABLE IF NOT EXISTS user (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL, role TEXT NOT NULL, failed_attempts INTEGER NOT NULL DEFAULT 0, locked_until TEXT)") #Text not null makes it so that no empty information is collected. Additionally, "UNIQUE" makes it so tjhat no duplicate information is collected
 
     #Workouts table stores logged workouts linked to the user
     cursor.execute("CREATE TABLE IF NOT EXISTS workout (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, workout_date TEXT NOT NULL DEFAULT (DATE('now')), exercise TEXT NOT NULL, sets INTEGER NOT NULL, reps INTEGER NOT NULL, weight REAL NOT NULL, FOREIGN KEY (user_id) REFERENCES user(id))") #Foreign Key indicates which table it has a relationship with

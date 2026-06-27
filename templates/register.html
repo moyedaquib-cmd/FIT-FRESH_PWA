@@ -7,6 +7,7 @@
         <p style="color:var(--text-muted);font-size:0.9rem;margin-top:0.25rem;">Create your account to get started.</p>
     </div>
     <div class="form-card">
+        <!-- Sends secure registration inputs to the server authentication route handler -->
         <form action="/register" method="POST" id="registerForm">
             <div class="form-group">
                 <label class="form-label">Username</label>
@@ -19,12 +20,14 @@
                     <input type="password" id="password" name="password" class="form-control" placeholder="Choose a password" required>
                     <button type="button" class="password-toggle" onclick="togglePassword()">👁</button>
                 </div>
+                <!-- Dynamic password strength checker -->
                 <div class="strength-bar-wrap"><div class="strength-bar" id="strengthBar"></div></div>
                 <p class="strength-label" id="strengthLabel"></p>
                 <p class="field-error" id="passwordErr"></p>
             </div>
             <div class="form-group">
                 <label class="form-label">I am a...</label>
+                <!-- Drop down menu to allow RBAC -->
                 <select name="role" class="form-control" required>
                     <option value="gym_goer">Gym Goer</option>
                     <option value="trainer">Personal Trainer</option>
@@ -37,12 +40,14 @@
 </div>
 {% endblock %}
 {% block head %}
+<!-- Frontend validation module evaluating input formats and password complexity variables in real-time -->
 <script>
     function togglePassword() { const p = document.getElementById("password"); p.type = p.type === "password" ? "text" : "password";}
-
     document.addEventListener('DOMContentLoaded', () => {
         const username = document.getElementById('username');
         const usernameErr = document.getElementById('usernameErr');
+        
+        // Tracks typing inside the text field to filter out short handles or invalid alphanumeric characters
         username.addEventListener('input', () => {
             const val = username.value.trim();
             let msg = '';
@@ -58,9 +63,12 @@
         const bar = document.getElementById('strengthBar');
         const label = document.getElementById('strengthLabel');
         const passErr = document.getElementById('passwordErr');
+        
+        // Theme palette colors mirroring the custom global root variables
         const colours = ['#ef4444', '#f59e0b', '#3b82f6', '#10b981'];
         const labels  = ['Weak', 'Fair', 'Good', 'Strong'];
- 
+        
+        // Calculates length, digit, and symbol parameters to score and animate password complexity metrics
         password.addEventListener('input', () => {
             const val = password.value;
             let score = 0;
@@ -78,6 +86,8 @@
             password.classList.toggle('input-error', !!msg && val.length > 0);
             password.classList.toggle('input-valid', !msg && val.length > 0);
         });
+
+        // Intercepts submissions to completely halt form routing if input field conditions fail
         form.addEventListener('submit', (e) => {
             const uVal = username.value.trim();
             const pVal = password.value;

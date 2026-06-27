@@ -3,7 +3,9 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Sets the default browser accent and navigation header layout background color -->
         <meta name="theme-color" content="#08080f">
+        <!-- Connects the PWA application manifest rules to make the layout fully installable -->
         <link rel="manifest" href="/manifest.json">
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
@@ -12,19 +14,23 @@
         <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/icon-192.png') }}">
         <title>{% block title %}Fit & Fresh{% endblock %}</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <!-- Imports external icon font asset configurations directly into the template header grid -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"> 
         {% block head %}{% endblock %}
     </head>
     <body>
+        <!-- Stand-by layout component wrapper to display alert information when network connection status breaks -->
         <div id="offline-banner">⚠️ You are currently <strong>offline</strong>. You can view pages you have already visited but saving changes requires an internet connection. </div>
         <nav class="navbar">
             <a href="/" class="navbar-logo">FIT<span>&</span>FRESH</a>
+            <!-- Evaluates session context state variables to conditionally display gym goer and personal trainer navigation links -->
             {% if session.user_id %}
             <ul class="navbar-links">
                 <li><a href="/exercises">Exercises</a></li>
                 <li><a href="/meal-plans">Meal Plans</a></li>
                 <li><a href="/workout-routines">Routines</a></li>
                 <li><a href="/view-favourites">Favourites</a></li>
+                <!-- Evaluates account privilege parameters to route the user to their matching dashboard -->
                 {% if session.role == "gym_goer" %}
                 <li><a href="/gym-goer-dashboard">Dashboard</a></li>
                 {% else %}
@@ -41,6 +47,7 @@
             </div>
             {% endif %}
         </nav>
+        <!-- Fetches flash alerts -->
         {% with messages = get_flashed_messages() %}
             {% if messages %}
                 <div class="toast-container" id="toastContainer">
@@ -52,6 +59,7 @@
                     </div>
                     {% endfor %}
                 </div>
+                <!-- Applies staggered interval sequence routines to smoothly clear notification alert logs off-screen -->
                 <script>
                     document.querySelectorAll('#toastContainer .toast').forEach((toast, i) => {
                         setTimeout(() => {
@@ -64,6 +72,7 @@
         {% endwith %}
         {% block content %}{% endblock %}
         <script>
+            // Registers the background service worker script file onto the user's browser
             if ("serviceWorker" in navigator) {
                 window.addEventListener("load", () => {
                     navigator.serviceWorker.register("/service-worker.js")
@@ -72,6 +81,8 @@
                 });
             }
             const offlineBanner = document.getElementById("offline-banner");
+            
+            // Automatically flips UI states and disables transactional form post headers when offline
             function updateOnlineStatus() {
                 const offline = !navigator.onLine;
                 if (offlineBanner) offlineBanner.classList.toggle("visible", offline);

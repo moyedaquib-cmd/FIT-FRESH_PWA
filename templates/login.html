@@ -7,6 +7,7 @@
         <p style="color:var(--text-muted);font-size:0.9rem;margin-top:0.25rem;">Welcome back. Log in to continue.</p>
     </div>
     <div class="form-card">
+        <!-- Submits credentials securely via form headers to the server login route handler -->
         <form action="/login" method="POST">
             <div class="form-group">
                 <label class="form-label">Username</label>
@@ -17,20 +18,23 @@
                 <label class="form-label">Password</label>
                 <div class="password-field">
                     <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
-                    <button type="button" class="password-toggle" onclick="togglePassword()">👁</button>
+                    <button type="button" class="password-toggle" onclick="togglePassword()">👁</button> <!-- Password visibility toggle -->
                 </div>
                 <p class="field-error" id="passwordErr"></p>
             </div>
             <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top:0.5rem;">Log In</button>
         </form>
     </div>
+    <!-- Allows user to go straight over to account registration-->
     <p class="auth-switch">Don't have an account? <a href="/register">Register here</a></p>
 </div>
 {% endblock %}
 {% block head %}
+<!-- Standard frontend script handling raw input visibility toggles and format validation rules -->
 <script>
-    function togglePassword() {const p = document.getElementById("password"); p.type = p.type === "password" ? "text" : "password";}
 
+    // Flips the layout element input visibility type between hidden character and raw text
+    function togglePassword() {const p = document.getElementById("password"); p.type = p.type === "password" ? "text" : "password";}
     document.addEventListener('DOMContentLoaded', () => {
         function validate(id, errId, checks) {
             const el = document.getElementById(id);
@@ -39,6 +43,7 @@
             el.addEventListener('input', () => {
                 const val = el.value.trim();
                 let msg = '';
+                // Checks structural properties to make sure text fields are filled prior to sending to database
                 for (const [test, message] of checks) {
                     if (!test(val)) { msg = message; break; }
                 }

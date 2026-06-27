@@ -2,14 +2,17 @@
 {% block title %}Edit Workout — Fit & Fresh{% endblock %}
 {% block content %}
 <div class="page-sm">
+    <!-- Returns the user back to workout history -->
     <a href="{{ url_for('workout_history') }}" class="back-link">← Back to Workout History</a>
     <h2 style="margin-bottom:1.5rem;">Edit Workout</h2>
     <div class="form-card">
         <form method="POST">
             <div class="form-group">
                 <label class="form-label">Exercise Name</label>
+                <!-- Populates the input value property with the previously saved inputs -->
                 <input name="exercise" class="form-control" value="{{ workout.exercise }}" required>
             </div>
+            <!-- Grid container splits input fields evenly across a three-column row layout -->
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
                 <div class="form-group">
                     <label class="form-label">Sets</label>

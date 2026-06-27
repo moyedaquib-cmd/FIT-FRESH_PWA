@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Meal Plans — Fit & Fresh{% endblock %}
 {% block content %}
+<!-- Functions the same as exercises.html -->
 <div class="page">
     <div class="page-header">
         <a href="{{ url_for('gym_goer_dashboard') if session.role == 'gym_goer' else url_for('personal_trainer_dashboard') }}" class="back-link">← Back to Dashboard</a>

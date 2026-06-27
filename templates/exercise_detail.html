@@ -2,8 +2,10 @@
 {% block title %}{{ exercise.name }} — Fit & Fresh{% endblock %}
 {% block content %}
 <div class="page">
+    <!-- Navigation link redirecting users back to exercise -->
     <a href="/exercises" class="back-link">← Back to Exercises</a>
- 
+    
+    <!-- Hero component container displaying exercise imagery, name details, and author username -->
     <div class="detail-hero">
         {% if exercise.image_url %}
         <img src="{{ exercise.image_url }}" class="detail-hero-img" alt="{{ exercise.name }}">
@@ -13,6 +15,7 @@
             <p class="detail-author">by {{ exercise.trainer_username }}</p>
             <div class="detail-meta">
                 <span class="badge badge-muscle">{{ exercise.muscle_group }}</span>
+                <!-- Renders the correct badge colour depending on difficulty levels -->
                 {% if exercise.difficulty == "Beginner" %}
                     <span class="badge badge-beginner">{{ exercise.difficulty }}</span>
                 {% elif exercise.difficulty == "Intermediate" %}
@@ -21,7 +24,9 @@
                     <span class="badge badge-advanced">{{ exercise.difficulty }}</span>
                 {% endif %}
             </div>
+            <!-- Dynamic data target container used by JavaScript to format raw strings into step counters -->
             <div id="exerciseSteps" data-raw="{{ exercise.description }}"></div>
+            <!-- Allows users to favourite exercises -->
             <form action="{{ url_for('toggle_favourite_exercise', exercise_id=exercise.id) }}" method="POST" class="fav-form">
                 {% if is_favourite %}
                 <button type="submit" class="btn btn-fav-active btn-sm">★ Remove Favourite</button>
@@ -29,6 +34,7 @@
                 <button type="submit" class="btn btn-outline btn-sm">☆ Add to Favourites</button>
                 {% endif %}
             </form>
+            <!-- Displays resource modifications buttons exclusively to the personal trainer who created it -->
             {% if is_owner %}
             <div class="owner-actions">
                 <button type="button" class="btn btn-outline btn-sm" onclick="toggleEdit()">✎ Edit</button>
@@ -41,6 +47,7 @@
     </div>
  
     {% if is_owner %}
+    <!-- Editing panel that stays hidden until the owner manually clicks the edit button -->
     <div class="detail-section" id="editForm" style="display:none;">
         <h3>Edit Exercise</h3>
         <form method="POST" action="{{ url_for('edit_exercise', exercise_id=exercise.id) }}">
@@ -80,11 +87,13 @@
 
     <div class="detail-section">
         <h3>Reviews</h3>
+        <!-- Displays the interactive feedback logger only if the user is authenticated, hasn't reviewed yet, and isn't the owner -->
         {% if session.user_id and not is_owner and not has_reviewed %}
         <div class="review-form">
             <form method="POST" action="{{ url_for('add_review_exercise', exercise_id=exercise.id) }}">
                 <input type="hidden" name="rating" id="ratingInput" value="">
                 <label class="form-label" style="margin-bottom:0.4rem;">Your Rating</label>
+                <!-- Interactive widget area where users hover and click stars to establish numerical rating scores -->
                 <div class="star-rating-widget" id="starWidget">
                     <span class="star" data-val="1">★</span>
                     <span class="star" data-val="2">★</span>
@@ -107,6 +116,7 @@
         {% if reviews %}
         <div class="reviews-list">
             {% for review in reviews %}
+            <!-- displays individual user reviews alongside their username and rating -->
             <div class="review-card">
                 <div class="review-header">
                     <span class="review-author">
@@ -115,6 +125,7 @@
                         <span class="badge badge-muscle" style="margin-left:0.4rem;">Trainer</span>
                         {% endif %}
                     </span>
+                    <!-- Uses template math string multipliers to inject filled stars onto empty background stars -->
                     <span class="review-stars">{{ "★" * review["rating"] }}{{ "☆" * (5 - review["rating"]) }}</span>
                 </div>
                 <p class="review-comment">{{ review["comment"] }}</p>
@@ -129,6 +140,7 @@
 {% endblock %}
 {% block head %}
 <script>
+     // Toggles the visibility state of the exercise edit interface.
     function toggleEdit() {
         const form = document.getElementById('editForm');
         if (form) {
@@ -145,11 +157,17 @@
         let selected = 0;
  
         if (stars.length) {
+             
+            // Iterates over star elements to combine interactive hover and click features.
             stars.forEach((star, i) => {
+                 
+                // Previews descriptive validation status labels with star glow updates on mouse entry. 
                 star.addEventListener('mouseenter', () => {
                     stars.forEach((s, j) => s.classList.toggle('lit', j <= i));
                     hint.textContent = labels[i + 1];
                 });
+                
+                // Flushes active hover indicators and builds previous selection settings on exit
                 star.addEventListener('mouseleave', () => {
                     stars.forEach((s, j) => {
                         s.classList.remove('lit');
@@ -157,6 +175,8 @@
                     });
                     hint.textContent = selected ? labels[selected] : 'Select a rating';
                 });
+                
+                // Commits individual value parameters to hidden structural input fields on click
                 star.addEventListener('click', () => {
                     selected = i + 1;
                     input.value = selected;
@@ -164,6 +184,8 @@
                     hint.textContent = labels[selected];
                 });
             });
+            
+            // Rejects submission forms tracking user feedback reviews if no stars are clicked
             document.getElementById('reviewSubmit')?.addEventListener('click', (e) => {
                 if (!input.value) {
                     e.preventDefault();
@@ -175,6 +197,8 @@
         const comment = document.getElementById('reviewComment');
         const counter = document.getElementById('charCounter');
         if (comment && counter) {
+            
+            // Tracks active text lengths typed inside forms to alert members as they reach the character limit
             comment.addEventListener('input', () => {
                 const len = comment.value.length;
                 counter.textContent = `${len} / 400`;
@@ -185,10 +209,13 @@
         const stepsEl = document.getElementById('exerciseSteps');
         if (stepsEl) {
             const raw = stepsEl.dataset.raw || '';
+            
+            // Splits input lines to evaluate and clean text
             const lines = raw.split('\n').map(l => l.trim()).filter(l => l);
             const isNumbered = lines.every(l => /^\d+[\.\)]/.test(l));
             const isBullet = lines.every(l => /^[-•*]/.test(l));
- 
+            
+            // Builds structured sequential html list elements if user numbers or dot points their lists
             if (isNumbered) {
                 const ul = document.createElement('ol');
                 ul.className = 'steps-list';
@@ -207,6 +234,8 @@
                     ul.appendChild(li);
                 });
                 stepsEl.appendChild(ul);
+            
+            // Builds a standard paragraph text
             } else {
                 const p = document.createElement('p');
                 p.style.whiteSpace = 'pre-wrap';

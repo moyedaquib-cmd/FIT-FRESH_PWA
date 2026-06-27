@@ -3,17 +3,20 @@
 {% block content %}
 <div class="page">
     <div class="page-header">
+        <!-- Directs users back to their dashboards -->
         <a href="{{ url_for('gym_goer_dashboard') if session.role == 'gym_goer' else url_for('personal_trainer_dashboard') }}" class="back-link">← Back to Dashboard</a>
         <h2>Exercise Library</h2>
+        <!-- Displays the add exercise button for personal trainers -->
         {% if session.role == "trainer" %}
         <a href="/add-exercise" class="btn btn-primary">+ Add Exercise</a>
         {% endif %}
     </div>
- 
     {% if exercises %}
+    <!-- Renders a responsive 3-column data grid to display individual exercises side-by-side -->
     <div class="grid-3">
         {% for exercise in exercises %}
         <div class="content-card">
+            <!-- Displays a preview image or showcases a generic theme icon placeholder -->
             {% if exercise.image_url %}
             <img src="{{ exercise.image_url }}" class="content-card-img" alt="{{ exercise.name }}">
             {% else %}
@@ -40,6 +43,7 @@
         {% endfor %}
     </div>
     {% else %}
+    <!-- Placeholder view generated automatically when the catalogue contains no elements -->
     <div class="empty-state">
         <div class="empty-state-icon">
             <i class="ti ti-dumbbell"></i>

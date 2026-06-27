@@ -1,18 +1,24 @@
 {% extends "base.html" %}
 {% block title %}Add Content — Fit & Fresh{% endblock %}
 {% block content %}
+
+<!-- Main column wrapper optimized for form displays -->
 <div class="page-sm">
+
+    <!-- Navigation link enabling personal trainers to return back to their dashboard -->
     <a href="{{ url_for('personal_trainer_dashboard') }}" class="back-link">← Back to Dashboard</a>
     <h2 style="margin-bottom:1rem;">Add Content</h2>
- 
+    
+    <!-- Tab group block utilises data attributes to target individual forms via JavaScript -->
     <div class="content-tabs" id="contentTabs">
         <button type="button" class="content-tab active" data-target="exerciseForm"><i class="ti ti-dumbbell"></i> Exercise</button>
         <button type="button" class="content-tab" data-target="mealForm"><i class="ti ti-salad"></i> Meal Plan</button>
         <button type="button" class="content-tab" data-target="routineForm"><i class="ti ti-flame"></i> Routine</button>
     </div>
- 
+    
+    <!-- Main structural card block containing all functional trainer creation tools -->
     <div class="form-card" style="margin-top:1.25rem;">
-
+        <!-- Uploads exercises to the database -->
         <form method="POST" action="{{ url_for('add_exercise') }}" id="exerciseForm" class="content-form">
             <div class="form-group">
                 <label class="form-label">Exercise Name</label>
@@ -45,8 +51,8 @@
             </div>
             <button type="submit" class="btn btn-primary btn-full">Add Exercise</button>
         </form>
- 
 
+        <!-- Uploads meal plans to the database -->
         <form method="POST" action="{{ url_for('add_meal_plan') }}" id="mealForm" class="content-form" style="display:none;">
             <div class="form-group">
                 <label class="form-label">Plan Name</label>
@@ -84,7 +90,7 @@
             <button type="submit" class="btn btn-primary btn-full">Add Meal Plan</button>
         </form>
  
-
+        <!-- Uploads workout routines to the database -->
         <form method="POST" action="{{ url_for('add_workout_routine') }}" id="routineForm" class="content-form" style="display:none;">
             <div class="form-group">
                 <label class="form-label">Routine Name</label>
@@ -126,14 +132,18 @@
     document.addEventListener('DOMContentLoaded', () => {
         const tabs = document.querySelectorAll('#contentTabs .content-tab');
         const forms = document.querySelectorAll('.content-form');
+        
+        // Loops through all navigation tab controls to handle tab styling states and target component views.
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 tabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
-                forms.forEach(f => f.style.display = 'none'); //Hide all forms
-                document.getElementById(tab.dataset.target).style.display = 'block'; //Show the chosen one
+                forms.forEach(f => f.style.display = 'none'); //Hides all forms
+                document.getElementById(tab.dataset.target).style.display = 'block'; //Shows the chosen one
             });
         });
+
+        // Attaches real-time keypress validation trackers that toggle visual status modifiers directly onto target inputs.
         function validate(inputId, errId, checks) {
             const el = document.getElementById(inputId);
             const err = document.getElementById(errId);
@@ -149,6 +159,8 @@
                 el.classList.toggle('input-valid', !msg && val.length > 0);
             });
         }
+
+        // Establishes custom field validation parameters for the individual exercise, meal plan, and workout routine forms.
         validate('exName',   'exNameErr',   [[v => v.length >= 2, 'Name must be at least 2 characters']]);
         validate('exDesc',   'exDescErr',   [[v => v.length >= 10, 'Please describe the exercise with at least 10 characters']]);
         validate('exMuscle', 'exMuscleErr', [[v => v.length >= 2, 'Please enter a muscle group']]);
@@ -158,6 +170,8 @@
         validate('routineName', 'routineNameErr', [[v => v.length >= 2, 'Please enter a routine name']]);
         validate('routineDesc', 'routineDescErr', [[v => v.length >= 10, 'Description must be at least 10 characters']]);
         validate('routineEx',   'routineExErr',   [[v => v.length >= 3, 'Please list at least one exercise']]);
+        
+        // Intercepts the single exercise submission to reject requests containing empty input values.
         document.getElementById('exerciseForm').addEventListener('submit', (e) => {
             const fields = ['exName', 'exDesc', 'exMuscle'];
             if (fields.some(id => document.getElementById(id).value.trim() === '')) {
@@ -165,6 +179,8 @@
                 if (document.getElementById('exNameErr')) document.getElementById('exNameErr').textContent = 'Please fill in all required fields';
             }
         });
+
+        // Intercepts the meal plan submission to guarantee a name, description, and at least one text row are saved.
         document.getElementById('mealForm').addEventListener('submit', (e) => {
             const cats = ['breakfast', 'lunch', 'dinner', 'snack'];
             const hasMeal = cats.some(id => document.getElementById(id).value.trim().length > 0);
@@ -175,6 +191,8 @@
                 document.getElementById('mealsErr').textContent = !hasMeal ? 'Please add at least one meal in any category' : 'Please fill in all required fields';
             }
         });
+
+        // Intercepts the workout routine submission to stop requests that are missing fields
         document.getElementById('routineForm').addEventListener('submit', (e) => {
             const fields = ['routineName', 'routineDesc', 'routineEx'];
             if (fields.some(id => document.getElementById(id).value.trim() === '')) {

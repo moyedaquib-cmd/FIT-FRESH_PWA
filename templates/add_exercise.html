@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 {% block title %}Add Exercise — Fit & Fresh{% endblock %}
 {% block content %}
+<!-- Standard form-centric column layout to house individual element containers -->
 <div class="page-sm">
     <a href="{{ url_for('personal_trainer_dashboard') }}" class="back-link">← Back to Dashboard</a>
     <h2 style="margin-bottom:1.5rem;">Add Exercise</h2>
     <div class="form-card">
+        <!-- Separates single resource target submission form for isolated exercise entries -->
         <form method="POST" id="addExerciseForm">
             <div class="form-group">
                 <label class="form-label">Exercise Name</label>

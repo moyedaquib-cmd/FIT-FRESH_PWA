@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 {% block title %}Dashboard — Fit & Fresh{% endblock %}
 {% block content %}
+<!-- Home page containts a background image -->
 <div class="page bg-image bg-gymgoer">
     <h2>Welcome, {{ session.username }}</h2>
     <p style="color:var(--text-muted);margin-top:0.25rem;">Gym-Goer Dashboard</p>
- 
+    <!-- Structural dashboard container displays cards in an adaptive grid layout -->
     <div class="dash-grid">
+         <!-- Highlights the primary workout logger with a high-contrast color style -->
         <a href="/log-workout" class="dash-card primary">
             <div class="dash-card-icon"><i class="ti ti-barbell" aria-hidden="true"></i></div>
             <div class="dash-card-title">Log Workout</div>

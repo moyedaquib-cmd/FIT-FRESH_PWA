@@ -1,12 +1,16 @@
 {% extends "base.html" %}
 {% block title %}Offline — Fit & Fresh{% endblock %}
 {% block content %}
+<!-- Centers a specialized offline notification screen when a user visits pages without connection -->
 <div class="page-sm">
     <div class="offline-page">
+        <!-- Renders a large offline status icon -->
         <div class="offline-icon"><i class="ti ti-wifi-off"></i></div>
+        <!-- Clarifies client-side caching limitations by warning users that actions require an internet connection -->
         <h2>You're Offline</h2>
         <p>Fit & Fresh can still show pages you've already visited. Logging workouts, tracking calories, and saving changes require an internet connection.</p>
         <p style="margin-top:0.5rem;">Please reconnect and try again.</p>
+        <!-- Re-routes the client back to the entry root page to trigger a standard service worker lifecycle check -->
         <a href="/" class="btn btn-primary btn-lg" style="margin-top:1.5rem;">Try Again</a>
     </div>
 </div>

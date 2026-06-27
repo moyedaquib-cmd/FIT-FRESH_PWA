@@ -23,6 +23,7 @@
                     <p class="field-error" id="repsErr"></p>
                 </div>
                 <div class="form-group">
+                     <!-- Embedded weight row wrapper tracking kg/lbs switches -->
                     <div class="stat-label weight-label-row">
                         <label class="form-label" id="weightLabel">Weight</label>
                         <div class="unit-toggle unit-toggle-sm" id="unitToggle">
@@ -41,6 +42,7 @@
 </div>
 {% endblock %}
 {% block head %}
+<!-- Script compiles custom metric conversions and boundary alerts -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         function validate(id, errId, checks) {
@@ -62,6 +64,8 @@
         validate('sets',   'setsErr',   [[v => v !== '', 'Required'], [v => parseInt(v) >= 1, 'Sets must be at least 1'], [v => parseInt(v) <= 100, 'Are you sure? That seems like a lot of sets']]);
         validate('reps',   'repsErr',   [[v => v !== '', 'Required'], [v => parseInt(v) >= 1, 'Reps must be at least 1'], [v => parseInt(v) <= 1000, 'Please enter a realistic rep count']]);
         validate('weight', 'weightErr', [[v => v !== '', 'Required'], [v => parseFloat(v) >= 0, 'Weight cannot be negative'], [v => parseFloat(v) <= 2500, 'Please enter a realistic weight']]); 
+        
+        // Mathematical float constant used to calculate accurate metric mass conversions
         const KG_TO_LBS = 2.20462; 
         const toggle = document.getElementById('unitToggle');
         const weightInput = document.getElementById('weight');
@@ -69,13 +73,17 @@
         const weightHint = document.getElementById('weightHint');
         const form = document.getElementById('logWorkoutForm');
         let currentUnit = 'kg'; 
+        
         if (toggle) {
             toggle.querySelectorAll('.unit-btn').forEach(btn => {
+                // Intercepts button clicks to dynamically rewrite form values into selected weights
                 btn.addEventListener('click', () => {
                     const newUnit = btn.dataset.unit;
                     if (newUnit === currentUnit) return;
                     const val = parseFloat(weightInput.value);
                     if (!isNaN(val)) {
+                        
+                        // Applies fractional decimal offsets to maintain precision across conversion states
                         if (newUnit === 'lbs') weightInput.value = Math.round(val * KG_TO_LBS * 100) / 100; 
                         else weightInput.value = Math.round(val / KG_TO_LBS * 100) / 100;
                     }
@@ -85,6 +93,8 @@
             });
         }
         if (form) {
+            
+            // Reverts payload inputs back to standard system kilograms right before dispatching data to server routes
             form.addEventListener('submit', (e) => {
                 if (currentUnit === 'lbs') {
                     const val = parseFloat(weightInput.value);

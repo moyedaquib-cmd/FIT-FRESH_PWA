@@ -12,6 +12,7 @@
             <h2>Workout History</h2>
         </div>
         <div class="page-header-actions">
+            <!-- Inline toggle button container enabling instantaneous client-side mass conversions -->
             <div class="unit-toggle" id="unitToggle">
                 <button type="button" class="unit-btn active" data-unit="kg">kg</button>
                 <button type="button" class="unit-btn" data-unit="lbs">lbs</button>
@@ -22,9 +23,11 @@
     {% if workouts %}
     {% for date_key, formatted_date, day_workouts in grouped_workouts %}
     <div class="date-group"> 
+        <!-- Separates records by date -->
         <div class="date-group-heading"> 
             <i class="ti ti-calendar-event"></i>
             <span>{{ formatted_date }}</span>
+             <!-- Dynamically tracks and appends a grammatical pluralised suffix string matching training items -->
             <span class="date-group-count">{{ day_workouts | length }} workout{{ 's' if day_workouts | length != 1 else '' }}</span>
         </div>
         <div class="table-wrap">
@@ -64,6 +67,7 @@
     </div>
     {% endfor %}
     {% else %}
+    <!-- Placeholder view generated automatically when no data is added -->
     <div class="empty-state">
         <div class="empty-state-icon"><i class="ti ti-barbell" aria-hidden="true"></i></div>
         <h3>No Workouts Logged</h3>
@@ -76,16 +80,20 @@
 {% block head %}
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        
+        // Mathematical constant rule to translate metric base masses over to imperial measures
         const KG_TO_LBS = 2.20462; 
         const toggle = document.getElementById('unitToggle');
         if (!toggle) return;
         const buttons = toggle.querySelectorAll('.unit-btn');
         
+        // Handles rounding fractions precisely to prevent messy micro-decimal trailing strings
         function fmt(n) {
             const rounded = Math.round(n * 100) / 100;
             return rounded % 1 === 0 ? rounded.toString() : rounded.toString();
         }
         
+        // Cycles layout selectors to recalculate text nodes without reloading webpage frames
         function setUnit(unit) {
             document.querySelectorAll('.weight-value').forEach(el => {
                 const kg = parseFloat(el.dataset.kg);

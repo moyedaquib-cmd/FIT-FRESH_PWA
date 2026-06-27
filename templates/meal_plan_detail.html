@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 {% block title %}{{ plan.name }} — Fit & Fresh{% endblock %}
 {% block content %}
+
+
 <div class="page">
     <a href="{{ url_for('meal_plans') }}" class="back-link">← Back to Meal Plans</a>
- 
     <div class="detail-hero">
         {% if plan.image_url %}
         <img src="{{ plan.image_url }}" class="detail-hero-img" alt="{{ plan.name }}">
@@ -19,7 +20,6 @@
                 <button type="submit" class="btn btn-outline btn-sm">☆ Add to Favourites</button>
                 {% endif %}
             </form>
-
             {% if is_owner %}
             <div class="owner-actions">
                 <button type="button" class="btn btn-outline btn-sm" onclick="toggleEdit()">✎ Edit</button>
@@ -30,7 +30,6 @@
             {% endif %}
         </div>
     </div>
- 
     {% if is_owner %}
     <div class="detail-section" id="editForm" style="display:none;">
         <h3>Edit Meal Plan</h3>
@@ -50,6 +49,7 @@
                 </label>
                 <input name="image_url" class="form-control" value="{{ plan.image_url or '' }}">
             </div>
+            <!-- Iterates through specific meals to re-compile multi-line edit values -->
             <div class="form-group">
                 <label class="form-label">
                     <i class="ti ti-sunrise"></i>
@@ -79,6 +79,7 @@
     </div>
     {% endif %}
 
+    <!-- Segragates diet listings by date -->
     <div class="detail-section">
         <h3>Meals Included</h3>
         {% if grouped_meals %}
@@ -102,7 +103,6 @@
         <p style="color:var(--text-muted);font-size:0.9rem;">No meals listed for this plan.</p>
         {% endif %}
     </div>
- 
     <div class="detail-section">
         <h3>Reviews</h3>
         {% if session.user_id and not is_owner and not has_reviewed %}
@@ -128,7 +128,6 @@
         {% elif is_owner %}
         <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem;">You can't review your own content.</p>
         {% endif %}
- 
         {% if reviews %}
         <div class="reviews-list">
             {% for review in reviews %}
