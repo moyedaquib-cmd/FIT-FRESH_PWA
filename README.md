@@ -42,7 +42,6 @@ with app.app_context():
 exit()
 ```
 
-*(A pre-built database with sample data may already be included in the `instance/` folder, in which case this step can be skipped.)*
 
 ### 3. Start the application
 
@@ -69,7 +68,7 @@ Open the address above in your web browser.
 3. **Gym Goers** can log workouts and calories, browse content, and favourite/review items.
 4. **Personal Trainers** can additionally upload exercises, meal plans and routines via the **Add Content** page.
 
-### Installing as a PWA (optional)
+### Installing as a PWA
 
 In Chrome, an **install icon** appears in the address bar. Clicking it installs Fit & Fresh as a standalone app. Once visited, pages are cached and remain viewable offline.
 
