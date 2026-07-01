@@ -1019,6 +1019,6 @@ def logout():
 
 #Constructs the initial local database tables before launching the active server
 if __name__ == "__main__" : 
-    #with app.app_context():
-        #init_db()
+    with app.app_context():
+        init_db()
     app.run(debug = True)

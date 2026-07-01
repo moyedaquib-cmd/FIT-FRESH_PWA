@@ -411,7 +411,7 @@ td {padding: 0.85rem 1rem; font-size: 0.9rem; color: var(--text); vertical-align
 /* Links distinct background wallpaper images stored in the local static directory to the home page and trainer / gym-goer dashboards. */
 .bg-home::before    { background-image: url("/static/images/IMG1.jpg"); }
 .bg-trainer::before { background-image: url("/static/images/IMG2.jpg"); }
-.bg-gymgoer::before { background-image: url("/static/images/IMG3.jpeg"); }
+.bg-gymgoer::before { background-image: url("/static/images/IMG3.jpg"); }
 
 /* Applies a softer dark gradient wash to maximize text contrast over the home wallpaper. */
 .bg-home.bg-image::before { opacity: 0.22; background-position: center center; } 
