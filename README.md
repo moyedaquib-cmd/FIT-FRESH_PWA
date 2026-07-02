@@ -98,3 +98,4 @@ FIT&FRESH_PWA/
 - All passwords are securely hashed (scrypt) before storage; no plaintext passwords are kept.
 - The app runs entirely locally — no internet connection or external services are required (aside from an icon CDN for display).
 - For the best experience, and to test the offline/installable PWA features, use Google Chrome.
+- The database (instance/app.db) can be inspected directly using the SQLite Viewer extension by Florian Klampfer for Visual Studio Code, which was used throughout development to browse tables and verify data. This is optional and not required to run the application.
